@@ -114,7 +114,10 @@ a{color:inherit;text-decoration:none}button{cursor:pointer;font-family:var(--fon
 .offering-location{font-size:12px;color:var(--slate2);display:flex;align-items:center;gap:4px;margin-bottom:10px}
 .offering-card-footer{display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid var(--surface2)}
 .raise-bar{height:8px;background:var(--surface2);border-radius:4px;overflow:hidden;margin-top:3px}
-.raise-fill{height:100%;background:linear-gradient(90deg,var(--navy2),#3B82F6);border-radius:2px;transition:width 0.6s ease}
+.raise-fill{height:100%;background:linear-gradient(90deg,var(--navy2),#3B82F6);border-radius:4px;animation:barFillIn 1.2s cubic-bezier(0.4,0,0.2,1) forwards}
+.timeline-bar{height:8px;background:var(--surface2);border-radius:4px;overflow:hidden;margin-top:3px}
+.timeline-fill{height:100%;background:linear-gradient(90deg,#059669,#34D399);border-radius:4px;animation:barFillIn 1.2s cubic-bezier(0.4,0,0.2,1) 0.3s forwards}
+@keyframes barFillIn{from{max-width:0}to{max-width:100%}}
 .peer-delta{font-size:10px;font-weight:600;margin-top:2px}.peer-delta.up{color:var(--green)}.peer-delta.down{color:var(--red)}.peer-delta.neutral{color:var(--fog)}
 .card-status-strip{position:absolute;top:0;left:0;right:0;height:5px}
 .card-status-strip.open{background:var(--green)}.card-status-strip.closing{background:var(--amber)}.card-status-strip.coming{background:var(--blue)}
@@ -292,11 +295,11 @@ function fmtPct(v) { return v != null && !isNaN(v) ? v.toFixed(2) + '%' : '—';
 function fmtMoney(v) { if (v == null || isNaN(v)) return '—'; if (v >= 1e6) return '$' + (v / 1e6).toFixed(1) + 'M'; if (v >= 1e3) return '$' + (v / 1e3).toFixed(0) + 'K'; return '$' + v.toLocaleString(); }
 function fmtMoneyFull(v) { return v != null && !isNaN(v) ? '$' + v.toLocaleString() : '—'; }
 function fmtNum(v, d = 2) { return v != null && !isNaN(v) ? v.toFixed(d) : '—'; }
-function parsePct(s) { if (s == null || s === '') return null; let str = String(s).trim(); let hadPct = str.includes('%'); let n = parseFloat(str.replace(/[%,]/g, '')); if (isNaN(n)) return null; if (!hadPct && Math.abs(n) < 1 && n !== 0) n = n * 100; return n; }
+function parsePct(s) { if (s == null || s === '') return null; let str = String(s).trim(); let hadPct = str.includes('%'); let n = parseFloat(str.replace(/[%,]/g, '')); if (isNaN(n)) return null; if (!hadPct && Math.abs(n) <= 1 && n !== 0) n = n * 100; return n; }
 function parseMoney(s) { if (s == null || s === '') return null; let str = String(s).trim().replace(/[$,]/g, ''); let n = parseFloat(str); if (isNaN(n)) return null; return n; }
 function parseMoneyM(s) { if (s == null || s === '') return null; let str = String(s).trim().replace(/[$,]/g, ''); let n = parseFloat(str); if (isNaN(n)) return null; if (n > 0 && n < 999) n = n * 1000000; return n; }
 function parseDate(s) { if (!s) return null; if (typeof s === 'string' && s.startsWith('Date(')) { let parts = s.replace('Date(','').replace(')','').split(',').map(Number); return new Date(parts[0], parts[1], parts[2]); } let d = new Date(s); return isNaN(d) ? null : d; }
-function peerDelta(val, avg) { if (val == null || avg == null) return ''; let d = val - avg; let arrow = d > 0.1 ? '↑' : d < -0.1 ? '↓' : '~'; let cls = d > 0.1 ? 'up' : d < -0.1 ? 'down' : 'neutral'; return `<span class="peer-delta ${cls}">${arrow} ${Math.abs(d).toFixed(1)}% vs avg</span>`; }
+function peerDelta(val, avg, unit) { if (val == null || avg == null) return ''; let d = val - avg; let u = unit || '%'; let arrow = d > 0.1 ? '↑' : d < -0.1 ? '↓' : '~'; let cls = d > 0.1 ? 'up' : d < -0.1 ? 'down' : 'neutral'; return `<span class="peer-delta ${cls}">${arrow} ${Math.abs(d).toFixed(1)}${u} vs avg</span>`; }
 function toast(msg, type = 'success') { let t = document.createElement('div'); t.className = 'toast toast-' + type; t.innerHTML = (type === 'success' ? '✓' : '⚠') + ' ' + msg; document.getElementById('toast-container').appendChild(t); setTimeout(() => t.remove(), 3200); }
 
 /* ═══════════════════════════════════════════
@@ -439,6 +442,7 @@ function computePeerStats() {
     avgMinInvest: avg(vals(f => f.minInvest)),
     avgDSCR: avg(vals(f => f.dscr)),
     avgHold: avg(vals(f => f.holdPeriod)),
+    avgLeaseTerm: avg(vals(f => f.avgLeaseTerm)),
     count: fs.length
   };
 }
@@ -796,7 +800,7 @@ function renderOfferingCard(fund, i) {
         <div class="offering-metric-item"><div class="label">Min Invest</div><div class="value">${fmtMoney(fund.minInvest)}</div></div>
         <div class="offering-metric-item"><div class="label">Hold</div><div class="value">${fund.holdPeriod ? fund.holdPeriod + ' yr' : '—'}</div></div>
       </div>
-      <div class="offering-badges"><span class="badge badge-navy">${fund.propType || 'DST'}</span>${fund.occupancy ? `<span class="badge badge-green">${fmtPct(fund.occupancy)} occ</span>` : ''}</div>
+      <div class="offering-badges"><span class="badge badge-navy">${fund.propType || 'DST'}</span>${fund.occupancy ? `<span class="badge badge-green">${fmtPct(fund.occupancy)} Occupied</span>` : ''}</div>
       <div class="offering-card-footer">
         ${pctRemaining != null ? `<div style="flex:1"><div style="font-size:11px;color:var(--slate2)">${pctRemaining}% remaining${fund.equityRemaining ? ' · ' + fmtMoney(fund.equityRemaining) : ''}</div><div class="raise-bar"><div class="raise-fill" style="width:${Math.min(100 - pctRemaining, 100)}%"></div></div></div>` : '<div style="flex:1"></div>'}
         <button class="btn btn-sm ${inBasket ? 'btn-primary' : 'btn-secondary'}" onclick="event.stopPropagation();toggleBasket(${fund.id})">${inBasket ? '✓ In Basket' : '+ Basket'}</button>
@@ -898,33 +902,55 @@ function renderOfferingDetail() {
   // ── Raise Progress & Timeline ──
   const pctRaised = fund.pctRaised; const pctRemaining = fund.pctRemaining;
   const daysRemaining = fund.closeDate ? Math.max(0, Math.round((fund.closeDate - new Date()) / 86400000)) : null;
+  const totalDays = (fund.openDate && fund.closeDate) ? Math.max(1, Math.round((fund.closeDate - fund.openDate) / 86400000)) : null;
+  const pctTimeElapsed = (totalDays && daysRemaining != null) ? Math.round(((totalDays - daysRemaining) / totalDays) * 100) : null;
+  const pctTimeRemaining = pctTimeElapsed != null ? (100 - pctTimeElapsed) : null;
   const raiseSection = `
     <div class="panel detail-section">
-      <div class="panel-title">📊 Raise Progress & Timeline</div>
-      <div class="detail-two-col">
+      <div class="panel-title">\u{1F4CA} Raise Progress & Timeline</div>
+      <div style="display:grid;gap:24px">
         <div>
+          <div style="font-size:12px;font-weight:700;color:var(--slate);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px">Capital Raise</div>
           ${pctRemaining != null ? `
-            <div style="margin-bottom:14px">
-              <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="font-weight:700;color:var(--navy)">${pctRemaining}% Remaining</span><span style="color:var(--slate2)">${fmtMoney(fund.filedRaise)} filed raise</span></div>
-              <div class="raise-bar" style="height:12px;border-radius:6px"><div class="raise-fill" style="width:${Math.min(100 - pctRemaining, 100)}%;border-radius:6px"></div></div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
+              <span style="font-weight:700;color:var(--navy)">${pctRemaining}% Remaining</span>
+              <span style="color:var(--slate2)">${100 - pctRemaining}% Raised</span>
             </div>
-            <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--slate)">
-              ${fund.equityRemaining ? `<div>Remaining: <strong style="color:var(--navy)">${fmtMoney(fund.equityRemaining)}</strong></div>` : ''}
-              ${fund.currentRaise ? `<div>Current Raise: <strong>${fmtMoney(fund.currentRaise)}</strong></div>` : ''}
-              ${fund.filedRaise ? `<div>Filed Raise: <strong>${fmtMoney(fund.filedRaise)}</strong></div>` : ''}
+            <div class="raise-bar" style="height:14px;border-radius:7px"><div class="raise-fill" style="width:${Math.min(100 - pctRemaining, 100)}%;border-radius:7px"></div></div>
+            <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:12px;color:var(--slate)">
+              <div style="display:flex;gap:14px;flex-wrap:wrap">
+                ${fund.equityRemaining ? `<span>Remaining: <strong style="color:var(--navy)">${fmtMoney(fund.equityRemaining)}</strong></span>` : ''}
+                ${fund.currentRaise ? `<span>Current Raise: <strong>${fmtMoney(fund.currentRaise)}</strong></span>` : ''}
+              </div>
+              <div>Filed Raise: <strong>${fmtMoney(fund.filedRaise)}</strong></div>
             </div>
           ` : '<div style="font-size:13px;color:var(--slate2)">Raise data not available</div>'}
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <div class="metric-tile"><div class="metric-label">Opened</div><div class="metric-value" style="font-size:15px">${fund.openDate ? fund.openDate.toLocaleDateString() : '\u2014'}</div></div>
-          <div class="metric-tile"><div class="metric-label">Est. Close</div><div class="metric-value" style="font-size:15px">${fund.closeDate ? fund.closeDate.toLocaleDateString() : '\u2014'}</div></div>
-          <div class="metric-tile"><div class="metric-label">On Market</div><div class="metric-value" style="font-size:15px">${fund.monthsOnMarket ? fund.monthsOnMarket + ' mo' : '\u2014'}</div></div>
-          <div class="metric-tile"><div class="metric-label">Days Remaining</div><div class="metric-value" style="font-size:15px">${daysRemaining != null ? daysRemaining + ' days' : '\u2014'}</div></div>
-          <div class="metric-tile"><div class="metric-label">Filed Raise</div><div class="metric-value" style="font-size:15px">${fmtMoney(fund.filedRaise)}</div></div>
-          <div class="metric-tile"><div class="metric-label">Current Raise</div><div class="metric-value" style="font-size:15px">${fmtMoney(fund.currentRaise)}</div></div>
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--slate);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px">Offering Timeline</div>
+          ${pctTimeRemaining != null ? `
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
+              <span style="font-weight:700;color:var(--navy)">${daysRemaining} Days Remaining</span>
+              <span style="color:var(--slate2)">${fund.monthsOnMarket ? fund.monthsOnMarket + ' months on market' : pctTimeElapsed + '% elapsed'}</span>
+            </div>
+            <div class="timeline-bar" style="height:14px;border-radius:7px"><div class="timeline-fill" style="width:${Math.min(pctTimeElapsed, 100)}%;border-radius:7px"></div></div>
+            <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:12px;color:var(--slate)">
+              <span>Opened: <strong>${fund.openDate ? fund.openDate.toLocaleDateString() : '\u2014'}</strong></span>
+              ${fund.monthsOnMarket ? `<span>On Market: <strong>${fund.monthsOnMarket} mo</strong></span>` : ''}
+              <span>Est. Close: <strong>${fund.closeDate ? fund.closeDate.toLocaleDateString() : '\u2014'}</strong></span>
+            </div>
+          ` : `
+            <div style="font-size:13px;color:var(--slate2)">
+              ${fund.openDate ? 'Opened: <strong>' + fund.openDate.toLocaleDateString() + '</strong>' : ''}
+              ${fund.monthsOnMarket ? ' \u00B7 On Market: <strong>' + fund.monthsOnMarket + ' mo</strong>' : ''}
+              ${fund.closeDate ? ' \u00B7 Est. Close: <strong>' + fund.closeDate.toLocaleDateString() + '</strong>' : 'Timeline data not available'}
+            </div>
+          `}
         </div>
       </div>
     </div>`;
+
+
 
 
   // ── Purchase Price & Valuation ──
@@ -965,7 +991,7 @@ function renderOfferingDetail() {
         </div>
         <div>
           <div class="metric-grid" style="grid-template-columns:1fr 1fr;gap:10px">
-            <div class="metric-tile"><div class="metric-label">Avg Lease Term</div><div class="metric-value" style="font-size:18px">${fund.avgLeaseTerm ? fmtNum(fund.avgLeaseTerm, 1) + ' yr' : '—'}</div></div>
+            <div class="metric-tile"><div class="metric-label">Avg Lease Term</div><div class="metric-value" style="font-size:18px">${fund.avgLeaseTerm ? fmtNum(fund.avgLeaseTerm, 1) + ' yr' : '—'}</div>${peerDelta(fund.avgLeaseTerm, p.avgLeaseTerm, ' yr')}</div>
             <div class="metric-tile"><div class="metric-label">Occupancy</div><div class="metric-value" style="font-size:18px">${fmtPct(fund.occupancy)}</div>${peerDelta(fund.occupancy, p.avgOccupancy)}</div>
             <div class="metric-tile" style="grid-column:1/-1"><div class="metric-label">Tenant Credit</div><div class="metric-value" style="font-size:14px">${fund.tenantCredit || '—'}</div></div>
           </div>
