@@ -113,10 +113,10 @@ a{color:inherit;text-decoration:none}button{cursor:pointer;font-family:var(--fon
 .offering-metric-item .value{font-size:16px;font-weight:700;color:var(--navy);letter-spacing:-0.02em}
 .offering-location{font-size:12px;color:var(--slate2);display:flex;align-items:center;gap:4px;margin-bottom:10px}
 .offering-card-footer{display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid var(--surface2)}
-.raise-bar{height:4px;background:var(--surface2);border-radius:2px;overflow:hidden;margin-top:3px}
+.raise-bar{height:8px;background:var(--surface2);border-radius:4px;overflow:hidden;margin-top:3px}
 .raise-fill{height:100%;background:linear-gradient(90deg,var(--navy2),#3B82F6);border-radius:2px;transition:width 0.6s ease}
 .peer-delta{font-size:10px;font-weight:600;margin-top:2px}.peer-delta.up{color:var(--green)}.peer-delta.down{color:var(--red)}.peer-delta.neutral{color:var(--fog)}
-.card-status-strip{position:absolute;top:0;left:0;right:0;height:3px}
+.card-status-strip{position:absolute;top:0;left:0;right:0;height:5px}
 .card-status-strip.open{background:var(--green)}.card-status-strip.closing{background:var(--amber)}.card-status-strip.coming{background:var(--blue)}
 .offering-table{width:100%;border-collapse:collapse;font-size:13px}
 .offering-table thead th{background:var(--surface2);padding:9px 12px;text-align:left;font-size:11px;font-weight:700;color:var(--slate2);text-transform:uppercase;letter-spacing:0.07em;border-bottom:1px solid var(--mist);white-space:nowrap;cursor:pointer;user-select:none;position:sticky;top:0;z-index:10}
@@ -279,7 +279,7 @@ const STATE = {
   basket: JSON.parse(localStorage.getItem('afl_basket') || '[]'),
   browseLayout: 'card',
   browseSort: 'y1coc_desc',
-  browseFilters: { status: 'all', propType: 'all', sponsor: 'all', cocMin: '', cocMax: '', search: '', clientEquity: false },
+  browseFilters: { status: 'all', propType: 'all', sponsor: 'all', sector: 'all', focus: 'all', cocMin: '', cocMax: '', search: '', clientEquity: false },
   incomeChart: null
 };
 
@@ -336,7 +336,15 @@ function fetchSheetData() {
         const remainingRaise = parseMoneyM(g('Remaining Raise'));
         const totalRaise = currentRaise || filedRaise;
         let pctRaised = null;
-        if (totalRaise && remainingRaise != null) pctRaised = Math.round(((totalRaise - remainingRaise) / totalRaise) * 100);
+        let pctRemaining = null;
+        if (filedRaise && remainingRaise != null) {
+          pctRemaining = Math.round((remainingRaise / filedRaise) * 100);
+          pctRaised = 100 - pctRemaining;
+          if (pctRemaining < 0) pctRemaining = 0;
+          if (pctRemaining > 100) pctRemaining = 100;
+          if (pctRaised < 0) pctRaised = 0;
+          if (pctRaised > 100) pctRaised = 100;
+        }
 
         // Compute months on market
         let monthsOnMarket = null;
@@ -359,6 +367,7 @@ function fetchSheetData() {
           currentRaise: currentRaise,
           equityRemaining: remainingRaise,
           pctRaised: pctRaised,
+          pctRemaining: pctRemaining,
           ltv: parsePct(g('Loan to Value')),
           dscr: null,
           dscrStress: null,
@@ -670,6 +679,8 @@ function getFilteredFunds() {
   if (f.status !== 'all') funds = funds.filter(x => x.status === f.status);
   if (f.propType !== 'all') funds = funds.filter(x => x.propType.toLowerCase().includes(f.propType.toLowerCase()));
   if (f.sponsor !== 'all') funds = funds.filter(x => x.sponsor === f.sponsor);
+  if (f.sector !== 'all') funds = funds.filter(x => x.sector === f.sector);
+  if (f.focus !== 'all') funds = funds.filter(x => x.focus === f.focus);
   if (f.cocMin) funds = funds.filter(x => x.y1coc != null && x.y1coc >= parseFloat(f.cocMin));
   if (f.cocMax) funds = funds.filter(x => x.y1coc != null && x.y1coc <= parseFloat(f.cocMax));
   if (f.clientEquity && STATE.client.exchangeAmount) funds = funds.filter(x => x.minInvest && x.minInvest <= STATE.client.exchangeAmount);
@@ -691,11 +702,15 @@ function renderBrowse() {
   const funds = getFilteredFunds();
   const sponsors = [...new Set(STATE.funds.map(f => f.sponsor).filter(Boolean))].sort();
   const propTypes = [...new Set(STATE.funds.map(f => f.propType).filter(Boolean))].sort();
+  const sectors = [...new Set(STATE.funds.map(f => f.sector).filter(Boolean))].sort();
+  const focuses = [...new Set(STATE.funds.map(f => f.focus).filter(Boolean))].sort();
   const f = STATE.browseFilters;
   const activeFilters = [];
   if (f.status !== 'all') activeFilters.push({ label: f.status, key: 'status' });
   if (f.propType !== 'all') activeFilters.push({ label: f.propType, key: 'propType' });
   if (f.sponsor !== 'all') activeFilters.push({ label: f.sponsor, key: 'sponsor' });
+  if (f.sector !== 'all') activeFilters.push({ label: f.sector, key: 'sector' });
+  if (f.focus !== 'all') activeFilters.push({ label: f.focus, key: 'focus' });
   if (f.cocMin || f.cocMax) activeFilters.push({ label: `CoC ${f.cocMin || '0'}–${f.cocMax || '∞'}%`, key: 'coc' });
   if (f.clientEquity) activeFilters.push({ label: 'Fits Exchange', key: 'clientEquity' });
 
@@ -715,6 +730,14 @@ function renderBrowse() {
       <select class="filter-select" onchange="STATE.browseFilters.sponsor=this.value;renderApp()">
         <option value="all" ${f.sponsor === 'all' ? 'selected' : ''}>All Sponsors</option>
         ${sponsors.map(s => `<option value="${s}" ${f.sponsor === s ? 'selected' : ''}>${s}</option>`).join('')}
+      </select>
+      <select class="filter-select" onchange="STATE.browseFilters.sector=this.value;renderApp()">
+        <option value="all" ${f.sector === 'all' ? 'selected' : ''}>All Sectors</option>
+        ${sectors.map(s => `<option value="${s}" ${f.sector === s ? 'selected' : ''}>${s}</option>`).join('')}
+      </select>
+      <select class="filter-select" onchange="STATE.browseFilters.focus=this.value;renderApp()">
+        <option value="all" ${f.focus === 'all' ? 'selected' : ''}>All Focus</option>
+        ${focuses.map(s => `<option value="${s}" ${f.focus === s ? 'selected' : ''}>${s}</option>`).join('')}
       </select>
     </div>
     <div class="filter-row-2">
@@ -758,7 +781,7 @@ function clearFilter(key) {
 function renderOfferingCard(fund, i) {
   const inBasket = STATE.basket.includes(fund.id);
   const statusCls = fund.status === 'Open' ? 'open' : fund.status === 'Closing' ? 'closing' : 'coming';
-  const pctRaised = fund.pctRaised || (fund.totalRaise && fund.equityRemaining ? Math.round(((fund.totalRaise - fund.equityRemaining) / fund.totalRaise) * 100) : null);
+  const pctRaised = fund.pctRaised; const pctRemaining = fund.pctRemaining;
   return `
     <div class="offering-card card-enter" style="animation-delay:${Math.min(i * 0.04, 0.5)}s" onclick="navigateTo('offering_detail',${fund.id})">
       <div class="card-status-strip ${statusCls}"></div>
@@ -775,7 +798,7 @@ function renderOfferingCard(fund, i) {
       </div>
       <div class="offering-badges"><span class="badge badge-navy">${fund.propType || 'DST'}</span>${fund.occupancy ? `<span class="badge badge-green">${fmtPct(fund.occupancy)} occ</span>` : ''}</div>
       <div class="offering-card-footer">
-        ${pctRaised != null ? `<div style="flex:1"><div style="font-size:11px;color:var(--slate2)">${100 - pctRaised}% remaining${fund.equityRemaining ? ' · ' + fmtMoney(fund.equityRemaining) : ''}</div><div class="raise-bar"><div class="raise-fill" style="width:${Math.min(pctRaised, 100)}%"></div></div></div>` : '<div style="flex:1"></div>'}
+        ${pctRemaining != null ? `<div style="flex:1"><div style="font-size:11px;color:var(--slate2)">${pctRemaining}% remaining${fund.equityRemaining ? ' · ' + fmtMoney(fund.equityRemaining) : ''}</div><div class="raise-bar"><div class="raise-fill" style="width:${Math.min(100 - pctRemaining, 100)}%"></div></div></div>` : '<div style="flex:1"></div>'}
         <button class="btn btn-sm ${inBasket ? 'btn-primary' : 'btn-secondary'}" onclick="event.stopPropagation();toggleBasket(${fund.id})">${inBasket ? '✓ In Basket' : '+ Basket'}</button>
       </div>
     </div>`;
@@ -873,28 +896,36 @@ function renderOfferingDetail() {
   </div>`;
 
   // ── Raise Progress & Timeline ──
-  const pctRaised = fund.pctRaised || (fund.totalRaise && fund.equityRemaining ? Math.round(((fund.totalRaise - fund.equityRemaining) / fund.totalRaise) * 100) : null);
+  const pctRaised = fund.pctRaised; const pctRemaining = fund.pctRemaining;
+  const daysRemaining = fund.closeDate ? Math.max(0, Math.round((fund.closeDate - new Date()) / 86400000)) : null;
   const raiseSection = `
     <div class="panel detail-section">
       <div class="panel-title">📊 Raise Progress & Timeline</div>
       <div class="detail-two-col">
         <div>
-          ${pctRaised != null ? `
+          ${pctRemaining != null ? `
             <div style="margin-bottom:14px">
-              <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="font-weight:700;color:var(--navy)">${100 - pctRaised}% Remaining</span><span style="color:var(--slate2)">${fmtMoney(fund.totalRaise)} total raise</span></div>
-              <div class="raise-bar" style="height:8px"><div class="raise-fill" style="width:${Math.min(pctRaised, 100)}%"></div></div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="font-weight:700;color:var(--navy)">${pctRemaining}% Remaining</span><span style="color:var(--slate2)">${fmtMoney(fund.filedRaise)} filed raise</span></div>
+              <div class="raise-bar" style="height:12px;border-radius:6px"><div class="raise-fill" style="width:${Math.min(100 - pctRemaining, 100)}%;border-radius:6px"></div></div>
             </div>
-            ${fund.equityRemaining ? `<div style="font-size:12.5px;color:var(--slate)">Remaining equity: <strong style="color:var(--navy)">${fmtMoney(fund.equityRemaining)}</strong></div>` : ''}
+            <div style="display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--slate)">
+              ${fund.equityRemaining ? `<div>Remaining: <strong style="color:var(--navy)">${fmtMoney(fund.equityRemaining)}</strong></div>` : ''}
+              ${fund.currentRaise ? `<div>Current Raise: <strong>${fmtMoney(fund.currentRaise)}</strong></div>` : ''}
+              ${fund.filedRaise ? `<div>Filed Raise: <strong>${fmtMoney(fund.filedRaise)}</strong></div>` : ''}
+            </div>
           ` : '<div style="font-size:13px;color:var(--slate2)">Raise data not available</div>'}
         </div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <div class="metric-tile"><div class="metric-label">Opened</div><div class="metric-value" style="font-size:15px">${fund.openDate ? fund.openDate.toLocaleDateString() : '—'}</div></div>
-          <div class="metric-tile"><div class="metric-label">Est. Close</div><div class="metric-value" style="font-size:15px">${fund.closeDate ? fund.closeDate.toLocaleDateString() : '—'}</div></div>
-          <div class="metric-tile"><div class="metric-label">On Market</div><div class="metric-value" style="font-size:15px">${fund.monthsOnMarket ? fund.monthsOnMarket + ' mo' : '—'}</div></div>
-          <div class="metric-tile"><div class="metric-label">Total Raise</div><div class="metric-value" style="font-size:15px">${fmtMoney(fund.totalRaise)}</div></div>
+          <div class="metric-tile"><div class="metric-label">Opened</div><div class="metric-value" style="font-size:15px">${fund.openDate ? fund.openDate.toLocaleDateString() : '\u2014'}</div></div>
+          <div class="metric-tile"><div class="metric-label">Est. Close</div><div class="metric-value" style="font-size:15px">${fund.closeDate ? fund.closeDate.toLocaleDateString() : '\u2014'}</div></div>
+          <div class="metric-tile"><div class="metric-label">On Market</div><div class="metric-value" style="font-size:15px">${fund.monthsOnMarket ? fund.monthsOnMarket + ' mo' : '\u2014'}</div></div>
+          <div class="metric-tile"><div class="metric-label">Days Remaining</div><div class="metric-value" style="font-size:15px">${daysRemaining != null ? daysRemaining + ' days' : '\u2014'}</div></div>
+          <div class="metric-tile"><div class="metric-label">Filed Raise</div><div class="metric-value" style="font-size:15px">${fmtMoney(fund.filedRaise)}</div></div>
+          <div class="metric-tile"><div class="metric-label">Current Raise</div><div class="metric-value" style="font-size:15px">${fmtMoney(fund.currentRaise)}</div></div>
         </div>
       </div>
     </div>`;
+
 
   // ── Purchase Price & Valuation ──
   const valDiscount = (fund.appraisedValue && fund.purchasePrice) ? ((fund.appraisedValue - fund.purchasePrice) / fund.appraisedValue * 100) : null;
@@ -1062,7 +1093,7 @@ function generateKeyDrivers(fund) {
   }
 
   // Raise momentum
-  const pctRaised = fund.pctRaised || (fund.totalRaise && fund.equityRemaining ? Math.round(((fund.totalRaise - fund.equityRemaining) / fund.totalRaise) * 100) : null);
+  const pctRaised = fund.pctRaised; const pctRemaining = fund.pctRemaining;
   if (pctRaised != null) {
     if (pctRaised >= 85) d.push({ cls: 'caution', icon: '🔥', text: `${pctRaised}% raised — limited equity remaining, act promptly if interested` });
     else if (pctRaised >= 50) d.push({ cls: 'info', icon: '📊', text: `${pctRaised}% raised — moderate market adoption, equity still available` });
