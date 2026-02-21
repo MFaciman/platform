@@ -313,47 +313,96 @@ function fetchSheetData() {
       const cols = json.table.cols.map(c => c.label || '');
       const rows = json.table.rows;
       STATE.funds = rows.map((row, idx) => {
-        const g = (label) => { let ci = cols.indexOf(label); return ci >= 0 && row.c[ci] ? (row.c[ci].v ?? null) : null; };
+        const g = (label) => { let ci = cols.findIndex(c => c.trim() === label.trim()); return ci >= 0 && row.c[ci] ? (row.c[ci].v ?? null) : null; };
         const income = [];
-        for (let y = 1; y <= 10; y++) { let val = parsePct(g(`Y${y} CoC`)); if (y === 1 && val == null) val = parsePct(g('Y1 Cash on Cash')); income.push(val); }
+        for (let y = 1; y <= 10; y++) { income.push(parsePct(g('Year ' + y))); }
+        if (income[0] == null) income[0] = parsePct(g('Year 1 Cash on Cash'));
+
+        // Status: derive from dates + structure
         let status = 'Open';
-        const rawStatus = g('Status');
-        if (rawStatus) { let s = rawStatus.toLowerCase(); if (s.includes('clos')) status = 'Closing'; else if (s.includes('com') || s.includes('soon')) status = 'Coming Soon'; else if (s.includes('open')) status = 'Open'; }
+        const oClose = parseDate(g('Offering Close'));
+        const oOpen = parseDate(g('Offering Open'));
+        const struct = g('Offering Structure') || '';
+        const now = new Date();
+        if (oOpen && oOpen > now) status = 'Coming Soon';
+        else if (oClose && oClose < now) status = 'Closed';
+        else if (oClose) { const daysLeft = (oClose - now) / 86400000; if (daysLeft < 60) status = 'Closing'; }
+
+        // Compute pctRaised from Filed vs Remaining
+        const filedRaise = parseMoney(g('Filed Raise'));
+        const currentRaise = parseMoney(g('Current Raise'));
+        const remainingRaise = parseMoney(g('Remaining Raise'));
+        const totalRaise = currentRaise || filedRaise;
+        let pctRaised = null;
+        if (totalRaise && remainingRaise != null) pctRaised = Math.round(((totalRaise - remainingRaise) / totalRaise) * 100);
+
+        // Compute months on market
+        let monthsOnMarket = null;
+        if (oOpen) { monthsOnMarket = Math.round((now - oOpen) / (30.44 * 86400000)); if (monthsOnMarket < 0) monthsOnMarket = null; }
+
         return {
           id: idx,
-          name: g('Offering Name') || g('DST Name') || 'Unnamed',
+          name: g('Offering Name') || 'Unnamed',
           sponsor: g('Sponsor') || '',
           status: status,
-          propType: g('Property Type') || '',
-          location: g('Location') || '',
-          y1coc: income[0],
-          avgCoc: parsePct(g('Avg CoC')) || parsePct(g('Average CoC')),
-          minInvest: parseMoney(g('Minimum Investment')) || parseMoney(g('Min Investment')),
-          totalRaise: parseMoney(g('Total Raise')) || parseMoney(g('Equity Raise')),
-          equityRemaining: parseMoney(g('Equity Remaining')),
-          pctRaised: parsePct(g('% Raised')) || parsePct(g('Pct Raised')),
-          ltv: parsePct(g('LTV')) || parsePct(g('Loan to Value')),
-          dscr: parseFloat(g('DSCR')) || null,
-          dscrStress: parseFloat(g('DSCR Stress')) || null,
+          propType: g('Asset Class') || '',
+          sector: g('Sector') || '',
+          focus: g('Focus') || '',
+          location: g('Property Location(s)') || '',
+          y1coc: parsePct(g('Year 1 Cash on Cash')),
+          avgCoc: null,
+          minInvest: parseMoney(g('Minimum - DST')),
+          totalRaise: totalRaise,
+          filedRaise: filedRaise,
+          currentRaise: currentRaise,
+          equityRemaining: remainingRaise,
+          pctRaised: pctRaised,
+          ltv: parsePct(g('Loan to Value')),
+          dscr: null,
+          dscrStress: null,
           holdPeriod: parseInt(g('Hold Period')) || null,
-          occupancy: parsePct(g('Occupancy')) || parsePct(g('% Leased')),
-          purchasePrice: parseMoney(g('Purchase Price')),
-          appraisedValue: parseMoney(g('Appraised Value')),
-          loadedPrice: parseMoney(g('Loaded Price')) || parseMoney(g('Total Offering Price')),
-          units: parseInt(g('Units')) || null,
-          sqft: parseMoney(g('Square Feet')) || parseMoney(g('Sq Ft')),
-          pricePerUnit: parseMoney(g('Price Per Unit')),
-          pricePerSqFt: parseMoney(g('Price Per SF')) || parseMoney(g('Price Per Sq Ft')),
-          avgLeaseTerm: parseFloat(g('Avg Lease Term')) || null,
-          tenantCredit: g('Tenant Credit') || g('Credit Rating') || '',
-          brochureUrl: g('Brochure URL') || g('Brochure'),
-          ppmUrl: g('PPM URL') || g('PPM'),
-          trackRecordUrl: g('Track Record URL'),
-          sponsorNewsUrl: g('Sponsor News URL'),
-          salesTeamUrl: g('Sales Team URL'),
-          openDate: parseDate(g('Open Date')),
-          closeDate: parseDate(g('Close Date')),
-          monthsOnMarket: parseInt(g('Months on Market')) || null,
+          occupancy: parsePct(g('% Leased')),
+          purchasePrice: parseMoney(g('Purchase Price (Unloaded)')),
+          appraisedValue: parseMoney(g('Appraised Valuation')),
+          loadedPrice: parseMoney(g('Loaded Price')),
+          units: parseInt(g('# Assets')) || null,
+          sqft: null,
+          pricePerUnit: null,
+          pricePerSqFt: null,
+          acqCapRate: parsePct(g('Acquisition Cap Rate')),
+          avgLeaseTerm: parseFloat(g('Average Lease Term Remaining')) || null,
+          tenantCredit: '',
+          leaseTerms: g('Lease Terms') || '',
+          debtTerms: g('Debt Terms') || '',
+          rentEscalations: g('Rent Escalations') || '',
+          distFrequency: g('Distribution Frequency') || '',
+          preferred: g('Preferred') || '',
+          promote: g('Promote') || '',
+          upReit: g('721 UpREIT') || '',
+          exemption: g('Exemption') || '',
+          taxReporting: g('Tax Reporting') || '',
+          repComp: g('Rep Comp') || '',
+          salesLoad: g('Sales Load') || '',
+          reserve: g('Reserve') || '',
+          gpCommit: g('GP Commit') || '',
+          buildingAge: g('Building Age (Avg)') || '',
+          brochureUrl: g('Brochure'),
+          ppmUrl: g('PPM'),
+          trackRecordUrl: g('Track Record'),
+          salesTeamUrl: g('Sales Team Map'),
+          videoUrl: g('Video'),
+          sponsorNewsUrl: g('Sponsor News'),
+          aiChatUrl: g('AI Offering Chat'),
+          sponsorAum: g('Sponsor AUM') || '',
+          sponsorOfferings: g('Number of Sponsor Offerings') || '',
+          sponsorExits: g('Sponsor Full Cycle Exits') || '',
+          sponsorAvgIrr: g('Sponsor Average IRR') || '',
+          sponsorBestIrr: g('Sponsor Best IRR') || '',
+          sponsorWorstIrr: g('Sponsor Worst IRR') || '',
+          sponsorExperience: g('Sponsor Experience') || '',
+          openDate: oOpen,
+          closeDate: oClose,
+          monthsOnMarket: monthsOnMarket,
           income: income,
           _raw: row.c
         };
@@ -808,8 +857,10 @@ function renderOfferingDetail() {
     { label: 'Brochure', url: fund.brochureUrl, icon: '📄' },
     { label: 'PPM', url: fund.ppmUrl, icon: '📋' },
     { label: 'Track Record', url: fund.trackRecordUrl, icon: '📊' },
+    { label: 'Sales Team', url: fund.salesTeamUrl, icon: '👥' },
+    { label: 'Video', url: fund.videoUrl, icon: '🎬' },
     { label: 'Sponsor News', url: fund.sponsorNewsUrl, icon: '📰' },
-    { label: 'Sales Team', url: fund.salesTeamUrl, icon: '👥' }
+    { label: 'AI Chat', url: fund.aiChatUrl, icon: '🤖' }
   ];
   const docRow = `<div class="doc-btn-row"><span class="doc-label">Documents</span>${docBtns.map(d => `<button class="btn btn-sm btn-secondary" ${d.url ? `onclick="window.open('${d.url}','_blank')"` : 'disabled style="opacity:0.4"'}>${d.icon} ${d.label}</button>`).join('')}</div>`;
   const actionBar = `<div class="action-bar">
@@ -1098,7 +1149,19 @@ function generateNarrativeFinancial(fund) {
 }
 
 function generateSponsorNarrative(fund) {
-  return `<strong>${fund.sponsor}</strong> is a DST program sponsor active on the Alts Fund Link platform. ${fund.trackRecordUrl ? 'Detailed track record documentation is available via the document links above. ' : ''}Comprehensive sponsor due diligence — including historical performance, AUM, completed program count, and investor return history — will be available through the enhanced Sponsor Intelligence module in Phase 2.`;
+  let text = `<strong>${fund.sponsor}</strong> is a DST program sponsor active on the Alts Fund Link platform.`;
+  if (fund.sponsorAum) text += ` The firm manages approximately <strong>${fund.sponsorAum}</strong> in assets under management.`;
+  if (fund.sponsorOfferings) text += ` They have launched <strong>${fund.sponsorOfferings}</strong> offerings`;
+  if (fund.sponsorExits) text += ` with <strong>${fund.sponsorExits}</strong> full-cycle exits to date.`;
+  else text += '.';
+  if (fund.sponsorAvgIrr) text += ` Historical average IRR is <strong>${fund.sponsorAvgIrr}</strong>`;
+  if (fund.sponsorBestIrr) text += ` (best: ${fund.sponsorBestIrr}`;
+  if (fund.sponsorWorstIrr) text += `, worst: ${fund.sponsorWorstIrr})`;
+  else if (fund.sponsorBestIrr) text += ')';
+  if (fund.sponsorAvgIrr) text += '.';
+  if (fund.sponsorExperience) text += `<br><br><strong>Experience:</strong> ${fund.sponsorExperience}`;
+  if (fund.trackRecordUrl) text += '<br><br>Detailed track record documentation is available via the document links above.';
+  return text;
 }
 
 /* ═══════════════════════════════════════════
