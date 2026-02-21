@@ -292,9 +292,10 @@ function fmtPct(v) { return v != null && !isNaN(v) ? v.toFixed(2) + '%' : '—';
 function fmtMoney(v) { if (v == null || isNaN(v)) return '—'; if (v >= 1e6) return '$' + (v / 1e6).toFixed(1) + 'M'; if (v >= 1e3) return '$' + (v / 1e3).toFixed(0) + 'K'; return '$' + v.toLocaleString(); }
 function fmtMoneyFull(v) { return v != null && !isNaN(v) ? '$' + v.toLocaleString() : '—'; }
 function fmtNum(v, d = 2) { return v != null && !isNaN(v) ? v.toFixed(d) : '—'; }
-function parsePct(s) { if (!s) return null; let n = parseFloat(String(s).replace(/[%,]/g, '')); return isNaN(n) ? null : n; }
-function parseMoney(s) { if (!s) return null; let n = parseFloat(String(s).replace(/[$,]/g, '')); return isNaN(n) ? null : n; }
-function parseDate(s) { if (!s) return null; let d = new Date(s); return isNaN(d) ? null : d; }
+function parsePct(s) { if (s == null || s === '') return null; let str = String(s).trim(); let hadPct = str.includes('%'); let n = parseFloat(str.replace(/[%,]/g, '')); if (isNaN(n)) return null; if (!hadPct && Math.abs(n) < 1 && n !== 0) n = n * 100; return n; }
+function parseMoney(s) { if (s == null || s === '') return null; let str = String(s).trim().replace(/[$,]/g, ''); let n = parseFloat(str); if (isNaN(n)) return null; return n; }
+function parseMoneyM(s) { if (s == null || s === '') return null; let str = String(s).trim().replace(/[$,]/g, ''); let n = parseFloat(str); if (isNaN(n)) return null; if (n > 0 && n < 999) n = n * 1000000; return n; }
+function parseDate(s) { if (!s) return null; if (typeof s === 'string' && s.startsWith('Date(')) { let parts = s.replace('Date(','').replace(')','').split(',').map(Number); return new Date(parts[0], parts[1], parts[2]); } let d = new Date(s); return isNaN(d) ? null : d; }
 function peerDelta(val, avg) { if (val == null || avg == null) return ''; let d = val - avg; let arrow = d > 0.1 ? '↑' : d < -0.1 ? '↓' : '~'; let cls = d > 0.1 ? 'up' : d < -0.1 ? 'down' : 'neutral'; return `<span class="peer-delta ${cls}">${arrow} ${Math.abs(d).toFixed(1)}% vs avg</span>`; }
 function toast(msg, type = 'success') { let t = document.createElement('div'); t.className = 'toast toast-' + type; t.innerHTML = (type === 'success' ? '✓' : '⚠') + ' ' + msg; document.getElementById('toast-container').appendChild(t); setTimeout(() => t.remove(), 3200); }
 
@@ -314,14 +315,15 @@ function fetchSheetData() {
       const rows = json.table.rows;
       STATE.funds = rows.map((row, idx) => {
         const g = (label) => { let ci = cols.findIndex(c => c.trim() === label.trim()); return ci >= 0 && row.c[ci] ? (row.c[ci].v ?? null) : null; };
+        const gf = (label) => { let ci = cols.findIndex(c => c.trim() === label.trim()); return ci >= 0 && row.c[ci] ? (row.c[ci].f || row.c[ci].v || null) : null; };
         const income = [];
         for (let y = 1; y <= 10; y++) { income.push(parsePct(g('Year ' + y))); }
         if (income[0] == null) income[0] = parsePct(g('Year 1 Cash on Cash'));
 
         // Status: derive from dates + structure
         let status = 'Open';
-        const oClose = parseDate(g('Offering Close'));
-        const oOpen = parseDate(g('Offering Open'));
+        const oClose = parseDate(gf('Offering Close'));
+        const oOpen = parseDate(gf('Offering Open'));
         const struct = g('Offering Structure') || '';
         const now = new Date();
         if (oOpen && oOpen > now) status = 'Coming Soon';
@@ -329,9 +331,9 @@ function fetchSheetData() {
         else if (oClose) { const daysLeft = (oClose - now) / 86400000; if (daysLeft < 60) status = 'Closing'; }
 
         // Compute pctRaised from Filed vs Remaining
-        const filedRaise = parseMoney(g('Filed Raise'));
-        const currentRaise = parseMoney(g('Current Raise'));
-        const remainingRaise = parseMoney(g('Remaining Raise'));
+        const filedRaise = parseMoneyM(g('Filed Raise'));
+        const currentRaise = parseMoneyM(g('Current Raise'));
+        const remainingRaise = parseMoneyM(g('Remaining Raise'));
         const totalRaise = currentRaise || filedRaise;
         let pctRaised = null;
         if (totalRaise && remainingRaise != null) pctRaised = Math.round(((totalRaise - remainingRaise) / totalRaise) * 100);
@@ -362,9 +364,9 @@ function fetchSheetData() {
           dscrStress: null,
           holdPeriod: parseInt(g('Hold Period')) || null,
           occupancy: parsePct(g('% Leased')),
-          purchasePrice: parseMoney(g('Purchase Price (Unloaded)')),
-          appraisedValue: parseMoney(g('Appraised Valuation')),
-          loadedPrice: parseMoney(g('Loaded Price')),
+          purchasePrice: parseMoneyM(g('Purchase Price (Unloaded)')),
+          appraisedValue: parseMoneyM(g('Appraised Valuation')),
+          loadedPrice: parseMoneyM(g('Loaded Price')),
           units: parseInt(g('# Assets')) || null,
           sqft: null,
           pricePerUnit: null,
@@ -396,9 +398,9 @@ function fetchSheetData() {
           sponsorAum: g('Sponsor AUM') || '',
           sponsorOfferings: g('Number of Sponsor Offerings') || '',
           sponsorExits: g('Sponsor Full Cycle Exits') || '',
-          sponsorAvgIrr: g('Sponsor Average IRR') || '',
-          sponsorBestIrr: g('Sponsor Best IRR') || '',
-          sponsorWorstIrr: g('Sponsor Worst IRR') || '',
+          sponsorAvgIrr: parsePct(g('Sponsor Average IRR')),
+          sponsorBestIrr: parsePct(g('Sponsor Best IRR')),
+          sponsorWorstIrr: parsePct(g('Sponsor Worst IRR')),
           sponsorExperience: g('Sponsor Experience') || '',
           openDate: oOpen,
           closeDate: oClose,
@@ -773,7 +775,7 @@ function renderOfferingCard(fund, i) {
       </div>
       <div class="offering-badges"><span class="badge badge-navy">${fund.propType || 'DST'}</span>${fund.occupancy ? `<span class="badge badge-green">${fmtPct(fund.occupancy)} occ</span>` : ''}</div>
       <div class="offering-card-footer">
-        ${pctRaised != null ? `<div style="flex:1"><div style="font-size:11px;color:var(--slate2)">${pctRaised}% raised</div><div class="raise-bar"><div class="raise-fill" style="width:${Math.min(pctRaised, 100)}%"></div></div></div>` : '<div style="flex:1"></div>'}
+        ${pctRaised != null ? `<div style="flex:1"><div style="font-size:11px;color:var(--slate2)">${100 - pctRaised}% remaining${fund.equityRemaining ? ' · ' + fmtMoney(fund.equityRemaining) : ''}</div><div class="raise-bar"><div class="raise-fill" style="width:${Math.min(pctRaised, 100)}%"></div></div></div>` : '<div style="flex:1"></div>'}
         <button class="btn btn-sm ${inBasket ? 'btn-primary' : 'btn-secondary'}" onclick="event.stopPropagation();toggleBasket(${fund.id})">${inBasket ? '✓ In Basket' : '+ Basket'}</button>
       </div>
     </div>`;
@@ -879,7 +881,7 @@ function renderOfferingDetail() {
         <div>
           ${pctRaised != null ? `
             <div style="margin-bottom:14px">
-              <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="font-weight:700;color:var(--navy)">${pctRaised}% Raised</span><span style="color:var(--slate2)">${fmtMoney(fund.totalRaise)} total raise</span></div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px"><span style="font-weight:700;color:var(--navy)">${100 - pctRaised}% Remaining</span><span style="color:var(--slate2)">${fmtMoney(fund.totalRaise)} total raise</span></div>
               <div class="raise-bar" style="height:8px"><div class="raise-fill" style="width:${Math.min(pctRaised, 100)}%"></div></div>
             </div>
             ${fund.equityRemaining ? `<div style="font-size:12.5px;color:var(--slate)">Remaining equity: <strong style="color:var(--navy)">${fmtMoney(fund.equityRemaining)}</strong></div>` : ''}
@@ -1154,9 +1156,9 @@ function generateSponsorNarrative(fund) {
   if (fund.sponsorOfferings) text += ` They have launched <strong>${fund.sponsorOfferings}</strong> offerings`;
   if (fund.sponsorExits) text += ` with <strong>${fund.sponsorExits}</strong> full-cycle exits to date.`;
   else text += '.';
-  if (fund.sponsorAvgIrr) text += ` Historical average IRR is <strong>${fund.sponsorAvgIrr}</strong>`;
-  if (fund.sponsorBestIrr) text += ` (best: ${fund.sponsorBestIrr}`;
-  if (fund.sponsorWorstIrr) text += `, worst: ${fund.sponsorWorstIrr})`;
+  if (fund.sponsorAvgIrr) text += ` Historical average IRR is <strong>${fmtPct(fund.sponsorAvgIrr)}</strong>`;
+  if (fund.sponsorBestIrr) text += ` (best: ${fmtPct(fund.sponsorBestIrr)}`;
+  if (fund.sponsorWorstIrr) text += `, worst: ${fmtPct(fund.sponsorWorstIrr)})`;
   else if (fund.sponsorBestIrr) text += ')';
   if (fund.sponsorAvgIrr) text += '.';
   if (fund.sponsorExperience) text += `<br><br><strong>Experience:</strong> ${fund.sponsorExperience}`;
