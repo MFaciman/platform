@@ -231,6 +231,31 @@ a{color:inherit;text-decoration:none}button{cursor:pointer;font-family:var(--fon
 .doc-btn-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;padding:12px 16px;background:var(--surface);border-radius:var(--radius);border:1px solid var(--mist);align-items:center}
 .doc-btn-row .doc-label{font-size:11px;font-weight:700;color:var(--fog);text-transform:uppercase;letter-spacing:0.06em;margin-right:4px;white-space:nowrap}
 .action-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px;padding-bottom:20px;border-bottom:1px solid var(--mist)}
+/* Basket / Comparison */
+.comp-grid{display:grid;gap:0;border:1px solid var(--mist);border-radius:var(--radius-lg);overflow:hidden;background:var(--white)}
+.comp-row{display:grid;border-bottom:1px solid var(--surface2)}
+.comp-row:last-child{border-bottom:none}
+.comp-row.header{background:var(--surface2);position:sticky;top:0;z-index:5}
+.comp-row.section-header{background:var(--ice)}
+.comp-cell{padding:10px 14px;font-size:12.5px;color:var(--navy);display:flex;align-items:center;border-right:1px solid var(--surface2)}
+.comp-cell:last-child{border-right:none}
+.comp-cell.label{font-weight:600;color:var(--slate);font-size:12px;background:var(--surface)}
+.comp-cell.header-cell{font-weight:700;font-size:11px;color:var(--slate2);text-transform:uppercase;letter-spacing:0.06em}
+.comp-cell.section-label{font-weight:700;font-size:11px;color:var(--navy2);text-transform:uppercase;letter-spacing:0.06em;grid-column:1/-1;padding:8px 14px}
+.comp-cell .val{font-family:var(--mono);font-weight:600}
+.comp-cell .best{color:var(--green);font-weight:700}
+.comp-cell .worst{color:var(--red)}
+.basket-offering-header{padding:16px;text-align:center;border-right:1px solid var(--surface2);position:relative}
+.basket-offering-header:last-child{border-right:none}
+.basket-remove{position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:50%;border:none;background:var(--surface);color:var(--slate2);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all var(--transition)}
+.basket-remove:hover{background:var(--red-lt);color:var(--red)}
+.takeaway-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.takeaway-card{padding:14px;border-radius:var(--radius);font-size:12.5px;line-height:1.6}
+.takeaway-card.positive{background:var(--green-lt);border:1px solid #BBF7D0;color:var(--navy)}
+.takeaway-card.caution{background:var(--amber-lt);border:1px solid #FDE68A;color:var(--navy)}
+.takeaway-card.info{background:var(--blue-lt);border:1px solid #BFDBFE;color:var(--navy)}
+.takeaway-card .takeaway-icon{font-size:14px;margin-right:6px}
+.basket-chart-wrap{height:280px;position:relative}
 .skeleton{background:linear-gradient(90deg,var(--surface2) 25%,var(--mist) 50%,var(--surface2) 75%);background-size:200% 100%;animation:shimmer 1.4s ease-in-out infinite;border-radius:4px}
 @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 .skeleton-card{background:var(--white);border:1px solid var(--mist);border-radius:var(--radius-lg);padding:18px;height:200px}
@@ -1317,52 +1342,276 @@ function renderIncomeChart(fund) {
 ═══════════════════════════════════════════ */
 function renderBasket() {
   const items = STATE.basket.map(id => STATE.funds.find(f => f.id === id)).filter(Boolean);
-  if (!items.length) return `<div class="page-header"><div><div class="page-title">Basket</div><div class="page-subtitle">Your selected offerings for comparison and portfolio building</div></div></div><div class="empty-state"><div class="empty-state-icon">🛒</div><h3>Basket is Empty</h3><p>Add offerings from Browse to compare and build portfolios.</p><button class="btn btn-primary" onclick="navigateTo('browse')">Browse Offerings</button></div>`;
+  if (!items.length) return '<div class="page-header"><div><div class="page-title">Basket & Comparison</div><div class="page-subtitle">Add offerings from Browse to compare side-by-side</div></div></div><div class="empty-state"><div class="empty-state-icon">🛒</div><h3>Basket is Empty</h3><p>Add up to 3 offerings from Browse to unlock side-by-side comparison, peer benchmarking, and portfolio analysis.</p><button class="btn btn-primary" onclick="navigateTo(\'browse\')">Browse Offerings</button></div>';
 
-  const totals = {
-    avgCoc: items.reduce((s, f) => s + (f.y1coc || 0), 0) / items.filter(f => f.y1coc).length,
-    avgLtv: items.reduce((s, f) => s + (f.ltv || 0), 0) / items.filter(f => f.ltv).length,
-    totalMin: items.reduce((s, f) => s + (f.minInvest || 0), 0)
+  const p = STATE.peer;
+  const c = STATE.client;
+  const n = items.length;
+  const gridCols = 'grid-template-columns: 180px repeat(' + n + ', 1fr)';
+
+  const avgOf = (fn) => { const vs = items.map(fn).filter(v => v != null); return vs.length ? vs.reduce((a,b) => a+b, 0) / vs.length : null; };
+  const blended = {
+    y1coc: avgOf(f => f.y1coc), ltv: avgOf(f => f.ltv), occ: avgOf(f => f.occupancy),
+    minTotal: items.reduce((s, f) => s + (f.minInvest || 0), 0),
+    leaseTerm: avgOf(f => f.avgLeaseTerm)
   };
 
-  const rows = items.map(f => `
-    <tr onclick="navigateTo('offering_detail',${f.id})" style="cursor:pointer">
-      <td class="name-cell"><div>${f.name}</div><div style="font-size:11px;color:var(--slate2)">${f.sponsor}</div></td>
-      <td class="num-cell">${fmtPct(f.y1coc)}</td>
-      <td class="num-cell">${fmtPct(f.ltv)}</td>
-      <td class="num-cell">${fmtMoney(f.minInvest)}</td>
-      <td>${f.propType}</td>
-      <td><button class="btn btn-sm btn-ghost" onclick="event.stopPropagation();toggleBasket(${f.id})" style="color:var(--red)">✕</button></td>
-    </tr>`).join('');
+  const bestOf = (fn, lower) => { const vs = items.map(fn).filter(v => v != null); if (!vs.length) return null; return lower ? Math.min(...vs) : Math.max(...vs); };
+  const markBest = (v, fn, lower) => { if (v == null || n < 2) return ''; return v === bestOf(fn, lower) ? ' best' : ''; };
 
-  return `
-    <div class="page-header">
-      <div><div class="page-title">Basket</div><div class="page-subtitle">${items.length} offering${items.length > 1 ? 's' : ''} selected</div></div>
-      <div style="display:flex;gap:8px">
-        <button class="btn btn-secondary" onclick="toast('Portfolio Builder coming Phase 2','error')">📐 Build Portfolio</button>
-        <button class="btn btn-ghost" onclick="STATE.basket=[];saveBasket();renderApp();toast('Basket cleared')">Clear All</button>
-      </div>
-    </div>
-    <div class="quick-stats" style="grid-template-columns:repeat(3,1fr);margin-bottom:20px">
-      <div class="stat-card"><div class="stat-val">${fmtPct(totals.avgCoc)}</div><div class="stat-label">Avg Y1 CoC</div></div>
-      <div class="stat-card"><div class="stat-val">${fmtPct(totals.avgLtv)}</div><div class="stat-label">Avg LTV</div></div>
-      <div class="stat-card"><div class="stat-val">${fmtMoney(totals.totalMin)}</div><div class="stat-label">Total Min Invest</div></div>
-    </div>
-    <div class="table-wrapper"><table class="offering-table"><thead><tr><th>Offering</th><th>Y1 CoC</th><th>LTV</th><th>Min</th><th>Type</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`;
+  const allY1 = STATE.funds.map(f => f.y1coc).filter(v => v != null);
+  const allLTV = STATE.funds.map(f => f.ltv).filter(v => v != null);
+  const pctRank = (val, arr) => { if (val == null || !arr.length) return null; return Math.round((arr.filter(v => v <= val).length / arr.length) * 100); };
+
+  // Header
+  const header = '<div class="page-header"><div><div class="page-title">Basket & Comparison</div><div class="page-subtitle">' + n + ' offering' + (n > 1 ? 's' : '') + ' selected \u2014 side-by-side analysis</div></div><div style="display:flex;gap:8px"><button class="btn btn-secondary" onclick="navigateTo(\'browse\')">+ Add More</button><button class="btn btn-ghost" onclick="STATE.basket=[];saveBasket();renderApp();toast(\'Basket cleared\')">Clear All</button></div></div>';
+
+  // Stats bar
+  const statCols = c.exchangeAmount ? 5 : 4;
+  const statsBar = '<div class="quick-stats" style="grid-template-columns:repeat(' + statCols + ',1fr);margin-bottom:20px">' +
+    '<div class="stat-card card-enter"><div class="stat-val">' + n + '</div><div class="stat-label">In Basket</div></div>' +
+    '<div class="stat-card card-enter" style="animation-delay:0.06s"><div class="stat-val">' + fmtPct(blended.y1coc) + '</div><div class="stat-label">Blended Y1 CoC</div></div>' +
+    '<div class="stat-card card-enter" style="animation-delay:0.12s"><div class="stat-val">' + fmtPct(blended.ltv) + '</div><div class="stat-label">Blended LTV</div></div>' +
+    '<div class="stat-card card-enter" style="animation-delay:0.18s"><div class="stat-val">' + fmtMoney(blended.minTotal) + '</div><div class="stat-label">Total Minimum</div></div>' +
+    (c.exchangeAmount ? '<div class="stat-card card-enter" style="animation-delay:0.24s"><div class="stat-val">' + Math.round((blended.minTotal / c.exchangeAmount) * 100) + '%</div><div class="stat-label">Of Exchange Used</div></div>' : '') +
+    '</div>';
+
+  // Offering header row
+  const offeringHeaders = '<div class="comp-row header" style="' + gridCols + '">' +
+    '<div class="comp-cell header-cell">Metric</div>' +
+    items.map(f => '<div class="basket-offering-header"><button class="basket-remove" onclick="toggleBasket(' + f.id + ')">\u2715</button>' +
+      '<div style="font-weight:700;font-size:14px;color:var(--navy);margin-bottom:2px;cursor:pointer" onclick="navigateTo(\'offering_detail\',' + f.id + ')">' + f.name + '</div>' +
+      '<div style="font-size:12px;color:var(--slate2)">' + f.sponsor + '</div>' +
+      '<div style="margin-top:6px"><span class="badge badge-' + (f.status === 'Open' ? 'green' : f.status === 'Closing' ? 'amber' : 'blue') + '">' + f.status + '</span> <span class="badge badge-navy">' + (f.propType || 'DST') + '</span></div></div>').join('') +
+    '</div>';
+
+  // Comparison row builder
+  function compRow(label, vals, opts) {
+    opts = opts || {};
+    return '<div class="comp-row" style="' + gridCols + '">' +
+      '<div class="comp-cell label">' + label + '</div>' +
+      vals.map(v => '<div class="comp-cell"><span class="val' + (v.cls || '') + '">' + v.display + '</span>' + (v.sub ? '<span style="font-size:10px;color:var(--slate2);margin-left:6px">' + v.sub + '</span>' : '') + '</div>').join('') +
+      '</div>';
+  }
+
+  function sectionHeader(label) {
+    return '<div class="comp-row section-header" style="' + gridCols + '"><div class="comp-cell section-label" style="grid-column:1/-1">' + label + '</div></div>';
+  }
+
+  // Build comparison rows
+  let compRows = '';
+
+  // INCOME & RETURNS
+  compRows += sectionHeader('Income & Returns');
+  compRows += compRow('Y1 Cash on Cash', items.map(f => ({
+    display: fmtPct(f.y1coc),
+    cls: markBest(f.y1coc, x => x.y1coc, false),
+    sub: f.y1coc != null && p.avgY1CoC != null ? (f.y1coc >= p.avgY1CoC ? '\u2191' : '\u2193') + Math.abs(f.y1coc - p.avgY1CoC).toFixed(1) + '% vs peer' : ''
+  })));
+  compRows += compRow('Avg CoC (Hold)', items.map(f => {
+    const avgs = f.income.filter(v => v != null);
+    const avg = avgs.length ? avgs.reduce((a,b) => a+b,0) / avgs.length : null;
+    return { display: avg != null ? fmtPct(avg) : '\u2014', cls: '' };
+  }));
+  compRows += compRow('Distribution Freq', items.map(f => ({ display: f.distFrequency || '\u2014' })));
+  compRows += compRow('Hold Period', items.map(f => ({ display: f.holdPeriod ? f.holdPeriod + ' yr' : '\u2014' })));
+  if (c.exchangeAmount) {
+    compRows += compRow('Est. Y1 Income', items.map(f => ({
+      display: f.y1coc != null ? fmtMoney(c.exchangeAmount * f.y1coc / 100) : '\u2014',
+      cls: markBest(f.y1coc, x => x.y1coc, false)
+    })));
+  }
+
+  // CAPITAL STRUCTURE
+  compRows += sectionHeader('Capital Structure');
+  compRows += compRow('Loan to Value', items.map(f => ({
+    display: fmtPct(f.ltv),
+    cls: markBest(f.ltv, x => x.ltv, true),
+    sub: f.ltv != null && p.avgLTV != null ? (f.ltv <= p.avgLTV ? '\u2193' : '\u2191') + Math.abs(f.ltv - p.avgLTV).toFixed(1) + '% vs peer' : ''
+  })));
+  compRows += compRow('Debt Terms', items.map(f => ({ display: f.debtTerms || '\u2014' })));
+  compRows += compRow('Preferred Return', items.map(f => ({ display: f.preferred || '\u2014' })));
+  compRows += compRow('Promote', items.map(f => ({ display: f.promote || '\u2014' })));
+  compRows += compRow('721 UpREIT', items.map(f => ({ display: f.upReit || '\u2014' })));
+
+  // VALUATION
+  compRows += sectionHeader('Purchase Price & Valuation');
+  compRows += compRow('Purchase Price', items.map(f => ({ display: fmtMoney(f.purchasePrice) })));
+  compRows += compRow('Appraised Value', items.map(f => ({ display: fmtMoney(f.appraisedValue) })));
+  compRows += compRow('Discount/Premium', items.map(f => {
+    if (!f.appraisedValue || !f.purchasePrice) return { display: '\u2014' };
+    const d = ((f.appraisedValue - f.purchasePrice) / f.appraisedValue * 100);
+    return { display: (d > 0 ? '-' : '+') + Math.abs(d).toFixed(1) + '%', cls: d > 0 ? ' best' : ' worst' };
+  }));
+  compRows += compRow('Loaded Price', items.map(f => ({ display: fmtMoney(f.loadedPrice) })));
+  compRows += compRow('Acq Cap Rate', items.map(f => ({ display: f.acqCapRate ? fmtPct(f.acqCapRate) : '\u2014' })));
+
+  // PROPERTY & LEASE
+  compRows += sectionHeader('Property & Lease');
+  compRows += compRow('Location', items.map(f => ({ display: f.location || '\u2014' })));
+  compRows += compRow('# Assets', items.map(f => ({ display: f.units ? f.units.toString() : '\u2014' })));
+  compRows += compRow('% Occupied', items.map(f => ({
+    display: fmtPct(f.occupancy),
+    cls: markBest(f.occupancy, x => x.occupancy, false)
+  })));
+  compRows += compRow('Avg Lease Remaining', items.map(f => ({
+    display: f.avgLeaseTerm ? fmtNum(f.avgLeaseTerm, 1) + ' yr' : '\u2014',
+    cls: markBest(f.avgLeaseTerm, x => x.avgLeaseTerm, false)
+  })));
+  compRows += compRow('Lease Terms', items.map(f => ({ display: f.leaseTerms || '\u2014' })));
+  compRows += compRow('Rent Escalations', items.map(f => ({ display: f.rentEscalations || '\u2014' })));
+  compRows += compRow('Building Age', items.map(f => ({ display: f.buildingAge || '\u2014' })));
+
+  // RAISE & TIMELINE
+  compRows += sectionHeader('Raise & Timeline');
+  compRows += compRow('Filed Raise', items.map(f => ({ display: fmtMoney(f.filedRaise) })));
+  compRows += compRow('Remaining', items.map(f => ({ display: f.pctRemaining != null ? f.pctRemaining + '% (' + fmtMoney(f.equityRemaining) + ')' : '\u2014' })));
+  compRows += compRow('Minimum Investment', items.map(f => ({
+    display: fmtMoney(f.minInvest),
+    cls: markBest(f.minInvest, x => x.minInvest, true)
+  })));
+  compRows += compRow('Offering Open', items.map(f => ({ display: f.openDate ? f.openDate.toLocaleDateString() : '\u2014' })));
+  compRows += compRow('Offering Close', items.map(f => ({ display: f.closeDate ? f.closeDate.toLocaleDateString() : '\u2014' })));
+
+  // FEES & STRUCTURE
+  compRows += sectionHeader('Fees & Structure');
+  compRows += compRow('Rep Comp', items.map(f => ({ display: f.repComp || '\u2014' })));
+  compRows += compRow('Sales Load', items.map(f => ({ display: f.salesLoad || '\u2014' })));
+  compRows += compRow('Reserve', items.map(f => ({ display: f.reserve || '\u2014' })));
+  compRows += compRow('GP Commit', items.map(f => ({ display: f.gpCommit || '\u2014' })));
+  compRows += compRow('Tax Reporting', items.map(f => ({ display: f.taxReporting || '\u2014' })));
+  compRows += compRow('Exemption', items.map(f => ({ display: f.exemption || '\u2014' })));
+
+  // SPONSOR
+  compRows += sectionHeader('Sponsor Track Record');
+  compRows += compRow('Sponsor', items.map(f => ({ display: f.sponsor })));
+  compRows += compRow('AUM', items.map(f => ({ display: f.sponsorAum || '\u2014' })));
+  compRows += compRow('Total Offerings', items.map(f => ({ display: f.sponsorOfferings || '\u2014' })));
+  compRows += compRow('Full Cycle Exits', items.map(f => ({ display: f.sponsorExits || '\u2014' })));
+  compRows += compRow('Avg IRR', items.map(f => ({ display: f.sponsorAvgIrr != null ? fmtPct(f.sponsorAvgIrr) : '\u2014' })));
+  compRows += compRow('Experience', items.map(f => ({ display: f.sponsorExperience || '\u2014' })));
+
+  const compTable = '<div class="comp-grid" style="margin-bottom:24px">' + offeringHeaders + compRows + '</div>';
+
+  // ── Key Takeaways ──
+  let takeaways = [];
+  if (n >= 2) {
+    const bestCoc = items.reduce((a, b) => (a.y1coc || 0) > (b.y1coc || 0) ? a : b);
+    const lowestLtv = items.reduce((a, b) => (a.ltv || 999) < (b.ltv || 999) ? a : b);
+    const bestOcc = items.reduce((a, b) => (a.occupancy || 0) > (b.occupancy || 0) ? a : b);
+    takeaways.push({ cls: 'positive', icon: '\u{1F4C8}', text: '<strong>' + bestCoc.name + '</strong> leads with Y1 CoC of ' + fmtPct(bestCoc.y1coc) + ', ' + (bestCoc.y1coc - blended.y1coc > 0.5 ? 'significantly above' : 'slightly above') + ' the basket average of ' + fmtPct(blended.y1coc) + '.' });
+    takeaways.push({ cls: 'info', icon: '\u{1F6E1}', text: '<strong>' + lowestLtv.name + '</strong> has the most conservative leverage at ' + fmtPct(lowestLtv.ltv) + ' LTV' + (p.avgLTV ? ', vs peer average of ' + fmtPct(p.avgLTV) : '') + '.' });
+    if (bestOcc.occupancy && bestOcc.occupancy >= 95) takeaways.push({ cls: 'positive', icon: '\u{1F3E2}', text: '<strong>' + bestOcc.name + '</strong> is ' + fmtPct(bestOcc.occupancy) + ' occupied \u2014 highest stability in this basket.' });
+    const highLtv = items.filter(f => f.ltv && f.ltv > 65);
+    if (highLtv.length) takeaways.push({ cls: 'caution', icon: '\u26A0\uFE0F', text: highLtv.map(f => '<strong>' + f.name + '</strong>').join(' and ') + ' ha' + (highLtv.length > 1 ? 've' : 's') + ' LTV above 65% \u2014 consider leverage risk in a rising rate environment.' });
+    if (c.exchangeAmount) {
+      const pctUsed = Math.round((blended.minTotal / c.exchangeAmount) * 100);
+      takeaways.push({ cls: pctUsed > 90 ? 'caution' : 'info', icon: '\u{1F4B0}', text: 'Combined minimums of ' + fmtMoney(blended.minTotal) + ' use ' + pctUsed + '% of the ' + fmtMoney(c.exchangeAmount) + ' exchange \u2014 ' + (pctUsed <= 70 ? 'room for additional diversification.' : pctUsed <= 100 ? 'tight fit, limited room for adjustment.' : 'exceeds available exchange equity.') });
+    }
+  }
+  const takeawayHtml = takeaways.length ? '<div class="panel detail-section"><div class="panel-title">\u{1F3AF} Key Takeaways</div><div class="takeaway-grid">' +
+    takeaways.map(t => '<div class="takeaway-card ' + t.cls + '"><span class="takeaway-icon">' + t.icon + '</span>' + t.text + '</div>').join('') +
+    '</div></div>' : '';
+
+  // ── Potential Considerations ──
+  let concerns = [];
+  items.forEach(f => {
+    if (f.ltv && f.ltv > 70) concerns.push({ icon: '\u{1F6A8}', text: '<strong>' + f.name + ':</strong> High leverage (' + fmtPct(f.ltv) + ' LTV) increases exposure to rate and valuation risk.' });
+    if (f.occupancy && f.occupancy < 90) concerns.push({ icon: '\u{1F3E2}', text: '<strong>' + f.name + ':</strong> Below-90% occupancy (' + fmtPct(f.occupancy) + ') introduces lease-up execution risk.' });
+    if (f.avgLeaseTerm && f.avgLeaseTerm < 3) concerns.push({ icon: '\u{1F4C5}', text: '<strong>' + f.name + ':</strong> Short avg lease term (' + fmtNum(f.avgLeaseTerm, 1) + ' yr) creates near-term rollover risk.' });
+    if (f.pctRemaining != null && f.pctRemaining < 10) concerns.push({ icon: '\u{1F525}', text: '<strong>' + f.name + ':</strong> Only ' + f.pctRemaining + '% remaining in raise \u2014 may close before allocation.' });
+    if (c.age && f.holdPeriod && (c.age + f.holdPeriod) > 85) concerns.push({ icon: '\u23F3', text: '<strong>' + f.name + ':</strong> ' + f.holdPeriod + '-year hold extends to client age ' + (c.age + f.holdPeriod) + ' \u2014 consider liquidity needs.' });
+  });
+  const concernsHtml = concerns.length ? '<div class="panel detail-section"><div class="panel-title">\u26A0\uFE0F Potential Considerations</div><div style="display:grid;gap:8px">' +
+    concerns.map(c => '<div class="kd-item caution"><span class="kd-icon">' + c.icon + '</span><div>' + c.text + '</div></div>').join('') +
+    '</div></div>' : '';
+
+  // ── Income Comparison Chart ──
+  const chartHtml = '<div class="panel detail-section"><div class="panel-title">\u{1F4C8} Income Comparison (Y1\u2013Y10)</div><div class="basket-chart-wrap"><canvas id="basket-chart"></canvas></div></div>';
+
+  // ── Document Links ──
+  const docHtml = '<div class="panel detail-section"><div class="panel-title">\u{1F4C4} Documents</div><div style="display:grid;gap:12px">' +
+    items.map(f => '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><strong style="font-size:13px;color:var(--navy);min-width:160px">' + f.name + ':</strong>' +
+      (f.brochureUrl ? '<a href="' + f.brochureUrl + '" target="_blank" class="btn btn-sm btn-secondary">\u{1F4C4} Brochure</a>' : '') +
+      (f.ppmUrl ? '<a href="' + f.ppmUrl + '" target="_blank" class="btn btn-sm btn-secondary">\u{1F4CB} PPM</a>' : '') +
+      (f.trackRecordUrl ? '<a href="' + f.trackRecordUrl + '" target="_blank" class="btn btn-sm btn-secondary">\u{1F4CA} Track Record</a>' : '') +
+      (f.videoUrl ? '<a href="' + f.videoUrl + '" target="_blank" class="btn btn-sm btn-secondary">\u{1F3AC} Video</a>' : '') +
+      (f.salesTeamUrl ? '<a href="' + f.salesTeamUrl + '" target="_blank" class="btn btn-sm btn-secondary">\u{1F465} Sales Team</a>' : '') +
+    '</div>').join('') +
+    '</div></div>';
+
+  return header + statsBar + takeawayHtml + concernsHtml + compTable + chartHtml + docHtml;
 }
+
+function renderBasketChart() {
+  const ctx = document.getElementById('basket-chart');
+  if (!ctx) return;
+  if (STATE.incomeChart) { STATE.incomeChart.destroy(); STATE.incomeChart = null; }
+
+  const items = STATE.basket.map(id => STATE.funds.find(f => f.id === id)).filter(Boolean);
+  if (!items.length) return;
+
+  const colors = ['#1C3A63', '#3B82F6', '#7C3AED'];
+  const labels = [];
+  for (let y = 1; y <= 10; y++) labels.push('Y' + y);
+
+  const datasets = items.map((f, i) => ({
+    label: f.name.length > 25 ? f.name.substring(0, 22) + '...' : f.name,
+    data: f.income.map(v => v != null ? v : null),
+    backgroundColor: colors[i % 3],
+    borderRadius: 3,
+    barPercentage: 0.7 / items.length
+  }));
+
+  // Add peer avg line
+  if (STATE.peer.avgY1CoC) {
+    datasets.push({
+      label: 'Peer Avg',
+      data: labels.map(() => STATE.peer.avgY1CoC),
+      type: 'line',
+      borderColor: '#F59E0B',
+      borderDash: [6, 3],
+      borderWidth: 2,
+      pointRadius: 0,
+      fill: false,
+      order: 0
+    });
+  }
+
+  STATE.incomeChart = new Chart(ctx, {
+    type: 'bar',
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { intersect: false, mode: 'index' },
+      plugins: {
+        legend: { position: 'top', align: 'end', labels: { boxWidth: 12, font: { family: "'DM Sans'", size: 11 }, color: '#5C7A99' } },
+        tooltip: {
+          backgroundColor: '#0B1F3B', titleFont: { family: "'DM Sans'", size: 12 }, bodyFont: { family: "'DM Mono'", size: 12 },
+          padding: 10, cornerRadius: 8,
+          callbacks: { label: function(ctx) { return ctx.dataset.label + ': ' + (ctx.raw != null ? ctx.raw.toFixed(2) + '%' : 'N/A'); } }
+        }
+      },
+      scales: {
+        y: { beginAtZero: true, ticks: { callback: v => v + '%', font: { family: "'DM Mono'", size: 11 }, color: '#8FA3BA' }, grid: { color: '#E8F0F8' }, border: { display: false } },
+        x: { ticks: { font: { family: "'DM Sans'", size: 11, weight: 600 }, color: '#3A5270' }, grid: { display: false }, border: { display: false } }
+      }
+    }
+  });
+}
+
 
 /* ═══════════════════════════════════════════
    EVENT HANDLERS & INIT
 ═══════════════════════════════════════════ */
 function attachViewHandlers() {
-  // Render income chart if on detail view
   if (STATE.view === 'offering_detail') {
     const fund = STATE.funds.find(f => f.id === STATE.selectedOfferingId);
-    if (fund) {
-      requestAnimationFrame(() => renderIncomeChart(fund));
-    }
+    if (fund) { requestAnimationFrame(() => renderIncomeChart(fund)); }
+  } else if (STATE.view === 'basket') {
+    requestAnimationFrame(() => renderBasketChart());
   } else {
-    // Destroy chart when leaving detail view
     if (STATE.incomeChart) { STATE.incomeChart.destroy(); STATE.incomeChart = null; }
   }
 }
