@@ -134,6 +134,11 @@ a{color:inherit;text-decoration:none}button{cursor:pointer;font-family:var(--fon
 .offering-table td.num-cell.highlight-green{color:var(--green)}.offering-table td.num-cell.highlight-red{color:var(--red)}
 .table-wrapper{border:1px solid var(--mist);border-radius:var(--radius-lg);overflow:hidden;background:var(--white)}
 .filter-bar{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.quick-filter-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.quick-filter-label{font-size:11px;font-weight:700;color:var(--slate2);text-transform:uppercase;letter-spacing:.5px}
+.quick-filter-btn{padding:6px 14px;border-radius:999px;border:1px solid var(--mist);background:var(--white);font-size:12px;font-weight:600;color:var(--navy);cursor:pointer;transition:all var(--transition);user-select:none}
+.quick-filter-btn:hover{border-color:var(--navy3);background:var(--ice)}
+.quick-filter-btn.active{background:var(--navy);color:var(--white);border-color:var(--navy);box-shadow:0 4px 12px rgba(11,31,59,0.2)}
 .filter-row-2{display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap}
 .filter-tag{display:flex;align-items:center;gap:5px;padding:5px 12px;border:1.5px solid var(--mist);border-radius:20px;font-size:12.5px;font-weight:500;color:var(--slate);cursor:pointer;background:var(--white);transition:all var(--transition);user-select:none}
 .filter-tag:hover{border-color:var(--slate2);color:var(--navy)}.filter-tag.active{border-color:var(--navy);background:var(--navy);color:var(--white)}
@@ -435,7 +440,7 @@ const STATE = {
   basket: JSON.parse(localStorage.getItem('afl_basket') || '[]'),
   browseLayout: 'card',
   browseSort: 'y1coc_desc',
-  browseFilters: { status: 'all', propType: 'all', sponsor: 'all', sector: 'all', focus: 'all', cocMin: '', cocMax: '', search: '', clientEquity: false },
+  browseFilters: { status: 'all', propType: 'all', sponsor: 'all', sector: 'all', focus: 'all', cocMin: '', cocMax: '', search: '', clientEquity: false, quickDst: false, quickNoDebt: false, quickUpreit: false },
   incomeChart: null
 };
 
@@ -852,6 +857,9 @@ function getFilteredFunds() {
   if (f.cocMin) funds = funds.filter(x => x.y1coc != null && x.y1coc >= parseFloat(f.cocMin));
   if (f.cocMax) funds = funds.filter(x => x.y1coc != null && x.y1coc <= parseFloat(f.cocMax));
   if (f.clientEquity && STATE.client.exchangeAmount) funds = funds.filter(x => x.minInvest && x.minInvest <= STATE.client.exchangeAmount);
+  if (f.quickDst) funds = funds.filter(x => (x.propType || '').toLowerCase().includes('dst') || (x._raw && STATE.headers && (() => { const ci = STATE.headers.findIndex(h => h.trim() === 'Offering Structure'); return ci >= 0 && x._raw[ci] && String(x._raw[ci].v || x._raw[ci].f || '').toLowerCase().includes('dst'); })()));
+  if (f.quickNoDebt) funds = funds.filter(x => { const ltv = x.ltv; const raw = String(x.debtTerms || '').toLowerCase(); return (ltv != null && Math.abs(ltv) < 0.01) || raw.includes('no debt') || raw.includes('all cash') || raw.includes('all-cash'); });
+  if (f.quickUpreit) funds = funds.filter(x => String(x.upReit || '').toLowerCase().includes('721 only'));
   if (f.search) { let s = f.search.toLowerCase(); funds = funds.filter(x => x.name.toLowerCase().includes(s) || x.sponsor.toLowerCase().includes(s) || x.propType.toLowerCase().includes(s) || x.location.toLowerCase().includes(s)); }
   const sortMap = {
     y1coc_desc: (a, b) => (b.y1coc || 0) - (a.y1coc || 0),
@@ -881,6 +889,9 @@ function renderBrowse() {
   if (f.focus !== 'all') activeFilters.push({ label: f.focus, key: 'focus' });
   if (f.cocMin || f.cocMax) activeFilters.push({ label: `CoC ${f.cocMin || '0'}–${f.cocMax || '∞'}%`, key: 'coc' });
   if (f.clientEquity) activeFilters.push({ label: 'Fits Exchange', key: 'clientEquity' });
+  if (f.quickDst) activeFilters.push({ label: 'DST Only', key: 'quickDst' });
+  if (f.quickNoDebt) activeFilters.push({ label: 'No Debt', key: 'quickNoDebt' });
+  if (f.quickUpreit) activeFilters.push({ label: '721 UpREIT Only', key: 'quickUpreit' });
 
   const filterHtml = `
     <div class="filter-bar">
@@ -907,6 +918,12 @@ function renderBrowse() {
         <option value="all" ${f.focus === 'all' ? 'selected' : ''}>All Focus</option>
         ${focuses.map(s => `<option value="${s}" ${f.focus === s ? 'selected' : ''}>${s}</option>`).join('')}
       </select>
+    </div>
+    <div class="quick-filter-bar">
+      <span class="quick-filter-label">Quick Filters</span>
+      <button class="quick-filter-btn ${f.quickDst ? 'active' : ''}" onclick="STATE.browseFilters.quickDst=!STATE.browseFilters.quickDst;renderApp()">DST Only</button>
+      <button class="quick-filter-btn ${f.quickNoDebt ? 'active' : ''}" onclick="STATE.browseFilters.quickNoDebt=!STATE.browseFilters.quickNoDebt;renderApp()">No Debt</button>
+      <button class="quick-filter-btn ${f.quickUpreit ? 'active' : ''}" onclick="STATE.browseFilters.quickUpreit=!STATE.browseFilters.quickUpreit;renderApp()">721 UpREIT Only</button>
     </div>
     <div class="filter-row-2">
       <div class="range-filter"><span>CoC</span><input placeholder="min" value="${f.cocMin}" oninput="STATE.browseFilters.cocMin=this.value;renderApp()"><span>–</span><input placeholder="max" value="${f.cocMax}" oninput="STATE.browseFilters.cocMax=this.value;renderApp()"><span>%</span></div>
@@ -942,6 +959,9 @@ function renderBrowse() {
 function clearFilter(key) {
   if (key === 'coc') { STATE.browseFilters.cocMin = ''; STATE.browseFilters.cocMax = ''; }
   else if (key === 'clientEquity') STATE.browseFilters.clientEquity = false;
+  else if (key === 'quickDst') STATE.browseFilters.quickDst = false;
+  else if (key === 'quickNoDebt') STATE.browseFilters.quickNoDebt = false;
+  else if (key === 'quickUpreit') STATE.browseFilters.quickUpreit = false;
   else STATE.browseFilters[key] = 'all';
   renderApp();
 }
