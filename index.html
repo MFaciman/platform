@@ -70,7 +70,7 @@ a{color:inherit;text-decoration:none}button{cursor:pointer;font-family:var(--fon
 .nav-icon{font-size:14px;width:18px;text-align:center;flex-shrink:0}
 .nav-badge{margin-left:auto;min-width:18px;height:18px;background:var(--navy2);color:#fff;border-radius:9px;font-size:10px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;padding:0 5px}
 #main{flex:1;overflow-y:auto;padding:28px 32px}
-.page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;gap:16px}
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;gap:16px}
 .page-title{font-size:22px;font-weight:700;color:var(--navy);letter-spacing:-0.02em;line-height:1.2}
 .page-subtitle{font-size:13px;color:var(--slate2);margin-top:3px}
 .panel{background:var(--white);border:1px solid var(--mist);border-radius:var(--radius-lg);padding:20px 24px;box-shadow:var(--shadow-sm)}
@@ -130,21 +130,22 @@ a{color:inherit;text-decoration:none}button{cursor:pointer;font-family:var(--fon
 .offering-table tbody tr:hover{background:var(--surface)}.offering-table tbody tr:last-child{border-bottom:none}
 .offering-table td{padding:10px 12px;vertical-align:middle}
 .offering-table td.name-cell{font-weight:600;color:var(--navy)}
-.offering-table td.num-cell{font-weight:600;font-family:var(--mono);font-size:12.5px}
+.offering-table td.num-cell{font-weight:400;font-family:var(--mono);font-size:12.5px}
 .offering-table td.num-cell.highlight-green{color:var(--green)}.offering-table td.num-cell.highlight-red{color:var(--red)}
 .table-wrapper{border:1px solid var(--mist);border-radius:var(--radius-lg);overflow:hidden;background:var(--white)}
-.filter-bar{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.filter-bar{display:flex;align-items:center;gap:6px;margin-bottom:6px;flex-wrap:wrap}
 .quick-filter-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px}
 .quick-filter-label{font-size:11px;font-weight:700;color:var(--slate2);text-transform:uppercase;letter-spacing:.5px}
-.quick-filter-btn{padding:6px 14px;border-radius:999px;border:1px solid var(--mist);background:var(--white);font-size:12px;font-weight:600;color:var(--navy);cursor:pointer;transition:all var(--transition);user-select:none}
+.quick-filter-btn{padding:5px 12px;border-radius:999px;border:1px solid var(--mist);background:var(--white);font-size:11px;font-weight:600;color:var(--navy);cursor:pointer;transition:all var(--transition);user-select:none}
 .quick-filter-btn:hover{border-color:var(--navy3);background:var(--ice)}
 .quick-filter-btn.active{background:var(--navy);color:var(--white);border-color:var(--navy);box-shadow:0 4px 12px rgba(11,31,59,0.2)}
-.filter-row-2{display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.filter-divider{width:1px;height:22px;background:var(--mist);flex-shrink:0}
+.filter-row-2{display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}
 .filter-tag{display:flex;align-items:center;gap:5px;padding:5px 12px;border:1.5px solid var(--mist);border-radius:20px;font-size:12.5px;font-weight:500;color:var(--slate);cursor:pointer;background:var(--white);transition:all var(--transition);user-select:none}
 .filter-tag:hover{border-color:var(--slate2);color:var(--navy)}.filter-tag.active{border-color:var(--navy);background:var(--navy);color:var(--white)}
-.filter-select{height:34px;padding:0 28px 0 10px;border:1.5px solid var(--mist);border-radius:20px;font-size:12.5px;color:var(--slate);background:var(--white);cursor:pointer;outline:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%235C7A99' d='M5 7L1 2h8z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;transition:border-color var(--transition)}
+.filter-select{height:30px;padding:0 28px 0 10px;border:1.5px solid var(--mist);border-radius:20px;font-size:12px;color:var(--slate);background:var(--white);cursor:pointer;outline:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'%3E%3Cpath fill='%235C7A99' d='M5 7L1 2h8z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;transition:border-color var(--transition)}
 .filter-select:focus{border-color:var(--navy2)}
-.search-input{flex:1;max-width:260px;height:34px;padding:0 12px 0 34px;border:1.5px solid var(--mist);border-radius:20px;font-size:13px;color:var(--navy);background:var(--white);outline:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%235C7A99' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:11px center;transition:border-color var(--transition)}
+.search-input{flex:1;max-width:260px;height:30px;padding:0 12px 0 34px;border:1.5px solid var(--mist);border-radius:20px;font-size:12px;color:var(--navy);background:var(--white);outline:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%235C7A99' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:11px center;transition:border-color var(--transition)}
 .search-input:focus{border-color:var(--navy2)}.search-input::placeholder{color:var(--fog)}
 .view-toggle-group{display:flex;border:1.5px solid var(--mist);border-radius:8px;overflow:hidden}
 .view-toggle-btn{padding:5px 10px;border:none;background:var(--white);color:var(--slate2);font-size:13px;cursor:pointer;transition:all var(--transition)}
@@ -157,9 +158,9 @@ a{color:inherit;text-decoration:none}button{cursor:pointer;font-family:var(--fon
 .filter-chip{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;background:var(--ice);color:var(--navy2);border-radius:20px;font-size:11px;font-weight:600;border:1px solid var(--mist)}
 .filter-chip button{background:none;border:none;color:var(--slate2);font-size:11px;padding:0;line-height:1;cursor:pointer;display:flex;align-items:center}
 .filter-chip button:hover{color:var(--red)}
-.range-filter{display:flex;align-items:center;gap:6px;height:34px;padding:0 12px;border:1.5px solid var(--mist);border-radius:20px;background:var(--white);font-size:12.5px;color:var(--slate)}
-.range-filter input{width:44px;border:none;outline:none;font-size:12.5px;color:var(--navy);font-family:var(--mono);background:transparent;text-align:center;padding:0}
-.range-filter span{color:var(--fog);font-size:11px}
+.range-filter{display:flex;align-items:center;gap:5px;height:30px;padding:0 10px;border:1.5px solid var(--mist);border-radius:20px;background:var(--white);font-size:11px;color:var(--slate)}
+.range-filter input{width:40px;border:none;outline:none;font-size:11px;color:var(--navy);font-family:var(--mono);background:transparent;text-align:center;padding:0}
+.range-filter span{color:var(--fog);font-size:11px;white-space:nowrap}
 .equity-filter{display:flex;align-items:center;gap:5px;height:34px;padding:0 12px;border:1.5px solid var(--mist);border-radius:20px;background:var(--white);font-size:12.5px;color:var(--slate);cursor:pointer;transition:all var(--transition);user-select:none}
 .equity-filter.active{border-color:var(--navy);background:var(--ice);color:var(--navy)}.equity-filter:hover{border-color:var(--slate2)}
 .modal-overlay{position:fixed;inset:0;background:rgba(11,31,59,0.55);backdrop-filter:blur(4px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeIn 0.2s ease}
@@ -440,7 +441,7 @@ const STATE = {
   basket: JSON.parse(localStorage.getItem('afl_basket') || '[]'),
   browseLayout: 'card',
   browseSort: 'y1coc_desc',
-  browseFilters: { status: 'all', propType: 'all', sponsor: 'all', sector: 'all', focus: 'all', cocMin: '', cocMax: '', search: '', clientEquity: false, quickDst: false, quickNoDebt: false, quickUpreit: false },
+  browseFilters: { status: 'all', propType: 'all', sponsor: 'all', sector: 'all', focus: 'all', cocMin: '', cocMax: '', ltvMin: '', ltvMax: '', search: '', clientEquity: false, quickDst: false, quickNoDebt: false, quickUpreit: false },
   incomeChart: null
 };
 
@@ -856,6 +857,8 @@ function getFilteredFunds() {
   if (f.focus !== 'all') funds = funds.filter(x => x.focus === f.focus);
   if (f.cocMin) funds = funds.filter(x => x.y1coc != null && x.y1coc >= parseFloat(f.cocMin));
   if (f.cocMax) funds = funds.filter(x => x.y1coc != null && x.y1coc <= parseFloat(f.cocMax));
+  if (f.ltvMin) funds = funds.filter(x => x.ltv != null && x.ltv >= parseFloat(f.ltvMin));
+  if (f.ltvMax) funds = funds.filter(x => x.ltv != null && x.ltv <= parseFloat(f.ltvMax));
   if (f.clientEquity && STATE.client.exchangeAmount) funds = funds.filter(x => x.minInvest && x.minInvest <= STATE.client.exchangeAmount);
   if (f.quickDst) funds = funds.filter(x => (x.propType || '').toLowerCase().includes('dst') || (x._raw && STATE.headers && (() => { const ci = STATE.headers.findIndex(h => h.trim() === 'Offering Structure'); return ci >= 0 && x._raw[ci] && String(x._raw[ci].v || x._raw[ci].f || '').toLowerCase().includes('dst'); })()));
   if (f.quickNoDebt) funds = funds.filter(x => { const ltv = x.ltv; const raw = String(x.debtTerms || '').toLowerCase(); return (ltv != null && Math.abs(ltv) < 0.01) || raw.includes('no debt') || raw.includes('all cash') || raw.includes('all-cash'); });
@@ -888,6 +891,7 @@ function renderBrowse() {
   if (f.sector !== 'all') activeFilters.push({ label: f.sector, key: 'sector' });
   if (f.focus !== 'all') activeFilters.push({ label: f.focus, key: 'focus' });
   if (f.cocMin || f.cocMax) activeFilters.push({ label: `CoC ${f.cocMin || '0'}–${f.cocMax || '∞'}%`, key: 'coc' });
+  if (f.ltvMin || f.ltvMax) activeFilters.push({ label: `LTV ${f.ltvMin || '0'}–${f.ltvMax || '∞'}%`, key: 'ltv' });
   if (f.clientEquity) activeFilters.push({ label: 'Fits Exchange', key: 'clientEquity' });
   if (f.quickDst) activeFilters.push({ label: 'DST Only', key: 'quickDst' });
   if (f.quickNoDebt) activeFilters.push({ label: 'No Debt', key: 'quickNoDebt' });
@@ -919,14 +923,13 @@ function renderBrowse() {
         ${focuses.map(s => `<option value="${s}" ${f.focus === s ? 'selected' : ''}>${s}</option>`).join('')}
       </select>
     </div>
-    <div class="quick-filter-bar">
-      <span class="quick-filter-label">Quick Filters</span>
+    <div class="filter-row-2">
       <button class="quick-filter-btn ${f.quickDst ? 'active' : ''}" onclick="STATE.browseFilters.quickDst=!STATE.browseFilters.quickDst;renderApp()">DST Only</button>
       <button class="quick-filter-btn ${f.quickNoDebt ? 'active' : ''}" onclick="STATE.browseFilters.quickNoDebt=!STATE.browseFilters.quickNoDebt;renderApp()">No Debt</button>
       <button class="quick-filter-btn ${f.quickUpreit ? 'active' : ''}" onclick="STATE.browseFilters.quickUpreit=!STATE.browseFilters.quickUpreit;renderApp()">721 UpREIT Only</button>
-    </div>
-    <div class="filter-row-2">
-      <div class="range-filter"><span>CoC</span><input placeholder="min" value="${f.cocMin}" oninput="STATE.browseFilters.cocMin=this.value;renderApp()"><span>–</span><input placeholder="max" value="${f.cocMax}" oninput="STATE.browseFilters.cocMax=this.value;renderApp()"><span>%</span></div>
+      <span class="filter-divider"></span>
+      <div class="range-filter"><span>Cash on Cash</span><input placeholder="min" value="${f.cocMin}" oninput="STATE.browseFilters.cocMin=this.value;renderApp()"><span>–</span><input placeholder="max" value="${f.cocMax}" oninput="STATE.browseFilters.cocMax=this.value;renderApp()"><span>%</span></div>
+      <div class="range-filter"><span>Loan to Value</span><input placeholder="min" value="${f.ltvMin}" oninput="STATE.browseFilters.ltvMin=this.value;renderApp()"><span>–</span><input placeholder="max" value="${f.ltvMax}" oninput="STATE.browseFilters.ltvMax=this.value;renderApp()"><span>%</span></div>
       ${STATE.client.exchangeAmount ? `<div class="equity-filter ${f.clientEquity ? 'active' : ''}" onclick="STATE.browseFilters.clientEquity=!STATE.browseFilters.clientEquity;renderApp()">💰 Fits ${fmtMoney(STATE.client.exchangeAmount)}</div>` : ''}
       <div style="flex:1"></div>
       <select class="sort-select" onchange="STATE.browseSort=this.value;renderApp()">
@@ -958,6 +961,7 @@ function renderBrowse() {
 
 function clearFilter(key) {
   if (key === 'coc') { STATE.browseFilters.cocMin = ''; STATE.browseFilters.cocMax = ''; }
+  else if (key === 'ltv') { STATE.browseFilters.ltvMin = ''; STATE.browseFilters.ltvMax = ''; }
   else if (key === 'clientEquity') STATE.browseFilters.clientEquity = false;
   else if (key === 'quickDst') STATE.browseFilters.quickDst = false;
   else if (key === 'quickNoDebt') STATE.browseFilters.quickNoDebt = false;
