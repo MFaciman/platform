@@ -6,7 +6,7 @@
 <title>Alts Fund Link — Platform</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 :root {
@@ -270,6 +270,121 @@ a{color:inherit;text-decoration:none}button{cursor:pointer;font-family:var(--fon
 .toast-success{border-left:4px solid #34D399}.toast-error{border-left:4px solid #F87171}
 ::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--mist);border-radius:3px}::-webkit-scrollbar-thumb:hover{background:var(--fog)}
 @media(max-width:900px){:root{--nav-w:0px}#sidebar{display:none}#main{padding:18px}.dashboard-grid{grid-template-columns:1fr}.quick-stats{grid-template-columns:repeat(2,1fr)}.offering-grid{grid-template-columns:1fr}#view-toggle .view-btn span.label-text{display:none}.offering-table{font-size:12px}.offering-table td,.offering-table th{padding:7px 8px}.detail-two-col{grid-template-columns:1fr}.kd-grid{grid-template-columns:1fr}.detail-prev-next button{max-width:80px}}
+/* ═══════════════════════════════════════════
+   BASKET VIEW — Imported from Tear Sheet
+═══════════════════════════════════════════ */
+.bv{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:rgba(9,14,25,0.92);direction:ltr!important}
+.bv .report{border:1px solid rgba(15,23,42,0.12);background:rgba(255,255,255,0.64);border-radius:16px;overflow:hidden;box-shadow:0 18px 60px rgba(15,23,42,0.12)}
+.bv .r-hero{padding:16px 16px 14px;border-bottom:1px solid rgba(255,255,255,0.14);background:radial-gradient(900px 380px at 10% 0%,rgba(11,31,59,0.56),transparent 62%),radial-gradient(700px 360px at 95% 10%,rgba(28,58,99,0.38),transparent 58%),linear-gradient(180deg,rgba(6,18,34,0.86),rgba(16,35,60,0.72))}
+.bv .topline{display:grid;grid-template-columns:1.2fr auto auto;gap:12px;align-items:start}
+@media(max-width:980px){.bv .topline{grid-template-columns:1fr}}
+.bv .r-title h2{margin:0;font-size:18px;font-weight:950;letter-spacing:.2px;line-height:1.2;color:rgba(255,255,255,0.98);text-shadow:0 6px 20px rgba(0,0,0,0.25)}
+.bv .r-title .subline{margin-top:6px;font-size:12px;color:rgba(255,255,255,0.92);font-weight:850;text-shadow:0 6px 20px rgba(0,0,0,0.22)}
+.bv .metaRow{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.bv .r-badge{display:inline-flex;align-items:center;padding:4px 8px;border-radius:999px;border:1px solid rgba(255,255,255,0.22);background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.86);font-size:11px;font-weight:850;backdrop-filter:blur(4px)}
+.bv .r-badge strong{font-weight:950;color:rgba(255,255,255,0.96)}
+.bv .hdrStatusWrap{border:1px solid rgba(255,255,255,0.20);background:rgba(255,255,255,0.12);border-radius:14px;padding:10px;min-height:92px;display:flex;align-items:stretch;gap:12px;min-width:280px;box-shadow:0 18px 44px rgba(0,0,0,0.14);backdrop-filter:blur(6px)}
+@media(max-width:980px){.bv .hdrStatusWrap{height:auto;min-width:0}}
+.bv .vStat{display:flex;gap:10px;align-items:stretch;min-width:0;flex:1 1 0}
+.bv .vTrack{width:12px;border-radius:999px;border:1px solid rgba(255,255,255,0.22);background:rgba(255,255,255,0.10);overflow:hidden;position:relative;flex:0 0 12px}
+.bv .vFill{position:absolute;left:0;right:0;bottom:0;height:0%;background:linear-gradient(180deg,rgba(52,211,153,0.96),rgba(16,185,129,0.98))}
+.bv .vInfo{display:grid;grid-template-rows:auto 1fr;gap:6px;min-width:0;width:100%}
+.bv .vHdr{display:flex;align-items:baseline;justify-content:space-between;gap:8px;min-width:0;white-space:nowrap}
+.bv .vHdr .k{font-size:10px;font-weight:950;text-transform:uppercase;letter-spacing:.25px;color:rgba(255,255,255,0.92)}
+.bv .vList{display:grid;gap:3px;align-content:start;min-width:0}
+.bv .vLine{font-size:10px;font-weight:850;color:rgba(255,255,255,0.82);line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bv .vLine b{font-weight:950;color:rgba(255,255,255,0.96)}
+.bv .docsBox{display:grid;gap:8px;text-align:left;align-content:start;justify-items:start;position:relative}
+.bv .docPopover{position:absolute;right:0;top:calc(100% + 10px);z-index:9999}
+@media(max-width:980px){.bv .docPopover{right:auto;left:0}}
+.bv .modal{max-width:540px;margin:0;border-radius:16px;border:1px solid rgba(15,23,42,0.14);background:radial-gradient(900px 420px at 20% 0%,rgba(11,31,59,0.12),transparent 65%),linear-gradient(180deg,rgba(255,255,255,0.94),rgba(238,242,246,0.90));box-shadow:0 24px 80px rgba(15,23,42,0.18);overflow:hidden;text-align:left}
+.bv .modalHdr{padding:12px;border-bottom:1px solid rgba(15,23,42,0.10);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.bv .modalHdr .t{font-size:12px;font-weight:950;letter-spacing:.25px;text-transform:uppercase;color:rgba(9,14,25,0.84)}
+.bv .modalBody{padding:12px;display:grid;gap:10px;max-height:55vh;overflow:auto}
+.bv .docRow{border:1px solid rgba(15,23,42,0.12);background:rgba(255,255,255,0.74);border-radius:14px;padding:10px;display:flex;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 10px 24px rgba(15,23,42,0.06)}
+.bv .docRow .name{font-size:11px;font-weight:900;color:rgba(9,14,25,0.86);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bv .docRow .right{display:flex;gap:8px;flex:0 0 auto}
+.bv .docRow .na{font-size:11px;font-weight:850;color:rgba(9,14,25,0.52)}
+.bv .kv-grid{padding:14px 16px;display:grid;grid-template-columns:1.1fr 0.9fr;gap:12px;border-bottom:1px solid rgba(15,23,42,0.10);background:rgba(255,255,255,0.54)}
+@media(max-width:980px){.bv .kv-grid{grid-template-columns:1fr}}
+.bv .callouts{display:grid;gap:10px}
+.bv .callout{border:1px solid rgba(15,23,42,0.12);background:rgba(255,255,255,0.64);border-radius:14px;padding:12px;box-shadow:0 12px 26px rgba(15,23,42,0.06)}
+.bv .callout h3{margin:0 0 8px 0;font-size:12px;text-transform:uppercase;letter-spacing:.25px;color:rgba(9,14,25,0.78);font-weight:950}
+.bv .callout ul{margin:0;padding-left:18px;color:rgba(9,14,25,0.78);font-size:12px;line-height:1.55;font-weight:700}
+.bv .callout li{margin:6px 0}
+.bv .mapWrap{border:1px solid rgba(15,23,42,0.12);background:rgba(255,255,255,0.60);border-radius:14px;padding:12px;box-shadow:0 12px 28px rgba(15,23,42,0.06)}
+.bv .mapHdr{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:10px}
+.bv .mapHdr .t{font-size:12px;font-weight:950;letter-spacing:.2px;color:rgba(9,14,25,0.88)}
+.bv .mapHdr .s{font-size:11px;color:rgba(9,14,25,0.60);font-weight:800}
+.bv .mapBox{height:270px;border-radius:14px;border:1px solid rgba(15,23,42,0.10);background:#EEF2F6;overflow:hidden}
+.bv .legend{display:flex;align-items:center;gap:10px;margin-top:10px;color:rgba(9,14,25,0.62);font-size:11px;font-weight:800}
+.bv .swatch{width:16px;height:10px;border-radius:999px;background:rgba(11,31,59,0.82);border:1px solid rgba(28,58,99,0.70)}
+.bv .sections{padding:14px 16px 16px;display:grid;gap:14px}
+.bv .sec{border:1px solid rgba(15,23,42,0.12);border-radius:14px;background:rgba(255,255,255,0.60);overflow:hidden;box-shadow:0 12px 30px rgba(15,23,42,0.06)}
+.bv .secHdr{padding:12px;border-bottom:1px solid rgba(15,23,42,0.10);display:flex;align-items:baseline;justify-content:space-between;gap:10px;background:linear-gradient(135deg,rgba(11,31,59,0.08),rgba(255,255,255,0.74));flex-wrap:wrap;box-shadow:inset 0 2px 0 rgba(11,31,59,0.18)}
+.bv .secHdr .h{font-size:12px;font-weight:950;letter-spacing:.25px;text-transform:uppercase;color:rgba(9,14,25,0.84)}
+.bv .secHdr .hint{font-size:11px;color:rgba(9,14,25,0.58);font-weight:800}
+.bv .secBody{padding:12px}
+.bv .metricsGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:980px){.bv .metricsGrid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.bv .metricsGrid{grid-template-columns:1fr}}
+.bv .mBox{border:1px solid rgba(15,23,42,0.12);border-radius:14px;padding:10px;background:linear-gradient(180deg,rgba(255,255,255,0.78),rgba(238,242,246,0.78));min-width:0;position:relative;box-shadow:0 10px 24px rgba(15,23,42,0.06)}
+.bv .mBox .k{font-size:10px;color:rgba(9,14,25,0.58);font-weight:950;text-transform:uppercase;letter-spacing:.25px;padding-right:56px}
+.bv .mBox .v{margin-top:6px;font-size:14px;font-weight:950;letter-spacing:.15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:rgba(9,14,25,0.92)}
+.bv .mBox .vs{margin-top:6px;font-size:11px;color:rgba(9,14,25,0.66);font-weight:800}
+.bv .mCov{position:absolute;top:8px;right:8px;font-size:10px;font-weight:900;color:rgba(9,14,25,0.52);background:rgba(238,242,246,0.90);padding:2px 6px;border-radius:6px}
+.bv .mCov.warn{color:rgba(198,137,42,0.92);background:rgba(198,137,42,0.12)}
+.bv .delta{font-weight:900}.bv .delta.pos{color:rgba(31,157,107,0.96)}.bv .delta.neg{color:rgba(214,69,69,0.90)}
+.bv .pctl{color:rgba(9,14,25,0.54);font-weight:850}
+.bv .textBlock{font-size:12px;color:rgba(9,14,25,0.62);font-weight:700;line-height:1.6}
+.bv .chartWrap{border:1px solid rgba(15,23,42,0.12);border-radius:14px;padding:12px;background:rgba(255,255,255,0.80);box-shadow:0 10px 24px rgba(15,23,42,0.06)}
+.bv .chartHdr{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:10px}
+.bv .chartHdr .t{font-size:12px;font-weight:950;letter-spacing:.2px;color:rgba(9,14,25,0.86)}
+.bv .chartHdr .s{font-size:11px;color:rgba(9,14,25,0.58);font-weight:800}
+.bv .chartBox{height:320px;position:relative}
+.bv .valHero{display:grid;gap:10px}
+.bv .calloutRow{display:grid;grid-template-columns:1fr auto;gap:10px}
+@media(max-width:700px){.bv .calloutRow{grid-template-columns:1fr}}
+.bv .heroCall{border:1px solid rgba(15,23,42,0.14);border-radius:14px;padding:12px;background:linear-gradient(135deg,rgba(238,242,246,0.92),rgba(255,255,255,0.92));box-shadow:0 16px 36px rgba(15,23,42,0.08)}
+.bv .heroCall.good{border-color:rgba(31,157,107,0.26);background:linear-gradient(135deg,rgba(31,157,107,0.08),rgba(255,255,255,0.92))}
+.bv .heroCall.bad{border-color:rgba(214,69,69,0.22);background:linear-gradient(135deg,rgba(214,69,69,0.06),rgba(255,255,255,0.92))}
+.bv .heroTop{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.bv .heroK{font-size:11px;font-weight:950;text-transform:uppercase;letter-spacing:.25px;color:rgba(9,14,25,0.68)}
+.bv .heroMain{font-size:16px;font-weight:950;color:rgba(9,14,25,0.92);letter-spacing:.15px}
+.bv .heroSub{font-size:12px;font-weight:850;color:rgba(9,14,25,0.72);margin-top:4px}
+.bv .heroMeta{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}
+.bv .kv{font-size:11px;font-weight:800;color:rgba(9,14,25,0.66)}.bv .kv b{font-weight:950;color:rgba(9,14,25,0.82)}
+.bv .miniCall{border:1px solid rgba(15,23,42,0.12);border-radius:14px;padding:12px;min-width:180px;background:rgba(255,255,255,0.74);box-shadow:0 10px 24px rgba(15,23,42,0.06)}
+.bv .miniCall .k{font-size:11px;font-weight:950;text-transform:uppercase;letter-spacing:.25px;color:rgba(9,14,25,0.62);margin-bottom:6px}
+.bv .miniCall .v{font-size:14px;font-weight:950;color:rgba(9,14,25,0.92)}
+.bv .miniCall .s{margin-top:6px;font-size:11px;color:rgba(9,14,25,0.58);font-weight:750;line-height:1.5}
+.bv .r-pill{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border-radius:999px;border:1px solid rgba(15,23,42,0.12);background:rgba(255,255,255,0.62);color:rgba(9,14,25,0.64);font-size:11px;font-weight:850}
+.bv .vcompWrap{border:1px solid rgba(15,23,42,0.12);background:rgba(255,255,255,0.64);border-radius:14px;overflow:hidden;box-shadow:0 12px 30px rgba(15,23,42,0.06)}
+.bv .vcompTop{padding:12px;border-bottom:1px solid rgba(15,23,42,0.10);background:linear-gradient(135deg,rgba(11,31,59,0.08),rgba(255,255,255,0.74));display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;box-shadow:inset 0 2px 0 rgba(11,31,59,0.18)}
+.bv .vcompTop .t{font-size:12px;font-weight:950;letter-spacing:.25px;text-transform:uppercase;color:rgba(9,14,25,0.84)}
+.bv .vcompTop .s{font-size:11px;color:rgba(9,14,25,0.58);font-weight:800}
+.bv .vcompScroller{overflow:auto;background:rgba(255,255,255,0.60)}
+.bv .vcompTable{width:100%;border-collapse:separate;border-spacing:0;min-width:760px}
+.bv .vcompTable th,.bv .vcompTable td{border-bottom:1px solid rgba(15,23,42,0.08);padding:10px;vertical-align:top;font-size:12px;color:rgba(9,14,25,0.82);font-weight:750}
+.bv .vcompTable thead th{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid rgba(15,23,42,0.14);box-shadow:0 6px 14px rgba(15,23,42,0.06)}
+.bv .vcompTable thead th:first-child{z-index:6}
+.bv .vcompField{width:260px;min-width:240px;max-width:340px;color:rgba(9,14,25,0.68);font-weight:900}
+.bv .vcompOfferHdr{font-size:11px;font-weight:950;color:rgba(9,14,25,0.88);letter-spacing:.2px;text-transform:uppercase;line-height:1.15}
+.bv .vcompOfferSub{margin-top:4px;font-size:10px;font-weight:850;color:rgba(9,14,25,0.58);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bv .vcompGroupRow td{background:rgba(238,242,246,0.94);border-top:1px solid rgba(15,23,42,0.10);border-bottom:1px solid rgba(15,23,42,0.10);padding:10px;font-size:11px;font-weight:950;text-transform:uppercase;letter-spacing:.25px;color:rgba(9,14,25,0.74)}
+.bv .vcompVal{white-space:pre-wrap;word-break:break-word;line-height:1.55}
+.bv .vcompNA{color:rgba(9,14,25,0.48);font-weight:850}
+.bv .bv-btn{border:1px solid rgba(15,23,42,0.14);background:rgba(255,255,255,0.74);color:rgba(9,14,25,0.90);padding:4px 10px;border-radius:12px;font-size:11px;font-weight:900;cursor:pointer;transition:transform .08s ease,background .15s ease;user-select:none;white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 8px 22px rgba(15,23,42,0.06)}
+.bv .bv-btn:hover{background:rgba(255,255,255,0.88)}
+.bv .bv-btn:active{transform:translateY(1px)}
+.bv .bv-btn.doc{border-color:rgba(255,255,255,0.20);color:rgba(255,255,255,0.98);background:linear-gradient(135deg,rgba(64,156,255,0.96),rgba(120,207,255,0.92));box-shadow:0 16px 44px rgba(30,136,229,0.20)}
+.bv .bv-btn.doc:hover{filter:brightness(1.05)}
+.bv .bv-btn:disabled{opacity:.55;cursor:not-allowed;pointer-events:none}
+.bv .ico{width:14px;height:14px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 14px;opacity:.98}
+.bv .ico svg{width:14px;height:14px;display:block}
+.bv .ftr{padding:10px 18px;border-top:1px solid rgba(15,23,42,0.10);display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:10px;color:rgba(9,14,25,0.50);font-weight:800;background:rgba(255,255,255,0.60)}
+@media print{.bv .report{border:1px solid #ddd!important;background:#fff!important}.bv .r-hero .r-badge{color:#333!important;border-color:#ccc!important;background:#f0f0f0!important}.bv .sec,.bv .callout,.bv .mapWrap,.bv .valHero,.bv .chartWrap,.bv .vcompWrap{break-inside:avoid;page-break-inside:avoid}.bv .vcompScroller{overflow:visible!important}.bv .vcompTable thead th{position:static!important;box-shadow:none!important}*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}}
+
 </style>
 </head>
 <body>
@@ -340,6 +455,7 @@ function fetchSheetData() {
     .then(raw => {
       const json = JSON.parse(raw.substring(raw.indexOf('{'), raw.lastIndexOf('}') + 1));
       const cols = json.table.cols.map(c => c.label || '');
+      STATE.headers = cols;
       const rows = json.table.rows;
       STATE.funds = rows.map((row, idx) => {
         const g = (label) => { let ci = cols.findIndex(c => c.trim() === label.trim()); return ci >= 0 && row.c[ci] ? (row.c[ci].v ?? null) : null; };
@@ -1340,264 +1456,450 @@ function renderIncomeChart(fund) {
 /* ═══════════════════════════════════════════
    BASKET VIEW
 ═══════════════════════════════════════════ */
-function renderBasket() {
-  const items = STATE.basket.map(id => STATE.funds.find(f => f.id === id)).filter(Boolean);
-  if (!items.length) return '<div class="page-header"><div><div class="page-title">Basket & Comparison</div><div class="page-subtitle">Add offerings from Browse to compare side-by-side</div></div></div><div class="empty-state"><div class="empty-state-icon">🛒</div><h3>Basket is Empty</h3><p>Add up to 3 offerings from Browse to unlock side-by-side comparison, peer benchmarking, and portfolio analysis.</p><button class="btn btn-primary" onclick="navigateTo(\'browse\')">Browse Offerings</button></div>';
+/* ═══════════════════════════════════════════
+   BASKET VIEW — Tear Sheet Integration
+   Ported from standalone Basket Builder
+═══════════════════════════════════════════ */
 
-  const p = STATE.peer;
-  const c = STATE.client;
-  const n = items.length;
-  const gridCols = 'grid-template-columns: 180px repeat(' + n + ', 1fr)';
+// ── Basket utilities ──
+const BV = {};
+BV.escapeHTML = (s) => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+BV.isNum = (x) => typeof x === 'number' && isFinite(x);
+BV.clamp = (n, a, b) => Math.max(a, Math.min(b, n));
+BV.fmtDate = (d) => (d instanceof Date && !isNaN(d.getTime())) ? d.toLocaleDateString(undefined, { year:'numeric', month:'short', day:'2-digit' }) : '—';
+BV.fmtPct = (p, digits) => BV.isNum(p) ? p.toFixed(digits ?? 2) + '%' : '—';
+BV.fmtMoney = (n) => { if (!BV.isNum(n)) return '—'; const a = Math.abs(n); if (a >= 1e9) return '$' + (n/1e9).toFixed(2) + 'B'; if (a >= 1e6) return '$' + (n/1e6).toFixed(3) + 'M'; if (a >= 1e3) return '$' + (n/1e3).toFixed(1) + 'K'; return '$' + n.toFixed(0); };
+BV.fmtMoneyFull = (n) => { if (!BV.isNum(n)) return '—'; try { return new Intl.NumberFormat(undefined, { style:'currency', currency:'USD', maximumFractionDigits:0 }).format(n); } catch(e) { return '$' + Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ','); } };
+BV.normalizeHeader = (s) => String(s ?? '').toLowerCase().replace(/\s+/g, ' ').replace(/[^a-z0-9%#()$\/\- ]+/g, '').trim();
+BV.uniqSorted = (arr) => Array.from(new Set(arr.map(x => String(x||'').trim()).filter(Boolean))).sort((a,b)=>a.localeCompare(b));
+BV.parseNumberLoose = (v) => { if (v == null) return null; if (typeof v === 'number') return isFinite(v) ? v : null; const s = String(v).trim(); if (!s || /^na$/i.test(s)) return null; const m = s.replace(/,/g,'').match(/-?\d+(\.\d+)?/); return m ? parseFloat(m[0]) : null; };
+BV.parsePercent = (v) => { if (v == null) return null; if (typeof v === 'number') { if (!isFinite(v)) return null; if (Math.abs(v) <= 1) return v * 100; return v; } const s0 = String(v).trim(); if (!s0 || /^na$/i.test(s0)) return null; const s = s0.replace(/,/g, ''); if (/%/.test(s)) { const m = s.match(/-?\d+(\.\d+)?/); if (!m) return null; const num = parseFloat(m[0]); if (!isFinite(num)) return null; return num; } const m = s.match(/-?\d+(\.\d+)?/); if (!m) return null; const num = parseFloat(m[0]); if (!isFinite(num)) return null; if (Math.abs(num) <= 1) return num * 100; return num; };
+BV.parseMoney = (v) => { if (v == null) return null; if (typeof v === 'number') return isFinite(v) ? v : null; const s0 = String(v).trim(); if (!s0 || /^na$/i.test(s0)) return null; const s = s0.replace(/,/g, ''); const m = s.match(/-?\$?\s*(\d+(\.\d+)?)(\s*[kKmMbB])?/); if (!m) return null; let num = parseFloat(m[1]); const suf = (m[3]||'').trim().toUpperCase(); if (suf === 'K') num *= 1e3; if (suf === 'M') num *= 1e6; if (suf === 'B') num *= 1e9; return isFinite(num) ? num : null; };
+BV.parseDate = (v) => { if (v == null) return null; if (v instanceof Date) return isNaN(v.getTime()) ? null : v; if (typeof v === 'number' && isFinite(v)) { if (v > 1e11) { const d = new Date(v); return isNaN(d.getTime()) ? null : d; } const base = new Date(Date.UTC(1899,11,30)); const d = new Date(base.getTime() + v * 86400000); return isNaN(d.getTime()) ? null : d; } const s = String(v).trim(); if (!s || /^na$/i.test(s)) return null; const m = s.match(/(?:Date|Datetime)\(\s*([^)]+)\s*\)/i); if (m) { const parts = m[1].split(',').map(x=>parseInt(x.trim(),10)).filter(x=>!isNaN(x)); if (parts.length >= 3) { const d = new Date(parts[0], parts[1], parts[2]); return isNaN(d.getTime()) ? null : d; } } const d = new Date(s); return isNaN(d.getTime()) ? null : d; };
+BV.parseHoldPeriodYears = (v) => { if (v == null) return null; const s = String(v).trim().toLowerCase(); if (!s || s === 'na') return null; const range = s.match(/(\d+(\.\d+)?)\s*(to|\-)\s*(\d+(\.\d+)?)/); if (range) return (parseFloat(range[1]) + parseFloat(range[4])) / 2; const single = s.match(/(\d+(\.\d+)?)/); return single ? parseFloat(single[1]) : null; };
+BV.normalizeDocUrl = (u) => { u = String(u || '').trim(); if (!u || /^na$/i.test(u)) return ''; const openId = u.match(/drive\.google\.com\/open\?id=([^&]+)/i); if (openId) return 'https://drive.google.com/file/d/' + openId[1] + '/view'; const fileId = u.match(/drive\.google\.com\/file\/d\/([^\/]+)/i); if (fileId) return 'https://drive.google.com/file/d/' + fileId[1] + '/view'; if (/^www\./i.test(u)) return 'https://' + u; if (!/^https?:\/\//i.test(u) && /\./.test(u)) return 'https://' + u; return u; };
 
-  const avgOf = (fn) => { const vs = items.map(fn).filter(v => v != null); return vs.length ? vs.reduce((a,b) => a+b, 0) / vs.length : null; };
-  const blended = {
-    y1coc: avgOf(f => f.y1coc), ltv: avgOf(f => f.ltv), occ: avgOf(f => f.occupancy),
-    minTotal: items.reduce((s, f) => s + (f.minInvest || 0), 0),
-    leaseTerm: avgOf(f => f.avgLeaseTerm)
+// ── State extraction helpers ──
+BV.STATE_ABBR = new Set(["AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY","DC"]);
+BV.STATE_NAME_TO_ABBR = {"ALABAMA":"AL","ALASKA":"AK","ARIZONA":"AZ","ARKANSAS":"AR","CALIFORNIA":"CA","COLORADO":"CO","CONNECTICUT":"CT","DELAWARE":"DE","FLORIDA":"FL","GEORGIA":"GA","HAWAII":"HI","IDAHO":"ID","ILLINOIS":"IL","INDIANA":"IN","IOWA":"IA","KANSAS":"KS","KENTUCKY":"KY","LOUISIANA":"LA","MASSACHUSETTS":"MA","MARYLAND":"MD","MAINE":"ME","MICHIGAN":"MI","MINNESOTA":"MN","MISSISSIPPI":"MS","MISSOURI":"MO","MONTANA":"MT","NEBRASKA":"NE","NEVADA":"NV","NEW HAMPSHIRE":"NH","NEW JERSEY":"NJ","NEW MEXICO":"NM","NEW YORK":"NY","NORTH CAROLINA":"NC","NORTH DAKOTA":"ND","OHIO":"OH","OKLAHOMA":"OK","OREGON":"OR","PENNSYLVANIA":"PA","RHODE ISLAND":"RI","SOUTH CAROLINA":"SC","SOUTH DAKOTA":"SD","TENNESSEE":"TN","TEXAS":"TX","UTAH":"UT","VERMONT":"VT","VIRGINIA":"VA","WASHINGTON":"WA","WEST VIRGINIA":"WV","WISCONSIN":"WI","WYOMING":"WY","DISTRICT OF COLUMBIA":"DC"};
+BV.extractStates = (locationText) => { const s = String(locationText ?? '').toUpperCase(); if (!s || s === 'NA') return []; const found = new Set(); const abbrMatches = s.match(/\b[A-Z]{2}\b/g) || []; for (const ab of abbrMatches) { if (BV.STATE_ABBR.has(ab)) found.add(ab); } for (const [name, ab] of Object.entries(BV.STATE_NAME_TO_ABBR)) { if (s.includes(name)) found.add(ab); } return Array.from(found).filter(x => x !== 'AK' && x !== 'HI').sort(); };
+BV.summarizeStates = (states, max) => { max = max || 6; const arr = BV.uniqSorted(states); if (!arr.length) return '—'; if (arr.length <= max) return arr.join(', '); return arr.slice(0, max).join(', ') + '…'; };
+BV.pctDelta = (a, b) => { if (!BV.isNum(a) || !BV.isNum(b) || b === 0) return null; return (a - b) / b * 100; };
+BV.moneyDelta = (a, b) => { if (!BV.isNum(a) || !BV.isNum(b)) return null; return a - b; };
+
+BV.iconSvg = (type) => { const common = 'width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"'; const wrap = (inner) => '<span class="ico"><svg ' + common + '>' + inner + '</svg></span>'; const icons = { brochure: wrap('<path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"/><path d="M14 2v5h5"/><path d="M9 13h6"/><path d="M9 17h6"/>'), ppm: wrap('<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 6h8"/><path d="M8 10h8"/>'), video: wrap('<path d="M15 10l4.5-2.5v9L15 14"/><rect x="3" y="7" width="12" height="10" rx="2" ry="2"/>'), ai_offering_chat: wrap('<path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/><path d="M8 9h8"/><path d="M8 13h6"/>'), track_record: wrap('<path d="M3 3v18h18"/><path d="M7 14l3-3 3 2 5-6"/>'), sponsor_news: wrap('<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10"/><path d="M7 12h6"/><path d="M7 16h8"/>'), sales_team_map: wrap('<path d="M21 10c0 6-9 12-9 12S3 16 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>') }; return icons[type] || wrap('<circle cx="12" cy="12" r="9"/>'); };
+
+// ── Percentile rank ──
+BV.lowerBound = (arr, x) => { let lo = 0, hi = arr.length; while (lo < hi) { const mid = (lo + hi) >> 1; if (arr[mid] < x) lo = mid + 1; else hi = mid; } return lo; };
+BV.upperBound = (arr, x) => { let lo = 0, hi = arr.length; while (lo < hi) { const mid = (lo + hi) >> 1; if (arr[mid] <= x) lo = mid + 1; else hi = mid; } return lo; };
+BV.percentileRank = (sorted, x) => { if (!sorted || !sorted.length || !BV.isNum(x)) return null; const n = sorted.length; const lo = BV.lowerBound(sorted, x); const hi = BV.upperBound(sorted, x); return BV.clamp((lo + 0.5 * (hi - lo)) / n * 100, 0, 100); };
+BV.ordinal = (n) => { n = Math.round(n); const v = n % 100; const s = ['th','st','nd','rd']; return n + (s[(v-20)%10] || s[v] || s[0]); };
+BV.pctileText = (p) => p == null ? '' : BV.ordinal(p) + ' pctile';
+
+// ── Adapter: convert platform fund → basket fund format ──
+BV.adaptFund = (f) => {
+  if (!f) return null;
+  const parseCellValue = (cell) => { if (!cell) return ''; if (cell.p && typeof cell.p === 'object') { for (const k of ['link','url','href','hyperlink']) { if (typeof cell.p[k] === 'string' && cell.p[k].trim()) return cell.p[k].trim(); } } const v = cell.v; const fmt = cell.f; if (typeof v === 'number' && isFinite(v)) return v; if (v instanceof Date && !isNaN(v.getTime())) return v; if (typeof v === 'string' && v.trim()) return v.trim(); if (typeof fmt === 'string' && fmt.trim() !== '') return fmt.trim(); if (v == null) return ''; return v; };
+
+  // Build raw row array from _raw cells
+  const rawRow = f._raw ? f._raw.map(parseCellValue) : [];
+
+  const m = {};
+  m.year1_coc = f.y1coc;
+  m.ltv = f.ltv;
+  m.cap_rate = f.acqCapRate;
+  m.hold_period_years = f.holdPeriod;
+  m.minimum_investment = f.minInvest;
+  m.pct_leased = f.occupancy;
+  m.num_assets = f.units;
+  m.rent_escalations = BV.parseNumberLoose(f.rentEscalations);
+  m.avg_lease_term_remaining = f.avgLeaseTerm;
+  m.purchase_price_unloaded = f.purchasePrice;
+  m.appraised_valuation = f.appraisedValue;
+  m.loaded_price = f.loadedPrice;
+  m.filed_raise = f.filedRaise;
+  m.current_raise = f.currentRaise;
+  m.remaining_raise = f.equityRemaining;
+  m.pct_raise_remaining = f.pctRemaining;
+  m.offering_open = f.openDate;
+  m.offering_close = f.closeDate;
+  m.states = BV.extractStates(f.location);
+  for (let i = 1; i <= 10; i++) m['income_y' + i] = f.income[i - 1];
+
+  return {
+    id: f.id,
+    sponsor: f.sponsor,
+    offering_name: f.name,
+    displayLabel: f.sponsor + ' — ' + f.name,
+    asset_class: f.propType,
+    sector_focus: f.sector || f.focus || '',
+    offering_structure: f.propType,
+    distribution_frequency: f.distFrequency,
+    debt_terms: f.debtTerms,
+    lease_terms: f.leaseTerms,
+    preferred: f.preferred,
+    promote: f.promote,
+    upreit_721: f.upReit,
+    gp_commit: f.gpCommit,
+    property_locations: f.location,
+    year_built_avg: f.buildingAge,
+    metrics: m,
+    docs: {
+      brochure: BV.normalizeDocUrl(f.brochureUrl),
+      ppm: BV.normalizeDocUrl(f.ppmUrl),
+      video: BV.normalizeDocUrl(f.videoUrl),
+      ai_offering_chat: BV.normalizeDocUrl(f.aiChatUrl),
+      track_record: BV.normalizeDocUrl(f.trackRecordUrl),
+      sponsor_news: BV.normalizeDocUrl(f.sponsorNewsUrl),
+      sales_team_map: BV.normalizeDocUrl(f.salesTeamUrl)
+    },
+    __rawRow: rawRow
   };
+};
 
-  const bestOf = (fn, lower) => { const vs = items.map(fn).filter(v => v != null); if (!vs.length) return null; return lower ? Math.min(...vs) : Math.max(...vs); };
-  const markBest = (v, fn, lower) => { if (v == null || n < 2) return ''; return v === bestOf(fn, lower) ? ' best' : ''; };
+// ── Peer stats for basket ──
+BV.PEER_KEYS = ['year1_coc','ltv','hold_period_years','minimum_investment','pct_leased','rent_escalations','avg_lease_term_remaining','num_assets','purchase_price_unloaded','appraised_valuation','loaded_price','cap_rate'];
+BV.SNAPSHOT_KEYS = ['year1_coc','ltv','hold_period_years','minimum_investment','pct_leased','rent_escalations','avg_lease_term_remaining','num_assets'];
+BV.INCOME_KEYS = Array.from({length:10}, (_,i) => 'income_y' + (i+1));
+BV.DISCLOSURES = 'For informational purposes only. This material does not constitute investment advice, an offer to sell, or a solicitation of an offer to buy any security or interest. Figures are shown as provided in the underlying data source and may be incomplete, unaudited, or subject to change. Verify all information with official offering documents and your firm\'s compliance requirements. Peer averages shown are simple averages of the currently listed offerings in the data set (excluding blanks/NA). For Broker Dealer and Investment Advisor home office due diligence use only. Always validate data with official offering documents and compliance requirements. Alts Fund LINK, LLC is not responsible for data errors or omissions.';
 
-  const allY1 = STATE.funds.map(f => f.y1coc).filter(v => v != null);
-  const allLTV = STATE.funds.map(f => f.ltv).filter(v => v != null);
-  const pctRank = (val, arr) => { if (val == null || !arr.length) return null; return Math.round((arr.filter(v => v <= val).length / arr.length) * 100); };
-
-  // Header
-  const header = '<div class="page-header"><div><div class="page-title">Basket & Comparison</div><div class="page-subtitle">' + n + ' offering' + (n > 1 ? 's' : '') + ' selected \u2014 side-by-side analysis</div></div><div style="display:flex;gap:8px"><button class="btn btn-secondary" onclick="navigateTo(\'browse\')">+ Add More</button><button class="btn btn-ghost" onclick="STATE.basket=[];saveBasket();renderApp();toast(\'Basket cleared\')">Clear All</button></div></div>';
-
-  // Stats bar
-  const statCols = c.exchangeAmount ? 5 : 4;
-  const statsBar = '<div class="quick-stats" style="grid-template-columns:repeat(' + statCols + ',1fr);margin-bottom:20px">' +
-    '<div class="stat-card card-enter"><div class="stat-val">' + n + '</div><div class="stat-label">In Basket</div></div>' +
-    '<div class="stat-card card-enter" style="animation-delay:0.06s"><div class="stat-val">' + fmtPct(blended.y1coc) + '</div><div class="stat-label">Blended Y1 CoC</div></div>' +
-    '<div class="stat-card card-enter" style="animation-delay:0.12s"><div class="stat-val">' + fmtPct(blended.ltv) + '</div><div class="stat-label">Blended LTV</div></div>' +
-    '<div class="stat-card card-enter" style="animation-delay:0.18s"><div class="stat-val">' + fmtMoney(blended.minTotal) + '</div><div class="stat-label">Total Minimum</div></div>' +
-    (c.exchangeAmount ? '<div class="stat-card card-enter" style="animation-delay:0.24s"><div class="stat-val">' + Math.round((blended.minTotal / c.exchangeAmount) * 100) + '%</div><div class="stat-label">Of Exchange Used</div></div>' : '') +
-    '</div>';
-
-  // Offering header row
-  const offeringHeaders = '<div class="comp-row header" style="' + gridCols + '">' +
-    '<div class="comp-cell header-cell">Metric</div>' +
-    items.map(f => '<div class="basket-offering-header"><button class="basket-remove" onclick="toggleBasket(' + f.id + ')">\u2715</button>' +
-      '<div style="font-weight:700;font-size:14px;color:var(--navy);margin-bottom:2px;cursor:pointer" onclick="navigateTo(\'offering_detail\',' + f.id + ')">' + f.name + '</div>' +
-      '<div style="font-size:12px;color:var(--slate2)">' + f.sponsor + '</div>' +
-      '<div style="margin-top:6px"><span class="badge badge-' + (f.status === 'Open' ? 'green' : f.status === 'Closing' ? 'amber' : 'blue') + '">' + f.status + '</span> <span class="badge badge-navy">' + (f.propType || 'DST') + '</span></div></div>').join('') +
-    '</div>';
-
-  // Comparison row builder
-  function compRow(label, vals, opts) {
-    opts = opts || {};
-    return '<div class="comp-row" style="' + gridCols + '">' +
-      '<div class="comp-cell label">' + label + '</div>' +
-      vals.map(v => '<div class="comp-cell"><span class="val' + (v.cls || '') + '">' + v.display + '</span>' + (v.sub ? '<span style="font-size:10px;color:var(--slate2);margin-left:6px">' + v.sub + '</span>' : '') + '</div>').join('') +
-      '</div>';
+BV.computePeerStats = (allFunds) => {
+  const stats = {}; const dist = {};
+  for (const key of BV.PEER_KEYS) {
+    const vals = allFunds.map(f => f.metrics?.[key]).filter(BV.isNum);
+    if (!vals.length) continue;
+    stats[key] = { avg: vals.reduce((a,b)=>a+b,0)/vals.length, min: Math.min(...vals), max: Math.max(...vals), n: vals.length };
+    dist[key] = vals.slice().sort((a,b)=>a-b);
   }
+  return { stats, dist };
+};
 
-  function sectionHeader(label) {
-    return '<div class="comp-row section-header" style="' + gridCols + '"><div class="comp-cell section-label" style="grid-column:1/-1">' + label + '</div></div>';
+BV.metricLabel = (key) => {
+  const labels = { year1_coc:'Year 1 Cash-on-Cash', ltv:'Loan-to-Value (LTV)', hold_period_years:'Hold Period', minimum_investment:'Minimum Investment (Sum)', pct_leased:'Occupancy (% Leased)', rent_escalations:'Rent Escalations', avg_lease_term_remaining:'Avg Lease Term Remaining', num_assets:'# Assets', purchase_price_unloaded:'Purchase Price (Unloaded)', appraised_valuation:'Appraised Valuation', loaded_price:'Loaded Price', cap_rate:'Acquisition Cap Rate' };
+  if (/^income_y\d+$/.test(key)) return 'Client Income (%) — Year ' + key.match(/\d+/)[0];
+  return labels[key] || key;
+};
+
+BV.metricFormatter = (key, val) => {
+  if (!BV.isNum(val)) return '—';
+  if (key === 'minimum_investment') return BV.fmtMoney(val);
+  if (key === 'hold_period_years' || key === 'avg_lease_term_remaining') return val.toFixed(1) + ' yrs';
+  if (key === 'num_assets') return Math.round(val) + '';
+  if (key === 'purchase_price_unloaded' || key === 'appraised_valuation' || key === 'loaded_price') return BV.fmtMoney(val);
+  return BV.fmtPct(val, 2);
+};
+
+BV.coverageForKey = (funds, key) => { const total = funds.length; const present = funds.map(f => f.metrics?.[key]).filter(BV.isNum).length; return { total, present, missing: Math.max(0, total - present) }; };
+BV.covText = (cov) => (!cov || !cov.total) ? '' : cov.present + '/' + cov.total;
+BV.covBadgeHtml = (cov) => { if (!cov || !cov.total) return ''; const warn = cov.missing > 0 ? ' warn' : ''; const title = cov.missing > 0 ? 'Missing ' + cov.missing + ' of ' + cov.total + ' data points' : 'All ' + cov.total + ' selected have data'; return '<span class="mCov' + warn + '" title="' + BV.escapeHTML(title) + '">Data ' + BV.escapeHTML(BV.covText(cov)) + '</span>'; };
+
+BV.peerVsLine = (key, val, peer, cov) => {
+  const p = peer.stats[key];
+  const covPart = (cov && cov.total) ? ' • <span class="pctl">Data ' + BV.escapeHTML(BV.covText(cov)) + '</span>' : '';
+  if (!p || !BV.isNum(val) || !BV.isNum(p.avg)) return 'Peer avg: —' + covPart;
+  const d = val - p.avg;
+  const cls = d >= 0 ? 'pos' : 'neg';
+  let deltaStr = '';
+  if (key === 'minimum_investment' || key === 'purchase_price_unloaded' || key === 'appraised_valuation' || key === 'loaded_price') deltaStr = (d>=0?'+':'−') + BV.fmtMoney(Math.abs(d));
+  else if (key === 'hold_period_years' || key === 'avg_lease_term_remaining') deltaStr = (d>=0?'+':'−') + Math.abs(d).toFixed(2) + ' yrs';
+  else if (key === 'num_assets') deltaStr = (d>=0?'+':'−') + Math.abs(d).toFixed(0);
+  else deltaStr = (d>=0?'+':'−') + Math.abs(d).toFixed(2) + ' pts';
+  const pctl = BV.percentileRank(peer.dist[key], val);
+  const pctlHtml = pctl == null ? '' : ' • <span class="pctl">' + BV.escapeHTML(BV.pctileText(pctl)) + '</span>';
+  return 'Peer avg: ' + BV.escapeHTML(BV.metricFormatter(key, p.avg)) + ' • <span class="delta ' + cls + '">' + BV.escapeHTML(deltaStr) + '</span>' + pctlHtml + covPart;
+};
+
+// ── Aggregation ──
+BV.aggregate = (selectedFunds) => {
+  const n = selectedFunds.length;
+  const agg = { __isAggregate: n > 1, selectedCount: n, displayLabel: n === 1 ? selectedFunds[0].displayLabel : 'Selected Offerings (' + n + ')', sponsor: n === 1 ? selectedFunds[0].sponsor : '', offering_name: n === 1 ? selectedFunds[0].offering_name : '', asset_class: n === 1 ? selectedFunds[0].asset_class : '', sector_focus: n === 1 ? selectedFunds[0].sector_focus : '', offering_structure: n === 1 ? selectedFunds[0].offering_structure : '', distribution_frequency: n === 1 ? selectedFunds[0].distribution_frequency : '', debt_lease_list: selectedFunds.map(f => ({ label: f.displayLabel, debt_terms: f.debt_terms, lease_terms: f.lease_terms })), docs_list: selectedFunds.map(f => ({ label: f.displayLabel, docs: f.docs })), property_states: BV.uniqSorted(selectedFunds.flatMap(f => (f.metrics?.states || []))), property_locations_summary: BV.summarizeStates(selectedFunds.flatMap(f => (f.metrics?.states || []))), metrics: {}, coverage: {} };
+
+  const allKeys = [...new Set([...BV.PEER_KEYS, ...BV.SNAPSHOT_KEYS, 'filed_raise', 'current_raise', 'remaining_raise', 'cap_rate', ...BV.INCOME_KEYS])];
+  for (const key of allKeys) {
+    const cov = BV.coverageForKey(selectedFunds, key);
+    agg.coverage[key] = cov;
+    const vals = selectedFunds.map(f => f.metrics?.[key]).filter(BV.isNum);
+    agg.metrics[key] = key === 'minimum_investment' ? (vals.length ? vals.reduce((a,b)=>a+b,0) : null) : (vals.length ? vals.reduce((a,b)=>a+b,0) / vals.length : null);
   }
+  if (n === 1) { agg.metrics.offering_open = selectedFunds[0].metrics.offering_open; agg.metrics.offering_close = selectedFunds[0].metrics.offering_close; agg.metrics.filed_raise = selectedFunds[0].metrics.filed_raise; agg.metrics.current_raise = selectedFunds[0].metrics.current_raise; agg.metrics.remaining_raise = selectedFunds[0].metrics.remaining_raise; } else { agg.metrics.offering_open = null; agg.metrics.offering_close = null; }
+  return agg;
+};
 
-  // Build comparison rows
-  let compRows = '';
+// ── Insights ──
+BV.buildInsights = (agg, selectedFunds, peer) => {
+  const takeaways = [], considerations = [];
+  const m = agg.metrics; const n = selectedFunds.length;
+  const cov = (key) => agg.coverage?.[key] || { total:n, present:0, missing:n };
+  const covMark = (key) => { const c = cov(key); return c.missing > 0 ? ' (Data ' + c.present + '/' + c.total + ')' : ''; };
 
-  // INCOME & RETURNS
-  compRows += sectionHeader('Income & Returns');
-  compRows += compRow('Y1 Cash on Cash', items.map(f => ({
-    display: fmtPct(f.y1coc),
-    cls: markBest(f.y1coc, x => x.y1coc, false),
-    sub: f.y1coc != null && p.avgY1CoC != null ? (f.y1coc >= p.avgY1CoC ? '\u2191' : '\u2193') + Math.abs(f.y1coc - p.avgY1CoC).toFixed(1) + '% vs peer' : ''
-  })));
-  compRows += compRow('Avg CoC (Hold)', items.map(f => {
-    const avgs = f.income.filter(v => v != null);
-    const avg = avgs.length ? avgs.reduce((a,b) => a+b,0) / avgs.length : null;
-    return { display: avg != null ? fmtPct(avg) : '\u2014', cls: '' };
-  }));
-  compRows += compRow('Distribution Freq', items.map(f => ({ display: f.distFrequency || '\u2014' })));
-  compRows += compRow('Hold Period', items.map(f => ({ display: f.holdPeriod ? f.holdPeriod + ' yr' : '\u2014' })));
-  if (c.exchangeAmount) {
-    compRows += compRow('Est. Y1 Income', items.map(f => ({
-      display: f.y1coc != null ? fmtMoney(c.exchangeAmount * f.y1coc / 100) : '\u2014',
-      cls: markBest(f.y1coc, x => x.y1coc, false)
-    })));
+  if (BV.isNum(m.ltv)) { const p = peer.stats.ltv; if (p && BV.isNum(p.avg)) { const delta = m.ltv - p.avg; takeaways.push('Loan-to-value (LTV) is ' + (delta <= 0 ? 'below' : 'above') + ' the current peer average (' + BV.fmtPct(m.ltv,2) + ' vs ' + BV.fmtPct(p.avg,2) + ').' + covMark('ltv')); } }
+
+  const addVsPeer = (key, dir, friendly) => {
+    const p = peer.stats[key]; const v = m[key]; const c = cov(key);
+    if (!p || !BV.isNum(v) || !BV.isNum(p.avg)) { if (c.missing > 0) considerations.push(friendly + ' has missing data (Data ' + c.present + '/' + c.total + ').'); return; }
+    const delta = v - p.avg;
+    const th = { year1_coc:0.50, ltv:5.0, hold_period_years:1.0, minimum_investment:25000, pct_leased:5.0, rent_escalations:0.25, avg_lease_term_remaining:0.5, num_assets:1 }[key] ?? 0;
+    if (Math.abs(delta) < th) return;
+    const up = delta > 0; const suffix = c.missing > 0 ? ' (Data ' + c.present + '/' + c.total + ')' : '';
+    if (dir === 'higher_is_better' && up) takeaways.push(friendly + ' is above the current peer average (' + BV.metricFormatter(key, v) + ' vs ' + BV.metricFormatter(key, p.avg) + ').' + suffix);
+    else if (dir === 'higher_is_better' && !up) considerations.push(friendly + ' is below the current peer average (' + BV.metricFormatter(key, v) + ' vs ' + BV.metricFormatter(key, p.avg) + ').' + suffix);
+    else if (dir === 'lower_is_better' && !up) takeaways.push(friendly + ' is below the current peer average (' + BV.metricFormatter(key, v) + ' vs ' + BV.metricFormatter(key, p.avg) + ').' + suffix);
+    else if (dir === 'lower_is_better' && up) considerations.push(friendly + ' is above the current peer average (' + BV.metricFormatter(key, v) + ' vs ' + BV.metricFormatter(key, p.avg) + ').' + suffix);
+  };
+  addVsPeer('year1_coc','higher_is_better','Year 1 cash-on-cash');
+  addVsPeer('minimum_investment','lower_is_better','Minimum investment (sum)');
+  addVsPeer('pct_leased','higher_is_better','Occupancy (% leased)');
+  addVsPeer('rent_escalations','higher_is_better','Rent escalations');
+  addVsPeer('avg_lease_term_remaining','higher_is_better','Avg lease term remaining');
+  if (!agg.__isAggregate) { const close = selectedFunds[0].metrics.offering_close; if (close instanceof Date && !isNaN(close.getTime())) { const days = (close.getTime() - Date.now()) / (1000*60*60*24); if (days <= 45 && days >= -365) considerations.push('Offering close date is near (' + BV.fmtDate(close) + '). Confirm allocation availability.'); } }
+  const st = agg.property_states || [];
+  if (st.length) takeaways.push('Property footprint includes ' + st.length + ' state' + (st.length===1?'':'s') + ' (' + st.join(', ') + ').');
+  return { takeaways: takeaways.slice(0,6), considerations: considerations.slice(0,6) };
+};
+
+// ── Render: Status Module ──
+BV.renderStatusModule = (singleFund) => {
+  const m = singleFund.metrics;
+  const filed = m.filed_raise; const current = m.current_raise; const remaining = m.remaining_raise;
+  const filledRatio = (BV.isNum(filed) && filed > 0 && BV.isNum(current)) ? BV.clamp(current/filed, 0, 1) : null;
+  const filledPct = BV.isNum(filledRatio) ? (filledRatio*100).toFixed(1) + '%' : '—';
+  const filledLine = filledPct === '—' ? '—' : filledPct + ' raised';
+  const openD = m.offering_open; const closeD = m.offering_close; const now = new Date();
+  let timeRemRatio = null;
+  if (openD instanceof Date && closeD instanceof Date && !isNaN(openD.getTime()) && !isNaN(closeD.getTime()) && closeD > openD) { timeRemRatio = BV.clamp((closeD - now) / (closeD - openD), 0, 1); }
+  const timePct = BV.isNum(timeRemRatio) ? (timeRemRatio*100).toFixed(1) + '%' : '—';
+  const timeLine = timePct === '—' ? '—' : timePct + ' left';
+  let daysLeftText = '—';
+  if (openD instanceof Date && closeD instanceof Date && closeD > openD) { const days = Math.max(0, Math.ceil((closeD - now) / 86400000)); daysLeftText = days + ' day' + (days===1?'':'s'); }
+  const raiseH = BV.isNum(filledRatio) ? Math.round(filledRatio*100) : 0;
+  const winH = BV.isNum(timeRemRatio) ? Math.round(timeRemRatio*100) : 0;
+  const e = BV.escapeHTML;
+  return '<div class="hdrStatusWrap"><div class="vStat" title="Raise Progress"><div class="vTrack"><div class="vFill" style="height:'+raiseH+'%"></div></div><div class="vInfo"><div class="vHdr"><div class="k">Raise</div></div><div class="vList"><div class="vLine"><b>'+e(filledLine)+'</b></div><div class="vLine"><b>Filed:</b> '+e(BV.fmtMoney(filed))+'</div><div class="vLine"><b>Curr:</b> '+e(BV.fmtMoney(current))+'</div><div class="vLine"><b>Rem:</b> '+e(BV.fmtMoney(remaining))+'</div></div></div></div><div class="vStat" title="Raise Window"><div class="vTrack"><div class="vFill" style="height:'+winH+'%"></div></div><div class="vInfo"><div class="vHdr"><div class="k">Raise Window</div></div><div class="vList"><div class="vLine"><b>'+e(timeLine)+'</b></div><div class="vLine"><b>Open:</b> '+e(BV.fmtDate(openD))+'</div><div class="vLine"><b>Close:</b> '+e(BV.fmtDate(closeD))+'</div><div class="vLine"><b>Days left:</b> '+e(daysLeftText)+'</div></div></div></div></div>';
+};
+
+// ── Render: Purchase Valuation ──
+BV.renderPurchaseValuation = (agg) => {
+  const m = agg.metrics; const e = BV.escapeHTML;
+  const unloaded = m.purchase_price_unloaded; const loaded = m.loaded_price; const appraised = m.appraised_valuation;
+  const primaryPct = BV.pctDelta(unloaded, appraised); const primary$ = BV.moneyDelta(unloaded, appraised);
+  const loadComp$ = BV.moneyDelta(loaded, unloaded); const loadCompPct = (BV.isNum(loadComp$) && BV.isNum(unloaded) && unloaded !== 0) ? (loadComp$ / unloaded * 100) : null;
+  const isDiscount = BV.isNum(primaryPct) ? (primaryPct <= 0) : null;
+  const heroClass = isDiscount == null ? '' : (isDiscount ? ' good' : ' bad');
+  const heroWord = isDiscount == null ? '—' : (isDiscount ? 'Discount to Appraisal' : 'Premium to Appraisal');
+  const heroPctStr = BV.isNum(primaryPct) ? (primaryPct<=0?'−':'+')+Math.abs(primaryPct).toFixed(1)+'%' : '—';
+  const hero$Str = BV.isNum(primary$) ? (primary$<=0?'−':'+')+BV.fmtMoney(Math.abs(primary$)) : '—';
+  const secPctStr = BV.isNum(loadCompPct) ? (loadCompPct>=0?'+':'−')+Math.abs(loadCompPct).toFixed(1)+'%' : '—';
+  const sec$Str = BV.isNum(loadComp$) ? (loadComp$>=0?'+':'−')+BV.fmtMoney(Math.abs(loadComp$)) : '—';
+  const explain = isDiscount == null ? 'Provide Purchase Price and Appraised Valuation to compute premium/discount.' : (isDiscount ? 'Purchase price is below the reported appraisal (favorable entry point).' : 'Purchase price is above the reported appraisal (confirm underwriting assumptions).');
+  return '<div class="sec"><div class="secHdr"><div class="h">Purchase Price & Valuation</div><div class="hint">Advisor headline: purchase discount/premium vs appraisal</div></div><div class="secBody"><div class="valHero"><div class="calloutRow"><div class="heroCall'+heroClass+'"><div class="heroTop"><div class="heroK">Purchase Price (Unloaded) vs Appraised Valuation</div><span class="r-pill">Primary client message</span></div><div class="heroMain">'+e(heroWord)+'</div><div class="heroSub"><b>'+e(heroPctStr)+'</b> ('+e(hero$Str)+') vs appraisal</div><div class="heroMeta"><span class="kv"><b>Appraised:</b> '+e(BV.fmtMoney(appraised))+'</span><span class="kv"><b>Purchase:</b> '+e(BV.fmtMoney(unloaded))+'</span></div><div class="textBlock" style="font-size:11px;color:rgba(9,14,25,0.62)">'+e(explain)+'</div></div><div class="miniCall"><div class="k">Client Load</div><div class="v">'+e(sec$Str)+' <span style="font-size:12px;color:rgba(9,14,25,0.62);font-weight:850">('+e(secPctStr)+')</span></div><div class="s"><b>Loaded Price:</b> '+e(BV.fmtMoney(loaded))+'<br>Loaded minus Unloaded purchase price.</div></div></div><div class="textBlock" style="font-size:11px;color:rgba(9,14,25,0.58)">Tip: Advisors can say: "We\'re buying at a <b>'+e(heroPctStr)+'</b> ('+e(hero$Str)+') discount/premium to the reported appraisal."</div></div></div></div>';
+};
+
+// ── Render: Doc buttons ──
+BV.DOC_TYPES = ['brochure','ppm','video','ai_offering_chat','track_record','sponsor_news','sales_team_map'];
+BV.docAvailability = (funds) => { const avail = {}; for (const t of BV.DOC_TYPES) avail[t] = funds.some(f => f.docs && f.docs[t]); return avail; };
+
+BV.renderDocButtons = (selectedFunds) => {
+  const avail = BV.docAvailability(selectedFunds);
+  const mkBtn = (en, type, label) => en ? '<button class="bv-btn doc" data-bv-docbtn="'+BV.escapeHTML(type)+'">'+BV.iconSvg(type)+BV.escapeHTML(label)+'</button>' : '<button class="bv-btn" disabled>'+BV.escapeHTML(label)+' (NA)</button>';
+  return '<div style="display:grid;gap:8px;justify-items:start;align-items:start"><div style="display:grid;gap:6px;justify-items:start"><div style="font-size:10px;font-weight:950;text-transform:uppercase;letter-spacing:.25px;color:rgba(255,255,255,0.92)">Offering Diligence</div><div style="display:flex;gap:10px;flex-wrap:wrap">'+mkBtn(avail.brochure,'brochure','Brochure')+mkBtn(avail.ppm,'ppm','PPM')+mkBtn(avail.video,'video','Video')+mkBtn(avail.ai_offering_chat,'ai_offering_chat','AI Chat')+'</div></div><div style="display:grid;gap:6px;justify-items:start"><div style="font-size:10px;font-weight:950;text-transform:uppercase;letter-spacing:.25px;color:rgba(255,255,255,0.92)">Sponsor Diligence</div><div style="display:flex;gap:10px;flex-wrap:wrap">'+mkBtn(avail.track_record,'track_record','Track Record')+mkBtn(avail.sponsor_news,'sponsor_news','Sponsor News')+mkBtn(avail.sales_team_map,'sales_team_map','Sales Team Map')+'</div></div><div id="bv-doc-modal"></div></div>';
+};
+
+BV.renderDocModal = (selectedFunds, type) => {
+  const titleMap = { brochure:'Brochure', ppm:'PPM', video:'Video', ai_offering_chat:'AI Offering Chat', track_record:'Track Record', sponsor_news:'Sponsor News', sales_team_map:'Sales Team Map' };
+  const tLabel = titleMap[type] || 'Document'; const e = BV.escapeHTML;
+  const rows = selectedFunds.map(f => { const url = f.docs?.[type] || ''; return '<div class="docRow"><div class="name" title="'+e(f.displayLabel)+'">'+e(f.displayLabel)+'</div><div class="right">'+(url ? '<a class="bv-btn doc" href="'+e(url)+'" target="_blank" rel="noopener noreferrer">'+BV.iconSvg(type)+'Open</a>' : '<span class="na">NA</span>')+'</div></div>'; }).join('');
+  return '<div class="docPopover"><div class="modal"><div class="modalHdr"><div class="t">'+e(tLabel)+' Picker</div><button class="bv-btn" onclick="document.getElementById(\'bv-doc-modal\').innerHTML=\'\'">Close</button></div><div class="modalBody">'+rows+'</div></div></div>';
+};
+
+// ── Vertical Comparison Table ──
+BV.isExcludedHeader = (hNorm) => { if (!hNorm) return true; if (/^year\s*(10|[1-9])$/.test(hNorm)) return true; if (hNorm === 'brochure' || hNorm.includes('brochure')) return true; if (hNorm === 'ppm' || hNorm.includes('private placement') || (hNorm.includes('ppm') && !hNorm.includes('gp'))) return true; if (hNorm === 'video' || hNorm.includes('video url') || (hNorm.includes('video') && hNorm.includes('url'))) return true; if (hNorm.includes('ai offering chat')) return true; if (hNorm.includes('track record')) return true; if (hNorm.includes('sponsor news')) return true; if (hNorm.includes('sales team map') || (hNorm.includes('sales') && hNorm.includes('map'))) return true; if (hNorm.includes('property image')) return true; return false; };
+
+BV.groupForHeader = (hNorm) => { const has = (s) => hNorm.includes(s); if (hNorm === 'sponsor' || has('offering name') || hNorm === 'name') return 'Identity'; if (has('asset class') || has('sector') || has('offering structure') || has('distribution frequency')) return 'Identity'; if (has('focus')) return 'Identity'; if (has('rep comp') || (has('rep') && has('comp'))) return 'Identity'; if ((has('minimum') && has('dst')) || has('minimum - dst')) return 'Identity'; if (has('filed raise') || has('current raise') || has('remaining raise') || (has('remains') && has('%'))) return 'Raise & Timeline'; if (has('offering open') || has('offering close') || has('term') || has('close date') || has('open date')) return 'Raise & Timeline'; if (has('cash on cash') || has('cap rate') || hNorm === 'ltv' || has('loan to value') || has('hold period')) return 'Economics & Returns'; if (has('purchase price') || has('loaded price') || has('appraised') || has('valuation')) return 'Economics & Returns'; if (has('minimum investment') || has('min investment')) return 'Economics & Returns'; if (has('% leased') || has('occupancy') || has('rent escalations') || has('lease term')) return 'Economics & Returns'; if (has('debt terms') || has('lease terms')) return 'Economics & Returns'; if (has('reserve')) return 'Economics & Returns'; if (has('sales load')) return 'Economics & Returns'; if (has('# assets') || has('number assets') || has('num assets')) return 'Property & Operations'; if (has('property location') || has('year built') || has('building age') || has('location')) return 'Property & Operations'; if (has('preferred') || has('promote') || has('gp commit') || has('gp')) return 'Structure, Fees & Tax'; if (has('upreit') || has('721') || has('exemption') || has('tax reporting')) return 'Structure, Fees & Tax'; return 'Sponsor'; };
+
+BV.VCOMP_GROUP_ORDERS = { 'Identity': [(h)=>h==='sponsor', (h)=>h.includes('offering name')||h==='name', (h)=>h.includes('asset class'), (h)=>h.includes('offering structure'), (h)=>h.includes('sector'), (h)=>h.includes('focus'), (h)=>h.includes('distribution'), (h)=>(h.includes('minimum')&&h.includes('dst')), (h)=>h.includes('rep comp')], 'Raise & Timeline': [(h)=>h.includes('offering open'), (h)=>h.includes('offering close'), (h)=>h.includes('filed raise'), (h)=>h.includes('current raise'), (h)=>h.includes('remaining raise')], 'Economics & Returns': [(h)=>h.includes('year 1')&&h.includes('cash'), (h)=>hNorm==='ltv'||h.includes('loan to value'), (h)=>h.includes('hold period'), (h)=>h.includes('% leased')||h.includes('occupancy'), (h)=>h.includes('rent escalations'), (h)=>h.includes('lease term'), (h)=>h.includes('debt terms'), (h)=>h.includes('minimum investment'), (h)=>h.includes('cap rate'), (h)=>h.includes('reserve'), (h)=>h.includes('purchase price'), (h)=>h.includes('appraised'), (h)=>h.includes('loaded price'), (h)=>h.includes('sales load')], 'Property & Operations': [(h)=>h.includes('# assets'), (h)=>h.includes('property location'), (h)=>h.includes('building age')||h.includes('year built')], 'Sponsor': [(h)=>h.includes('sponsor aum'), (h)=>h.includes('sponsor experience'), (h)=>h.includes('number of sponsor offerings'), (h)=>h.includes('sponsor full cycle exits'), (h)=>h.includes('sponsor average irr'), (h)=>h.includes('sponsor best irr'), (h)=>h.includes('sponsor worst irr')] };
+
+BV.GROUP_ORDER = ['Identity','Raise & Timeline','Economics & Returns','Property & Operations','Structure, Fees & Tax','Sponsor'];
+
+BV.vcompIsPercentField = (hNorm) => (hNorm.includes('year 1')&&hNorm.includes('cash'))||hNorm==='ltv'||hNorm.includes('loan to value')||hNorm.includes('% leased')||hNorm.includes('occupancy')||hNorm.includes('rent escalations')||hNorm.includes('cap rate')||hNorm.includes('sales load')||hNorm.includes('rep comp')||hNorm.includes('sponsor average irr')||hNorm.includes('sponsor best irr')||hNorm.includes('sponsor worst irr');
+BV.vcompIsMoneyField = (hNorm) => hNorm.includes('reserve')||(hNorm.includes('purchase price'))||hNorm.includes('appraised')||hNorm.includes('valuation')||hNorm.includes('loaded price')||((hNorm.includes('minimum')&&hNorm.includes('dst')));
+BV.valueToDisplay = (v) => { if (v == null) return '—'; if (v instanceof Date && !isNaN(v.getTime())) return BV.fmtDate(v); if (typeof v === 'number' && isFinite(v)) return String(v); const s = String(v).trim(); if (!s || /^na$/i.test(s)) return '—'; if (/^(Date|Datetime)\(/i.test(s)) { const d = BV.parseDate(s); return d ? BV.fmtDate(d) : s; } return s; };
+BV.vcompFormatValue = (hNorm, raw) => { if (raw instanceof Date) return BV.fmtDate(raw); if (typeof raw === 'string' && /^(Date|Datetime)\(/i.test(raw.trim())) { const d = BV.parseDate(raw); return d ? BV.fmtDate(d) : raw; } if (BV.vcompIsPercentField(hNorm)) { let num = typeof raw === 'number' ? raw : BV.parseNumberLoose(raw); if (num == null) return BV.valueToDisplay(raw); if (Math.abs(num) <= 1) num *= 100; return BV.fmtPct(num, 2); } if (BV.vcompIsMoneyField(hNorm)) { let num = typeof raw === 'number' ? raw : BV.parseMoney(raw); if (num == null) return BV.valueToDisplay(raw); return BV.fmtMoneyFull(num); } return BV.valueToDisplay(raw); };
+
+BV.renderVerticalCompTable = (selectedFunds, headers) => {
+  if (!selectedFunds || !selectedFunds.length || !headers || !headers.length) return '';
+  const e = BV.escapeHTML;
+  const cols = headers.map((h, idx) => ({ idx, h, norm: BV.normalizeHeader(h) })).filter(c => c.h && c.norm && !BV.isExcludedHeader(c.norm));
+  const grouped = new Map();
+  for (const c of cols) { const g = BV.groupForHeader(c.norm); if (!grouped.has(g)) grouped.set(g, []); grouped.get(g).push(c); }
+  for (const [g, arr] of grouped.entries()) {
+    const rules = BV.VCOMP_GROUP_ORDERS[g];
+    arr.sort((a,b) => { if (!rules) return a.h.localeCompare(b.h); let ai = null, bi = null; for (let i=0; i<rules.length; i++) { try { if (rules[i](a.norm)) ai = i; } catch(e){} try { if (rules[i](b.norm)) bi = i; } catch(e){} } if (ai!=null && bi!=null) return ai-bi; if (ai!=null) return -1; if (bi!=null) return 1; return a.h.localeCompare(b.h); });
+    if (g === 'Identity') { let kept = false; grouped.set(g, arr.filter(c => { if (c.norm.includes('offering name') || c.norm === 'name') { if (kept) return false; kept = true; } return true; })); }
   }
+  const groupsOut = [];
+  for (const g of BV.GROUP_ORDER) { const arr = grouped.get(g); if (arr && arr.length) groupsOut.push({ group: g, cols: arr }); }
+  for (const [g, arr] of grouped.entries()) { if (!BV.GROUP_ORDER.includes(g) && arr.length) groupsOut.push({ group: g, cols: arr }); }
+  if (!groupsOut.length) return '<div class="sec"><div class="secHdr"><div class="h">Vertical Comparison Table</div></div><div class="secBody"><div style="padding:12px;color:rgba(9,14,25,0.58)">No comparable columns found.</div></div></div>';
 
-  // CAPITAL STRUCTURE
-  compRows += sectionHeader('Capital Structure');
-  compRows += compRow('Loan to Value', items.map(f => ({
-    display: fmtPct(f.ltv),
-    cls: markBest(f.ltv, x => x.ltv, true),
-    sub: f.ltv != null && p.avgLTV != null ? (f.ltv <= p.avgLTV ? '\u2193' : '\u2191') + Math.abs(f.ltv - p.avgLTV).toFixed(1) + '% vs peer' : ''
-  })));
-  compRows += compRow('Debt Terms', items.map(f => ({ display: f.debtTerms || '\u2014' })));
-  compRows += compRow('Preferred Return', items.map(f => ({ display: f.preferred || '\u2014' })));
-  compRows += compRow('Promote', items.map(f => ({ display: f.promote || '\u2014' })));
-  compRows += compRow('721 UpREIT', items.map(f => ({ display: f.upReit || '\u2014' })));
+  const offerHdrs = selectedFunds.map(f => ({ title: f.offering_name || '(Unnamed)', sub: f.sponsor || '—', full: f.displayLabel }));
+  const thead = '<thead><tr><th class="vcompField">Field</th>' + offerHdrs.map(o => '<th><div class="vcompOfferHdr" title="'+e(o.full)+'">'+e(o.title)+'</div><div class="vcompOfferSub" title="'+e(o.sub)+'">'+e(o.sub)+'</div></th>').join('') + '</tr></thead>';
 
-  // VALUATION
-  compRows += sectionHeader('Purchase Price & Valuation');
-  compRows += compRow('Purchase Price', items.map(f => ({ display: fmtMoney(f.purchasePrice) })));
-  compRows += compRow('Appraised Value', items.map(f => ({ display: fmtMoney(f.appraisedValue) })));
-  compRows += compRow('Discount/Premium', items.map(f => {
-    if (!f.appraisedValue || !f.purchasePrice) return { display: '\u2014' };
-    const d = ((f.appraisedValue - f.purchasePrice) / f.appraisedValue * 100);
-    return { display: (d > 0 ? '-' : '+') + Math.abs(d).toFixed(1) + '%', cls: d > 0 ? ' best' : ' worst' };
-  }));
-  compRows += compRow('Loaded Price', items.map(f => ({ display: fmtMoney(f.loadedPrice) })));
-  compRows += compRow('Acq Cap Rate', items.map(f => ({ display: f.acqCapRate ? fmtPct(f.acqCapRate) : '\u2014' })));
+  const bodyRows = groupsOut.map(g => {
+    let html = '<tr class="vcompGroupRow"><td colspan="'+(1+selectedFunds.length)+'">'+e(g.group)+'</td></tr>';
+    html += g.cols.map(c => {
+      const fieldLabel = c.h || '—';
+      const vals = selectedFunds.map(f => {
+        const raw = (f.__rawRow && Array.isArray(f.__rawRow)) ? f.__rawRow[c.idx] : '';
+        const shouldFormat = (g.group === 'Economics & Returns') || (g.group === 'Identity' && ((c.norm.includes('minimum') && c.norm.includes('dst')) || c.norm.includes('rep comp'))) || (g.group === 'Sponsor' && (c.norm.includes('sponsor average irr') || c.norm.includes('sponsor best irr') || c.norm.includes('sponsor worst irr')));
+        const disp = shouldFormat ? BV.vcompFormatValue(c.norm, raw) : BV.valueToDisplay(raw);
+        return disp === '—' ? '<td><div class="vcompNA">—</div></td>' : '<td><div class="vcompVal">'+e(disp)+'</div></td>';
+      }).join('');
+      return '<tr><td class="vcompField">'+e(fieldLabel)+'</td>'+vals+'</tr>';
+    }).join('');
+    return html;
+  }).join('');
 
-  // PROPERTY & LEASE
-  compRows += sectionHeader('Property & Lease');
-  compRows += compRow('Location', items.map(f => ({ display: f.location || '\u2014' })));
-  compRows += compRow('# Assets', items.map(f => ({ display: f.units ? f.units.toString() : '\u2014' })));
-  compRows += compRow('% Occupied', items.map(f => ({
-    display: fmtPct(f.occupancy),
-    cls: markBest(f.occupancy, x => x.occupancy, false)
-  })));
-  compRows += compRow('Avg Lease Remaining', items.map(f => ({
-    display: f.avgLeaseTerm ? fmtNum(f.avgLeaseTerm, 1) + ' yr' : '\u2014',
-    cls: markBest(f.avgLeaseTerm, x => x.avgLeaseTerm, false)
-  })));
-  compRows += compRow('Lease Terms', items.map(f => ({ display: f.leaseTerms || '\u2014' })));
-  compRows += compRow('Rent Escalations', items.map(f => ({ display: f.rentEscalations || '\u2014' })));
-  compRows += compRow('Building Age', items.map(f => ({ display: f.buildingAge || '\u2014' })));
+  return '<div class="sec"><div class="secHdr"><div class="h">Vertical Side-by-Side Comparison</div><div class="hint">All columns except Year 1–10 and doc URLs • Sticky headers</div></div><div class="secBody"><div class="vcompWrap"><div class="vcompTop"><div class="t">Comparison Table</div><div class="s">Scroll down — headers stay pinned</div></div><div class="vcompScroller"><table class="vcompTable">' + thead + '<tbody>' + bodyRows + '</tbody></table></div></div></div></div>';
+};
 
-  // RAISE & TIMELINE
-  compRows += sectionHeader('Raise & Timeline');
-  compRows += compRow('Filed Raise', items.map(f => ({ display: fmtMoney(f.filedRaise) })));
-  compRows += compRow('Remaining', items.map(f => ({ display: f.pctRemaining != null ? f.pctRemaining + '% (' + fmtMoney(f.equityRemaining) + ')' : '\u2014' })));
-  compRows += compRow('Minimum Investment', items.map(f => ({
-    display: fmtMoney(f.minInvest),
-    cls: markBest(f.minInvest, x => x.minInvest, true)
-  })));
-  compRows += compRow('Offering Open', items.map(f => ({ display: f.openDate ? f.openDate.toLocaleDateString() : '\u2014' })));
-  compRows += compRow('Offering Close', items.map(f => ({ display: f.closeDate ? f.closeDate.toLocaleDateString() : '\u2014' })));
+// ── Main renderBasket() ──
+function renderBasket() {
+  const basketIds = STATE.basket;
+  const platformFunds = basketIds.map(id => STATE.funds.find(f => f.id === id)).filter(Boolean);
+  if (!platformFunds.length) return '<div class="page-header"><div><div class="page-title">Basket & Comparison</div><div class="page-subtitle">Add offerings from Browse to compare side-by-side</div></div></div><div class="empty-state"><div class="empty-state-icon">🛒</div><h3>Basket is Empty</h3><p>Add up to 3 offerings from Browse to unlock full tear sheet comparison with peer benchmarking, valuation analysis, income charts, and vertical comparison tables.</p><button class="btn btn-primary" onclick="navigateTo(\'browse\')">Browse Offerings</button></div>';
 
-  // FEES & STRUCTURE
-  compRows += sectionHeader('Fees & Structure');
-  compRows += compRow('Rep Comp', items.map(f => ({ display: f.repComp || '\u2014' })));
-  compRows += compRow('Sales Load', items.map(f => ({ display: f.salesLoad || '\u2014' })));
-  compRows += compRow('Reserve', items.map(f => ({ display: f.reserve || '\u2014' })));
-  compRows += compRow('GP Commit', items.map(f => ({ display: f.gpCommit || '\u2014' })));
-  compRows += compRow('Tax Reporting', items.map(f => ({ display: f.taxReporting || '\u2014' })));
-  compRows += compRow('Exemption', items.map(f => ({ display: f.exemption || '\u2014' })));
+  // Adapt platform funds to basket format
+  const selectedFunds = platformFunds.map(BV.adaptFund).filter(Boolean);
+  const allAdapted = STATE.funds.map(BV.adaptFund).filter(Boolean);
+  const peer = BV.computePeerStats(allAdapted);
+  const agg = BV.aggregate(selectedFunds);
+  const isMulti = agg.__isAggregate;
+  const insights = BV.buildInsights(agg, selectedFunds, peer);
+  const st = agg.property_states || [];
+  const e = BV.escapeHTML;
+  const n = selectedFunds.length;
 
-  // SPONSOR
-  compRows += sectionHeader('Sponsor Track Record');
-  compRows += compRow('Sponsor', items.map(f => ({ display: f.sponsor })));
-  compRows += compRow('AUM', items.map(f => ({ display: f.sponsorAum || '\u2014' })));
-  compRows += compRow('Total Offerings', items.map(f => ({ display: f.sponsorOfferings || '\u2014' })));
-  compRows += compRow('Full Cycle Exits', items.map(f => ({ display: f.sponsorExits || '\u2014' })));
-  compRows += compRow('Avg IRR', items.map(f => ({ display: f.sponsorAvgIrr != null ? fmtPct(f.sponsorAvgIrr) : '\u2014' })));
-  compRows += compRow('Experience', items.map(f => ({ display: f.sponsorExperience || '\u2014' })));
+  // ── Platform nav header ──
+  const navHeader = '<div class="page-header"><div><div class="page-title">Basket & Comparison</div><div class="page-subtitle">' + n + ' offering' + (n>1?'s':'') + ' selected — full tear sheet analysis</div></div><div style="display:flex;gap:8px"><button class="btn btn-secondary" onclick="navigateTo(\'browse\')">+ Add More</button><button class="btn btn-ghost" onclick="STATE.basket=[];saveBasket();renderApp();toast(\'Basket cleared\')">Clear All</button></div></div>';
 
-  const compTable = '<div class="comp-grid" style="margin-bottom:24px">' + offeringHeaders + compRows + '</div>';
-
-  // ── Key Takeaways ──
-  let takeaways = [];
-  if (n >= 2) {
-    const bestCoc = items.reduce((a, b) => (a.y1coc || 0) > (b.y1coc || 0) ? a : b);
-    const lowestLtv = items.reduce((a, b) => (a.ltv || 999) < (b.ltv || 999) ? a : b);
-    const bestOcc = items.reduce((a, b) => (a.occupancy || 0) > (b.occupancy || 0) ? a : b);
-    takeaways.push({ cls: 'positive', icon: '\u{1F4C8}', text: '<strong>' + bestCoc.name + '</strong> leads with Y1 CoC of ' + fmtPct(bestCoc.y1coc) + ', ' + (bestCoc.y1coc - blended.y1coc > 0.5 ? 'significantly above' : 'slightly above') + ' the basket average of ' + fmtPct(blended.y1coc) + '.' });
-    takeaways.push({ cls: 'info', icon: '\u{1F6E1}', text: '<strong>' + lowestLtv.name + '</strong> has the most conservative leverage at ' + fmtPct(lowestLtv.ltv) + ' LTV' + (p.avgLTV ? ', vs peer average of ' + fmtPct(p.avgLTV) : '') + '.' });
-    if (bestOcc.occupancy && bestOcc.occupancy >= 95) takeaways.push({ cls: 'positive', icon: '\u{1F3E2}', text: '<strong>' + bestOcc.name + '</strong> is ' + fmtPct(bestOcc.occupancy) + ' occupied \u2014 highest stability in this basket.' });
-    const highLtv = items.filter(f => f.ltv && f.ltv > 65);
-    if (highLtv.length) takeaways.push({ cls: 'caution', icon: '\u26A0\uFE0F', text: highLtv.map(f => '<strong>' + f.name + '</strong>').join(' and ') + ' ha' + (highLtv.length > 1 ? 've' : 's') + ' LTV above 65% \u2014 consider leverage risk in a rising rate environment.' });
-    if (c.exchangeAmount) {
-      const pctUsed = Math.round((blended.minTotal / c.exchangeAmount) * 100);
-      takeaways.push({ cls: pctUsed > 90 ? 'caution' : 'info', icon: '\u{1F4B0}', text: 'Combined minimums of ' + fmtMoney(blended.minTotal) + ' use ' + pctUsed + '% of the ' + fmtMoney(c.exchangeAmount) + ' exchange \u2014 ' + (pctUsed <= 70 ? 'room for additional diversification.' : pctUsed <= 100 ? 'tight fit, limited room for adjustment.' : 'exceeds available exchange equity.') });
+  // ── Hero ──
+  const heroTitle = isMulti ? 'Selected Offerings (' + n + ')' : selectedFunds[0].displayLabel;
+  const heroSub = isMulti ? 'As of: ' + new Date().toLocaleDateString() + ' • Combined metrics are averages (except Min Investment = sum)' : 'As of: ' + new Date().toLocaleDateString();
+  const metaBadges = (() => {
+    if (isMulti) {
+      const sponsors = BV.uniqSorted(selectedFunds.map(f=>f.sponsor).filter(Boolean));
+      const asset = BV.uniqSorted(selectedFunds.map(f=>f.asset_class).filter(Boolean));
+      return (sponsors.length ? '<span class="r-badge"><strong>Sponsors:</strong> '+e(sponsors.slice(0,3).join(', ')+(sponsors.length>3?'…':''))+'</span>' : '') + (asset.length ? '<span class="r-badge">'+e(asset.slice(0,3).join(', ')+(asset.length>3?'…':''))+'</span>' : '');
     }
-  }
-  const takeawayHtml = takeaways.length ? '<div class="panel detail-section"><div class="panel-title">\u{1F3AF} Key Takeaways</div><div class="takeaway-grid">' +
-    takeaways.map(t => '<div class="takeaway-card ' + t.cls + '"><span class="takeaway-icon">' + t.icon + '</span>' + t.text + '</div>').join('') +
-    '</div></div>' : '';
+    const f = selectedFunds[0];
+    return (f.asset_class ? '<span class="r-badge">'+e(f.asset_class)+'</span>' : '') + (f.sector_focus ? '<span class="r-badge">'+e(f.sector_focus)+'</span>' : '') + (f.offering_structure ? '<span class="r-badge">'+e(f.offering_structure)+'</span>' : '');
+  })();
+  const statusHtml = !isMulti ? BV.renderStatusModule(selectedFunds[0]) : '';
+  const hero = '<div class="r-hero"><div class="topline"><div class="r-title"><h2>'+e(heroTitle)+'</h2><div class="subline">'+e(heroSub)+'</div><div class="metaRow">'+metaBadges+'</div></div>'+statusHtml+'<div class="docsBox">'+BV.renderDocButtons(selectedFunds)+'</div></div></div>';
 
-  // ── Potential Considerations ──
-  let concerns = [];
-  items.forEach(f => {
-    if (f.ltv && f.ltv > 70) concerns.push({ icon: '\u{1F6A8}', text: '<strong>' + f.name + ':</strong> High leverage (' + fmtPct(f.ltv) + ' LTV) increases exposure to rate and valuation risk.' });
-    if (f.occupancy && f.occupancy < 90) concerns.push({ icon: '\u{1F3E2}', text: '<strong>' + f.name + ':</strong> Below-90% occupancy (' + fmtPct(f.occupancy) + ') introduces lease-up execution risk.' });
-    if (f.avgLeaseTerm && f.avgLeaseTerm < 3) concerns.push({ icon: '\u{1F4C5}', text: '<strong>' + f.name + ':</strong> Short avg lease term (' + fmtNum(f.avgLeaseTerm, 1) + ' yr) creates near-term rollover risk.' });
-    if (f.pctRemaining != null && f.pctRemaining < 10) concerns.push({ icon: '\u{1F525}', text: '<strong>' + f.name + ':</strong> Only ' + f.pctRemaining + '% remaining in raise \u2014 may close before allocation.' });
-    if (c.age && f.holdPeriod && (c.age + f.holdPeriod) > 85) concerns.push({ icon: '\u23F3', text: '<strong>' + f.name + ':</strong> ' + f.holdPeriod + '-year hold extends to client age ' + (c.age + f.holdPeriod) + ' \u2014 consider liquidity needs.' });
-  });
-  const concernsHtml = concerns.length ? '<div class="panel detail-section"><div class="panel-title">\u26A0\uFE0F Potential Considerations</div><div style="display:grid;gap:8px">' +
-    concerns.map(c => '<div class="kd-item caution"><span class="kd-icon">' + c.icon + '</span><div>' + c.text + '</div></div>').join('') +
-    '</div></div>' : '';
+  // ── Key Takeaways + Map ──
+  const insightsHtml = '<div class="kv-grid"><div class="callouts"><div class="callout"><h3>Key Takeaways</h3><ul>'+(insights.takeaways.length ? insights.takeaways : ['No standout signals from current data.']).map(x=>'<li>'+e(x)+'</li>').join('')+'</ul></div><div class="callout"><h3>Potential Considerations</h3><ul>'+(insights.considerations.length ? insights.considerations : ['No specific considerations flagged.']).map(x=>'<li>'+e(x)+'</li>').join('')+'</ul></div></div><div class="mapWrap"><div class="mapHdr"><div class="t">Footprint (Contiguous US)</div><div class="s">'+(st.length ? st.length+' state'+(st.length===1?'':'s') : 'No states parsed')+'</div></div><div class="mapBox" id="bv-map"></div><div class="legend"><span class="swatch"></span><span>States in <b>Property Location(s)</b></span></div><div class="textBlock" style="margin-top:10px"><b>Locations:</b> '+e(agg.property_locations_summary||'—')+'</div></div></div>';
 
-  // ── Income Comparison Chart ──
-  const chartHtml = '<div class="panel detail-section"><div class="panel-title">\u{1F4C8} Income Comparison (Y1\u2013Y10)</div><div class="basket-chart-wrap"><canvas id="basket-chart"></canvas></div></div>';
+  // ── Snapshot Metrics ──
+  const snapshotHtml = '<div class="sec"><div class="secHdr"><div class="h">Snapshot Metrics</div><div class="hint">Peer averages + rank percentile • data coverage per tile</div></div><div class="secBody"><div class="metricsGrid">' + BV.SNAPSHOT_KEYS.map(k => {
+    const cov = agg.coverage[k]; const v = agg.metrics[k];
+    return '<div class="mBox">'+BV.covBadgeHtml(cov)+'<div class="k">'+e(BV.metricLabel(k))+'</div><div class="v">'+e(BV.metricFormatter(k, v))+'</div><div class="vs">'+BV.peerVsLine(k, v, peer, cov)+'</div></div>';
+  }).join('') + '</div></div></div>';
 
-  // ── Document Links ──
-  const docHtml = '<div class="panel detail-section"><div class="panel-title">\u{1F4C4} Documents</div><div style="display:grid;gap:12px">' +
-    items.map(f => '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><strong style="font-size:13px;color:var(--navy);min-width:160px">' + f.name + ':</strong>' +
-      (f.brochureUrl ? '<a href="' + f.brochureUrl + '" target="_blank" class="btn btn-sm btn-secondary">\u{1F4C4} Brochure</a>' : '') +
-      (f.ppmUrl ? '<a href="' + f.ppmUrl + '" target="_blank" class="btn btn-sm btn-secondary">\u{1F4CB} PPM</a>' : '') +
-      (f.trackRecordUrl ? '<a href="' + f.trackRecordUrl + '" target="_blank" class="btn btn-sm btn-secondary">\u{1F4CA} Track Record</a>' : '') +
-      (f.videoUrl ? '<a href="' + f.videoUrl + '" target="_blank" class="btn btn-sm btn-secondary">\u{1F3AC} Video</a>' : '') +
-      (f.salesTeamUrl ? '<a href="' + f.salesTeamUrl + '" target="_blank" class="btn btn-sm btn-secondary">\u{1F465} Sales Team</a>' : '') +
-    '</div>').join('') +
-    '</div></div>';
+  // ── Income Chart ──
+  const incomeKeys = BV.INCOME_KEYS;
+  const covAny = incomeKeys.some(k => (agg.coverage?.[k]?.present || 0) > 0);
+  const covSummary = incomeKeys.map(k => agg.coverage?.[k]).filter(Boolean);
+  const avgCov = covSummary.length ? Math.round(covSummary.reduce((a,c)=>a+(c.present/c.total),0)/covSummary.length*100) : 0;
+  const incomeHtml = '<div class="sec"><div class="secHdr"><div class="h">Client Income (%), Years 1–10</div><div class="hint">'+(isMulti ? 'Bars are averaged across selected offerings' : 'Bars reflect selected offering')+'</div></div><div class="secBody"><div class="chartWrap"><div class="chartHdr"><div class="t">Client Income (%) by Year</div><div class="s">'+(covAny ? 'Avg data coverage ~'+avgCov+'%' : 'No income data found')+'</div></div><div class="chartBox"><canvas id="bv-income-chart"></canvas></div></div></div></div>';
 
-  return header + statsBar + takeawayHtml + concernsHtml + compTable + chartHtml + docHtml;
+  // ── Debt & Lease ──
+  let debtHtml = '<div class="sec"><div class="secHdr"><div class="h">Debt & Lease</div><div class="hint">'+(isMulti ? 'Separate per offering' : 'As entered')+'</div></div><div class="secBody">';
+  if (isMulti) { debtHtml += agg.debt_lease_list.map(x => '<div class="mBox" style="margin-bottom:10px"><div class="k">'+e(x.label)+'</div><div class="textBlock" style="margin-top:8px"><b>Debt Terms</b><br>'+(x.debt_terms ? e(x.debt_terms) : '—')+'<br><br><b>Lease Terms</b><br>'+(x.lease_terms ? e(x.lease_terms) : '—')+'</div></div>').join(''); }
+  else { debtHtml += '<div class="textBlock"><b>Debt Terms</b><br>'+(selectedFunds[0].debt_terms ? e(selectedFunds[0].debt_terms) : '—')+'<br><br><b>Lease Terms</b><br>'+(selectedFunds[0].lease_terms ? e(selectedFunds[0].lease_terms) : '—')+'</div>'; }
+  debtHtml += '</div></div>';
+
+  // ── Vertical Comparison ──
+  const vcompHtml = BV.renderVerticalCompTable(selectedFunds, STATE.headers || []);
+
+  // ── Disclosures ──
+  const disclosuresHtml = '<div class="sec"><div class="secHdr"><div class="h">Important Disclosures</div><div class="hint">Compliance footer</div></div><div class="secBody"><div class="textBlock">'+e(BV.DISCLOSURES)+'</div></div></div>';
+
+  // ── Footer ──
+  const ftrHtml = '<div class="ftr"><div>Data loaded: ' + new Date().toLocaleDateString() + '</div><div>Alts Fund LINK Platform</div></div>';
+
+  const report = '<div class="bv"><div class="report">' + hero + insightsHtml + '<div class="sections">' + snapshotHtml + incomeHtml + BV.renderPurchaseValuation(agg) + debtHtml + vcompHtml + disclosuresHtml + '</div>' + ftrHtml + '</div></div>';
+  return navHeader + report;
 }
 
-function renderBasketChart() {
-  const ctx = document.getElementById('basket-chart');
-  if (!ctx) return;
+// ── Basket post-render hooks ──
+function basketPostRender() {
+  // Wire doc buttons
+  document.querySelectorAll('[data-bv-docbtn]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const type = btn.getAttribute('data-bv-docbtn');
+      const platformFunds = STATE.basket.map(id => STATE.funds.find(f => f.id === id)).filter(Boolean);
+      const selectedFunds = platformFunds.map(BV.adaptFund).filter(Boolean);
+      const modal = document.getElementById('bv-doc-modal');
+      if (modal) modal.innerHTML = BV.renderDocModal(selectedFunds, type);
+    });
+  });
+
+  // Draw US map
+  basketDrawMap();
+
+  // Draw income chart
+  basketDrawIncomeChart();
+}
+
+let bvChartsPromise = null;
+function loadGoogleCharts() {
+  if (bvChartsPromise) return bvChartsPromise;
+  bvChartsPromise = new Promise((resolve, reject) => {
+    if (window.google && google.charts && google.visualization) { resolve(); return; }
+    const s = document.createElement('script');
+    s.src = 'https://www.gstatic.com/charts/loader.js';
+    s.async = true;
+    s.onload = () => { try { google.charts.load('current', { packages: ['geochart'] }); google.charts.setOnLoadCallback(resolve); } catch(e) { reject(e); } };
+    s.onerror = () => reject(new Error('Failed to load Google Charts'));
+    document.head.appendChild(s);
+  });
+  return bvChartsPromise;
+}
+
+function basketDrawMap() {
+  const el = document.getElementById('bv-map');
+  if (!el) return;
+  const platformFunds = STATE.basket.map(id => STATE.funds.find(f => f.id === id)).filter(Boolean);
+  const states = BV.uniqSorted(platformFunds.flatMap(f => BV.extractStates(f.location)));
+  if (!states.length) { el.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:rgba(9,14,25,0.52);font-size:12px;font-weight:800">No states detected from Property Location(s)</div>'; return; }
+  loadGoogleCharts().then(() => {
+    const dataRows = [['State', 'Presence']];
+    states.forEach(s => dataRows.push(['US-' + s, 1]));
+    const data = google.visualization.arrayToDataTable(dataRows);
+    el.innerHTML = '';
+    const chart = new google.visualization.GeoChart(el);
+    chart.draw(data, { region: 'US', resolution: 'provinces', legend: 'none', backgroundColor: { fill: 'transparent' }, datalessRegionColor: 'rgba(15,23,42,0.06)', defaultColor: 'rgba(15,23,42,0.06)', colorAxis: { colors: ['#0B1F3B', '#0B1F3B'] }, keepAspectRatio: true });
+  }).catch(() => { el.innerHTML = '<div style="padding:20px;text-align:center;color:rgba(9,14,25,0.52);font-size:11px">Map unavailable</div>'; });
+}
+
+function basketDrawIncomeChart() {
+  const canvas = document.getElementById('bv-income-chart');
+  if (!canvas || !window.Chart) return;
   if (STATE.incomeChart) { STATE.incomeChart.destroy(); STATE.incomeChart = null; }
 
-  const items = STATE.basket.map(id => STATE.funds.find(f => f.id === id)).filter(Boolean);
-  if (!items.length) return;
+  const platformFunds = STATE.basket.map(id => STATE.funds.find(f => f.id === id)).filter(Boolean);
+  const selectedFunds = platformFunds.map(BV.adaptFund).filter(Boolean);
+  if (!selectedFunds.length) return;
 
-  const colors = ['#1C3A63', '#3B82F6', '#7C3AED'];
-  const labels = [];
-  for (let y = 1; y <= 10; y++) labels.push('Y' + y);
+  const agg = BV.aggregate(selectedFunds);
+  const labels = Array.from({length:10}, (_,i) => 'Year '+(i+1));
+  const vals = BV.INCOME_KEYS.map(k => agg.metrics?.[k] ?? null);
 
-  const datasets = items.map((f, i) => ({
-    label: f.name.length > 25 ? f.name.substring(0, 22) + '...' : f.name,
-    data: f.income.map(v => v != null ? v : null),
-    backgroundColor: colors[i % 3],
-    borderRadius: 3,
-    barPercentage: 0.7 / items.length
-  }));
-
-  // Add peer avg line
-  if (STATE.peer.avgY1CoC) {
-    datasets.push({
-      label: 'Peer Avg',
-      data: labels.map(() => STATE.peer.avgY1CoC),
-      type: 'line',
-      borderColor: '#F59E0B',
-      borderDash: [6, 3],
-      borderWidth: 2,
-      pointRadius: 0,
-      fill: false,
-      order: 0
-    });
-  }
-
-  STATE.incomeChart = new Chart(ctx, {
+  STATE.incomeChart = new Chart(canvas, {
     type: 'bar',
-    data: { labels, datasets },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      interaction: { intersect: false, mode: 'index' },
-      plugins: {
-        legend: { position: 'top', align: 'end', labels: { boxWidth: 12, font: { family: "'DM Sans'", size: 11 }, color: '#5C7A99' } },
-        tooltip: {
-          backgroundColor: '#0B1F3B', titleFont: { family: "'DM Sans'", size: 12 }, bodyFont: { family: "'DM Mono'", size: 12 },
-          padding: 10, cornerRadius: 8,
-          callbacks: { label: function(ctx) { return ctx.dataset.label + ': ' + (ctx.raw != null ? ctx.raw.toFixed(2) + '%' : 'N/A'); } }
-        }
-      },
-      scales: {
-        y: { beginAtZero: true, ticks: { callback: v => v + '%', font: { family: "'DM Mono'", size: 11 }, color: '#8FA3BA' }, grid: { color: '#E8F0F8' }, border: { display: false } },
-        x: { ticks: { font: { family: "'DM Sans'", size: 11, weight: 600 }, color: '#3A5270' }, grid: { display: false }, border: { display: false } }
-      }
-    }
+    data: { labels, datasets: [{ label: 'Client Income (%)', data: vals.map(v => BV.isNum(v) ? v : null), borderWidth: 0, borderRadius: 8, backgroundColor: 'rgba(11,31,59,0.70)', hoverBackgroundColor: 'rgba(28,58,99,0.78)' }] },
+    options: { responsive: true, maintainAspectRatio: false, animation: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: (ctx) => { const v = vals[ctx.dataIndex]; return 'Income: ' + (BV.isNum(v) ? v.toFixed(2) + '%' : '—'); } } } }, scales: { x: { ticks: { color: 'rgba(9,14,25,0.70)', font: { family: 'Inter', weight: '700' } }, grid: { color: 'rgba(15,23,42,0.08)' } }, y: { beginAtZero: true, ticks: { color: 'rgba(9,14,25,0.70)', callback: (v) => v + '%', font: { family: 'Inter', weight: '700' } }, grid: { color: 'rgba(15,23,42,0.08)' } } } }
   });
 }
 
@@ -1610,7 +1912,7 @@ function attachViewHandlers() {
     const fund = STATE.funds.find(f => f.id === STATE.selectedOfferingId);
     if (fund) { requestAnimationFrame(() => renderIncomeChart(fund)); }
   } else if (STATE.view === 'basket') {
-    requestAnimationFrame(() => renderBasketChart());
+    requestAnimationFrame(() => basketPostRender());
   } else {
     if (STATE.incomeChart) { STATE.incomeChart.destroy(); STATE.incomeChart = null; }
   }
