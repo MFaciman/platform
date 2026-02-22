@@ -402,6 +402,50 @@ a{color:inherit;text-decoration:none}button{cursor:pointer;font-family:var(--fon
 .bv-select-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .bv-select-x{flex-shrink:0;width:20px;height:20px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:rgba(153,27,27,0.08);color:var(--red);font-size:11px;font-weight:800;cursor:pointer;transition:background .12s}
 .bv-select-x:hover{background:rgba(153,27,27,0.16)}
+/* ── DST Calculator ── */
+.dst-offerings-bar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.dst-offering-pill{display:inline-flex;align-items:center;padding:4px 12px;border-radius:999px;background:var(--ice);border:1px solid var(--mist);font-size:11px;font-weight:600;color:var(--navy)}
+.dst-primary-inputs{background:var(--surface);border:1px solid var(--mist);border-radius:12px;padding:14px 16px;margin-bottom:14px}
+.dst-pi-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+@media(max-width:900px){.dst-pi-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:600px){.dst-pi-grid{grid-template-columns:repeat(2,1fr)}}
+.dst-pi{display:flex;flex-direction:column;gap:2px}
+.dst-pi-label{font-size:10px;font-weight:700;color:var(--slate2);text-transform:uppercase;letter-spacing:.5px}
+.dst-pi-value{font-size:15px;font-weight:700;color:var(--navy);font-family:var(--mono)}
+.dst-advanced-wrap{margin-bottom:14px}
+.dst-advanced{display:none;margin-top:8px;background:var(--surface);border:1px solid var(--mist);border-radius:12px;padding:14px 16px}
+.dst-advanced.open{display:block}
+.dst-adv-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px 12px}
+@media(max-width:900px){.dst-adv-grid{grid-template-columns:repeat(2,1fr)}}
+.dst-adv-field{display:flex;flex-direction:column;gap:3px;font-size:12px}
+.dst-adv-field label{font-weight:600;color:var(--slate);font-size:11px}
+.dst-adv-field input,.dst-adv-field select{padding:5px 8px;border:1px solid var(--mist);border-radius:8px;font-size:12px;color:var(--navy);outline:none;font-family:var(--mono);transition:border-color var(--transition)}
+.dst-adv-field input:focus{border-color:var(--navy2)}
+.dst-results-card{background:var(--white);border:1px solid var(--mist);border-radius:12px;padding:16px;margin-bottom:14px}
+.dst-results-label{font-size:14px;font-weight:700;color:var(--navy);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--surface2)}
+.dst-section-hdr{font-size:11px;font-weight:700;color:var(--slate2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.dst-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.dst-tbl td{padding:4px 0;border-bottom:1px dashed rgba(0,0,0,0.06);color:var(--navy)}
+.dst-tbl td:first-child{font-weight:500;color:var(--slate)}
+.dst-tbl td.r{text-align:right;font-family:var(--mono);font-size:12px}
+.dst-tbl td.b{font-weight:700}
+.dst-tbl td.hint{font-weight:400;color:var(--slate2);font-style:italic}
+.dst-tbl td.warn{color:var(--red);font-weight:600}
+.dst-tbl tr:last-child td{border-bottom:none}
+.dst-stress{width:100%;border-collapse:collapse;font-size:11px}
+.dst-stress th,.dst-stress td{border:1px solid var(--surface2);padding:5px 8px;text-align:right}
+.dst-stress th:first-child,.dst-stress td:first-child{text-align:left}
+.dst-stress th{background:var(--surface);font-weight:700;color:var(--slate2);text-transform:uppercase;letter-spacing:.3px;font-size:10px}
+.dst-stress td{color:var(--navy);font-family:var(--mono)}
+.dst-badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:999px;font-size:10px;font-weight:600;background:var(--ice);color:var(--navy)}
+.dst-badge.safe{background:rgba(22,163,74,0.1);color:#166534}
+.dst-badge.danger{background:rgba(185,28,28,0.08);color:#b91c1c}
+.dst-chart-area{margin-top:14px;height:180px;position:relative}
+.dst-chart-area canvas{width:100%!important;height:100%!important}
+.dst-per-offering-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:14px}
+.dst-view-toggle{display:flex;gap:6px;align-items:center}
+.dst-disclaimer{margin-top:16px;font-size:10px;color:var(--slate2);line-height:1.5;padding:10px;background:var(--surface);border-radius:8px}
+.dst-boot-inputs{margin-top:8px}
 @media print{.bv .report{border:1px solid #ddd!important;background:#fff!important}.bv .r-hero .r-badge{color:#333!important;border-color:#ccc!important;background:#f0f0f0!important}.bv .sec,.bv .callout,.bv .mapWrap,.bv .valHero,.bv .chartWrap,.bv .vcompWrap{break-inside:avoid;page-break-inside:avoid}.bv .vcompScroller{overflow:visible!important}.bv .vcompTable thead th{position:static!important;box-shadow:none!important}*{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}}
 
 </style>
@@ -442,7 +486,10 @@ const STATE = {
   browseLayout: 'card',
   browseSort: 'y1coc_desc',
   browseFilters: { status: 'all', propType: 'all', sponsor: 'all', sector: 'all', focus: 'all', cocMin: '', cocMax: '', ltvMin: '', ltvMax: '', search: '', clientEquity: false, quickDst: false, quickNoDebt: false, quickUpreit: false },
-  incomeChart: null
+  incomeChart: null,
+  dstCalcView: 'blended',
+  dstOverrides: null,
+  headers: []
 };
 
 function loadClient() {
@@ -647,6 +694,7 @@ function renderApp() {
     case 'dashboard': html = renderDashboard(); break;
     case 'browse': html = renderBrowse(); break;
     case 'basket': html = renderBasket(); break;
+    case 'model': html = renderModel(); break;
     default: html = renderPlaceholder(STATE.view);
   }
   container.innerHTML = html;
@@ -1985,9 +2033,265 @@ function basketDrawIncomeChart() {
 function attachViewHandlers() {
   if (STATE.view === 'basket') {
     requestAnimationFrame(() => basketPostRender());
+  } else if (STATE.view === 'model') {
+    requestAnimationFrame(() => dstPostRender());
   } else {
     if (STATE.incomeChart) { STATE.incomeChart.destroy(); STATE.incomeChart = null; }
   }
+}
+
+/* ═══════════════════════════════════════════
+   DST CALCULATOR — Model for Client
+═══════════════════════════════════════════ */
+const DST = {};
+DST.n = (v) => (typeof v === 'number' && isFinite(v)) ? v : 0;
+DST.fmtC = (v) => DST.n(v) ? v.toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0}) : '$0';
+DST.fmtC2 = (v) => DST.n(v) ? v.toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:2}) : '$0.00';
+DST.fmtP = (v) => (v!=null&&isFinite(v)) ? (v*100).toFixed(2)+'%' : 'N/A';
+
+DST.computeIRR = (flows) => {
+  if(!flows.some(c=>c>0)||!flows.some(c=>c<0)) return null;
+  const npv=(r)=>flows.reduce((s,c,t)=>s+c/Math.pow(1+r,t),0);
+  let lo=-0.99,hi=1.0;
+  if(npv(lo)*npv(hi)>0) return null;
+  for(let i=0;i<100;i++){const mid=(lo+hi)/2;const v=npv(mid);if(Math.abs(v)<1e-6||(hi-lo)<1e-8) return mid;if(npv(lo)*v<0) hi=mid; else lo=mid;}
+  return (lo+hi)/2;
+};
+
+DST.runModel = (inp) => {
+  const equity=DST.n(inp.equity)||Math.max(0,DST.n(inp.purchasePrice)-DST.n(inp.loanAmount));
+  const own=DST.n(inp.ownershipPct)||(equity>0&&DST.n(inp.purchasePrice)>0?equity/(DST.n(inp.purchasePrice)-DST.n(inp.loanAmount)):0.10);
+  const hold=Math.max(1,Math.round(DST.n(inp.holdYears)||7));
+  const grossIncome=DST.n(inp.grossIncome);
+  const opExpPct=grossIncome>0?DST.n(inp.opExpenses)/grossIncome:0;
+  const vacancy=DST.n(inp.vacancyRate);
+  const debtSvc=DST.n(inp.debtService);
+  const depBasis=DST.n(inp.depBasis);
+  const depLife=DST.n(inp.depLife)||27.5;
+  const taxRate=DST.n(inp.taxRate);
+  const exitPrice=DST.n(inp.exitPrice)||DST.n(inp.purchasePrice)*1.15;
+  const loanExit=DST.n(inp.loanExit)||DST.n(inp.loanAmount);
+  const dstLoad=DST.n(inp.dstLoadPct);
+  const annualFee=DST.n(inp.sponsorFeePct)+DST.n(inp.advisorFeePct);
+  const annualDep=depLife>0?(depBasis/depLife)*own:0;
+  const cfSeries=[];let totalCF=0;
+  for(let t=1;t<=hold;t++){const gross=grossIncome;const vac=gross*vacancy;const opex=gross*opExpPct;const noi=gross-vac-opex;const cfProp=noi-debtSvc;const cfInv=cfProp*own;cfSeries.push(cfInv);totalCF+=cfInv;}
+  const netSale=Math.max(0,exitPrice-loanExit);const exitEquity=netSale*own;
+  const totalReturn=totalCF+exitEquity;const avgCF=hold>0?totalCF/hold:0;const coc=equity>0?avgCF/equity:0;
+  const flows=[-equity,...cfSeries.map((c,i)=>i===hold-1?c+exitEquity:c)];const irr=DST.computeIRR(flows);
+  const upfront=equity*dstLoad;
+  const flowsFee=[-(equity+upfront),...cfSeries.map((c,i)=>{const drag=equity*annualFee;const net=c-drag;return i===hold-1?net+exitEquity:net;})];
+  const irrNet=DST.computeIRR(flowsFee);
+  const cfY1=cfSeries[0]||0;const taxableIncome=cfY1-annualDep;const afterTaxCF=cfY1-taxableIncome*taxRate;
+  const noiCalc=grossIncome-grossIncome*vacancy-grossIncome*opExpPct;
+  return{equity,own,hold,cfSeries,totalCF,exitEquity,totalReturn,coc,irr,irrNet,cfY1,annualDep,taxableIncome,afterTaxCF,noi:noiCalc,cfPropY1:noiCalc-debtSvc};
+};
+
+DST.stressTest = (inp) => {
+  const base=DST.runModel(inp);
+  const mild=DST.runModel({...inp,vacancyRate:(inp.vacancyRate||0)+0.05,opExpenses:(inp.opExpenses||0)*1.05,exitPrice:(inp.exitPrice||inp.purchasePrice*1.15)*0.95});
+  const severe=DST.runModel({...inp,vacancyRate:(inp.vacancyRate||0)+0.10,opExpenses:(inp.opExpenses||0)*1.10,exitPrice:(inp.exitPrice||inp.purchasePrice*1.15)*0.90});
+  return{base,mild,severe};
+};
+
+DST.bootAnalysis = (inp, model) => {
+  const rs=DST.n(inp.relinqSalePrice);const rd=DST.n(inp.relinqDebt);const re=Math.max(0,rs-rd);
+  const cds=DST.n(inp.loanAmount)*model.own;const rv=model.equity+cds;
+  const mb=Math.max(0,rd-cds);const eb=Math.max(0,rs-rv);
+  return{relinqEquity:re,replacementVal:rv,mortBoot:mb,eqBoot:eb,clean:mb===0&&eb===0&&rs>0,hasData:rs>0};
+};
+
+DST.fromFund = (f, client, overrides) => {
+  const pp=f.purchasePrice||0;const ltv=(f.ltv||0)/100;const loan=pp>0?pp*ltv:0;
+  const minInv=f.minInvest||0;const equity=(client&&client.exchangeAmount)?client.exchangeAmount:minInv;
+  const ownPct=(pp-loan)>0?equity/(pp-loan):0.10;
+  const grossEst=pp>0?pp*0.10:200000;const opExpEst=grossEst*0.30;
+  const debtSvcEst=loan>0?loan*0.06:0;
+  const hold=f.holdPeriod||7;
+  const o=overrides||{};
+  return{
+    label:f.sponsor+' — '+f.name, fundId:f.id,
+    purchasePrice:pp, loanAmount:loan, equity:equity, ownershipPct:ownPct,
+    grossIncome:grossEst, opExpenses:opExpEst,
+    vacancyRate:o.vacancyRate!=null?o.vacancyRate:0.05,
+    debtService:debtSvcEst,
+    holdYears:o.holdOverride||hold,
+    exitPrice:o.exitAppr!=null?pp*(1+o.exitAppr):pp*1.15,
+    loanExit:loan,
+    depBasis:pp*0.75, depLife:o.depLife||27.5,
+    taxRate:o.taxRate!=null?o.taxRate:0.32,
+    dstLoadPct:o.dstLoadPct!=null?o.dstLoadPct:0.15,
+    sponsorFeePct:o.sponsorFeePct!=null?o.sponsorFeePct:0.0075,
+    advisorFeePct:o.advisorFeePct!=null?o.advisorFeePct:0.005,
+    relinqSalePrice:o.relinqSalePrice||0, relinqDebt:o.relinqDebt||0,
+    y1cocFromSheet:f.y1coc
+  };
+};
+
+DST.blendInputs = (funds, client, overrides) => {
+  const inputs=funds.map(f=>DST.fromFund(f,client,overrides));const n=inputs.length;
+  if(n===1) return inputs[0];
+  const avg=(fn)=>inputs.reduce((s,i)=>s+fn(i),0)/n;
+  const sum=(fn)=>inputs.reduce((s,i)=>s+fn(i),0);
+  const o=overrides||{};
+  return{
+    label:'Blended ('+n+' offerings)', fundId:null,
+    purchasePrice:sum(i=>i.purchasePrice), loanAmount:sum(i=>i.loanAmount),
+    equity:(client&&client.exchangeAmount)?client.exchangeAmount:sum(i=>i.equity),
+    ownershipPct:avg(i=>i.ownershipPct),
+    grossIncome:sum(i=>i.grossIncome), opExpenses:sum(i=>i.opExpenses),
+    vacancyRate:o.vacancyRate!=null?o.vacancyRate:avg(i=>i.vacancyRate),
+    debtService:sum(i=>i.debtService),
+    holdYears:o.holdOverride||Math.round(avg(i=>i.holdYears)),
+    exitPrice:o.exitAppr!=null?sum(i=>i.purchasePrice)*(1+o.exitAppr):sum(i=>i.exitPrice),
+    loanExit:sum(i=>i.loanExit),
+    depBasis:sum(i=>i.depBasis), depLife:o.depLife||27.5,
+    taxRate:o.taxRate!=null?o.taxRate:0.32,
+    dstLoadPct:o.dstLoadPct!=null?o.dstLoadPct:avg(i=>i.dstLoadPct),
+    sponsorFeePct:o.sponsorFeePct!=null?o.sponsorFeePct:avg(i=>i.sponsorFeePct),
+    advisorFeePct:o.advisorFeePct!=null?o.advisorFeePct:avg(i=>i.advisorFeePct),
+    relinqSalePrice:o.relinqSalePrice||0, relinqDebt:o.relinqDebt||0,
+    y1cocFromSheet:null
+  };
+};
+
+DST.renderResults = (inp, label) => {
+  const{base,mild,severe}=DST.stressTest(inp);
+  const boot=DST.bootAnalysis(inp,base);
+  const e=BV.escapeHTML;const sheetCoC=inp.y1cocFromSheet;
+  return '<div class="dst-results-card"><div class="dst-results-label">'+e(label)+'</div>'
+    +'<div class="dst-section-hdr">Projected Metrics (Client Share)</div>'
+    +'<table class="dst-tbl"><tbody>'
+    +'<tr><td>Equity Invested</td><td class="r">'+e(DST.fmtC(base.equity))+'</td></tr>'
+    +'<tr><td>Year 1 NOI (Property)</td><td class="r">'+e(DST.fmtC(base.noi))+'</td></tr>'
+    +'<tr><td>Year 1 Cash Flow (pre-tax, client)</td><td class="r b">'+e(DST.fmtC(base.cfY1))+'</td></tr>'
+    +(sheetCoC!=null?'<tr><td>Y1 CoC from Offering Data</td><td class="r hint">'+e(fmtPct(sheetCoC))+'</td></tr>':'')
+    +'<tr><td>Depreciation / yr (client)</td><td class="r">'+e(DST.fmtC2(base.annualDep))+'</td></tr>'
+    +'<tr><td>Taxable Income / yr (approx.)</td><td class="r">'+e(DST.fmtC2(base.taxableIncome))+'</td></tr>'
+    +'<tr><td>After-Tax Cash Flow / yr</td><td class="r">'+e(DST.fmtC2(base.afterTaxCF))+'</td></tr>'
+    +'<tr><td>Total Cash Flow (over hold)</td><td class="r">'+e(DST.fmtC(base.totalCF))+'</td></tr>'
+    +'<tr><td>Equity From Exit (client)</td><td class="r">'+e(DST.fmtC(base.exitEquity))+'</td></tr>'
+    +'<tr><td>Total Return (CF + Exit)</td><td class="r b">'+e(DST.fmtC(base.totalReturn))+'</td></tr>'
+    +'<tr><td>Cash-on-Cash (avg annual)</td><td class="r">'+e(DST.fmtP(base.coc))+'</td></tr>'
+    +'<tr><td>IRR (before fee load)</td><td class="r">'+e(DST.fmtP(base.irr))+'</td></tr>'
+    +'<tr><td>Net IRR (after DST & advisory fees)</td><td class="r">'+e(DST.fmtP(base.irrNet))+'</td></tr>'
+    +'</tbody></table>'
+    +'<div class="dst-section-hdr" style="margin-top:16px">Stress Test</div>'
+    +'<table class="dst-stress"><thead><tr><th>Scenario</th><th>CF / yr</th><th>Total Return</th><th>IRR</th></tr></thead><tbody>'
+    +'<tr><td>Base Case</td><td class="r">'+e(DST.fmtC(base.cfY1))+'</td><td class="r">'+e(DST.fmtC(base.totalReturn))+'</td><td class="r">'+e(DST.fmtP(base.irr))+'</td></tr>'
+    +'<tr><td>Mild (+5% vac/exp, −5% exit)</td><td class="r">'+e(DST.fmtC(mild.cfY1))+'</td><td class="r">'+e(DST.fmtC(mild.totalReturn))+'</td><td class="r">'+e(DST.fmtP(mild.irr))+'</td></tr>'
+    +'<tr><td>Severe (+10%, −10% exit)</td><td class="r">'+e(DST.fmtC(severe.cfY1))+'</td><td class="r">'+e(DST.fmtC(severe.totalReturn))+'</td><td class="r">'+e(DST.fmtP(severe.irr))+'</td></tr>'
+    +'</tbody></table>'
+    +'<div class="dst-section-hdr" style="margin-top:16px">Boot Analysis (1031)</div>'
+    +'<table class="dst-tbl"><tbody>'
+    +'<tr><td>Relinquished Equity</td><td class="r">'+e(DST.fmtC(boot.relinqEquity))+'</td></tr>'
+    +'<tr><td>DST Replacement Value</td><td class="r">'+e(DST.fmtC(boot.replacementVal))+'</td></tr>'
+    +'<tr><td>Potential Mortgage Boot</td><td class="r '+(boot.mortBoot>0?'warn':'')+'">'+e(DST.fmtC(boot.mortBoot))+'</td></tr>'
+    +'<tr><td>Potential Equity Boot</td><td class="r '+(boot.eqBoot>0?'warn':'')+'">'+e(DST.fmtC(boot.eqBoot))+'</td></tr>'
+    +'<tr><td>Status</td><td class="r"><span class="dst-badge '+(boot.hasData?(boot.clean?'safe':'danger'):'')+'">'+(boot.hasData?(boot.clean?'No boot indicated':'Potential boot — review with CPA'):'Enter relinquished property data')+'</span></td></tr>'
+    +'</tbody></table>'
+    +'<div class="dst-chart-area"><canvas id="dst-cf-chart-'+(inp.fundId||'blend')+'"></canvas></div>'
+    +'</div>';
+};
+
+function renderModel() {
+  const basketIds=STATE.basket;
+  const funds=basketIds.map(id=>STATE.funds.find(f=>f.id===id)).filter(Boolean);
+  const client=STATE.client;
+  if(!funds.length) return '<div class="page-header"><div><div class="page-title">Model for Client</div><div class="page-subtitle">1031 DST Calculator</div></div></div><div class="empty-state"><div class="empty-state-icon">🧮</div><h3>No Offerings Selected</h3><p>Add offerings to your basket from Browse, then run the DST calculator to project cash flow, IRR, stress test, and boot analysis.</p><button class="btn btn-primary" onclick="navigateTo(\'browse\')">Browse Offerings</button></div>';
+  const isMulti=funds.length>1;
+  const overrides=STATE.dstOverrides||{};
+  const perInputs=funds.map(f=>DST.fromFund(f,client,overrides));
+  const blendedInput=DST.blendInputs(funds,client,overrides);
+  const viewMode=STATE.dstCalcView||'blended';
+  const inp=viewMode==='blended'||!isMulti?blendedInput:perInputs[0];
+
+  const toggleHtml=isMulti?'<div class="dst-view-toggle"><button class="btn btn-sm '+(viewMode==='blended'?'btn-primary':'btn-secondary')+'" onclick="STATE.dstCalcView=\'blended\';renderApp()">Blended View</button><button class="btn btn-sm '+(viewMode==='per_offering'?'btn-primary':'btn-secondary')+'" onclick="STATE.dstCalcView=\'per_offering\';renderApp()">Per Offering</button></div>':'';
+
+  const pills=funds.map(f=>'<span class="dst-offering-pill">'+BV.escapeHTML(f.sponsor+' — '+f.name)+'</span>').join('');
+
+  const ltvPct=inp.purchasePrice>0?inp.loanAmount/inp.purchasePrice*100:0;
+  const primaryHtml='<div class="dst-primary-inputs"><div class="dst-pi-grid">'
+    +'<div class="dst-pi"><span class="dst-pi-label">Client Equity</span><span class="dst-pi-value">'+fmtMoney(inp.equity)+'</span></div>'
+    +'<div class="dst-pi"><span class="dst-pi-label">Purchase Price</span><span class="dst-pi-value">'+fmtMoney(inp.purchasePrice)+'</span></div>'
+    +'<div class="dst-pi"><span class="dst-pi-label">Loan Amount</span><span class="dst-pi-value">'+fmtMoney(inp.loanAmount)+'</span></div>'
+    +'<div class="dst-pi"><span class="dst-pi-label">LTV</span><span class="dst-pi-value">'+fmtPct(ltvPct)+'</span></div>'
+    +'<div class="dst-pi"><span class="dst-pi-label">Hold Period</span><span class="dst-pi-value">'+(inp.holdYears||7)+' yrs</span></div>'
+    +'<div class="dst-pi"><span class="dst-pi-label">Ownership %</span><span class="dst-pi-value">'+((inp.ownershipPct||0.10)*100).toFixed(2)+'%</span></div>'
+    +'</div></div>';
+
+  const advVac=((overrides.vacancyRate!=null?overrides.vacancyRate:0.05)*100).toFixed(1);
+  const advDep=overrides.depLife||27.5;
+  const advTax=((overrides.taxRate!=null?overrides.taxRate:0.32)*100).toFixed(0);
+  const advLoad=((overrides.dstLoadPct!=null?overrides.dstLoadPct:0.15)*100).toFixed(1);
+  const advSpon=((overrides.sponsorFeePct!=null?overrides.sponsorFeePct:0.0075)*100).toFixed(2);
+  const advAdv=((overrides.advisorFeePct!=null?overrides.advisorFeePct:0.005)*100).toFixed(2);
+  const advExit=overrides.exitAppr!=null?(overrides.exitAppr*100).toFixed(0):'15';
+  const advHold=overrides.holdOverride||inp.holdYears||7;
+  const advRS=Math.round(overrides.relinqSalePrice||0);
+  const advRD=Math.round(overrides.relinqDebt||0);
+
+  const advancedHtml='<div class="dst-advanced-wrap"><button class="btn btn-ghost btn-sm" onclick="document.getElementById(\'dst-advanced\').classList.toggle(\'open\')">⚙ Advanced Assumptions</button>'
+    +'<div class="dst-advanced" id="dst-advanced">'
+    +'<div class="dst-adv-grid">'
+    +'<div class="dst-adv-field"><label>Vacancy & Reserves %</label><input type="number" id="dst-vacancy" value="'+advVac+'" step="0.5"></div>'
+    +'<div class="dst-adv-field"><label>Depreciation Life (yrs)</label><input type="number" id="dst-dep-life" value="'+advDep+'" step="0.5"></div>'
+    +'<div class="dst-adv-field"><label>Client Tax Rate %</label><input type="number" id="dst-tax-rate" value="'+advTax+'" step="1"></div>'
+    +'<div class="dst-adv-field"><label>DST Load on Equity %</label><input type="number" id="dst-load" value="'+advLoad+'" step="0.5"></div>'
+    +'<div class="dst-adv-field"><label>Sponsor Fee % / yr</label><input type="number" id="dst-sponsor-fee" value="'+advSpon+'" step="0.05"></div>'
+    +'<div class="dst-adv-field"><label>Advisor Fee % / yr</label><input type="number" id="dst-advisor-fee" value="'+advAdv+'" step="0.05"></div>'
+    +'<div class="dst-adv-field"><label>Exit Appreciation %</label><input type="number" id="dst-exit-appr" value="'+advExit+'" step="1"></div>'
+    +'<div class="dst-adv-field"><label>Holding Period Override</label><input type="number" id="dst-hold-override" value="'+advHold+'" step="1"></div>'
+    +'</div>'
+    +'<div class="dst-boot-inputs"><div class="dst-section-hdr" style="margin-top:12px">Relinquished Property (for Boot Analysis)</div>'
+    +'<div class="dst-adv-grid">'
+    +'<div class="dst-adv-field"><label>Relinquished Sale Price ($)</label><input type="number" id="dst-relinq-sale" value="'+advRS+'" step="1000"></div>'
+    +'<div class="dst-adv-field"><label>Relinquished Loan Payoff ($)</label><input type="number" id="dst-relinq-debt" value="'+advRD+'" step="1000"></div>'
+    +'</div></div>'
+    +'<button class="btn btn-primary btn-sm" style="margin-top:12px" onclick="dstRecalc()">Recalculate</button>'
+    +'</div></div>';
+
+  let resultsHtml='';
+  if(viewMode==='blended'||!isMulti){
+    resultsHtml=DST.renderResults(blendedInput,isMulti?'Blended Portfolio ('+funds.length+' offerings)':perInputs[0].label);
+  } else {
+    resultsHtml='<div class="dst-per-offering-grid">'+perInputs.map(inp=>DST.renderResults(inp,inp.label)).join('')+'</div>';
+  }
+
+  const disclaimer='<div class="dst-disclaimer">This tool is for educational and illustrative purposes only and does not constitute tax, legal, or investment advice. Projections are hypothetical, not guaranteed, and do not reflect all risks, fees, or tax nuances. DSTs are illiquid and involve the risk of loss, including loss of principal. Clients should consult their own tax, legal, and investment professionals before making decisions.</div>';
+
+  return '<div class="page-header"><div><div class="page-title">Model for Client</div><div class="page-subtitle">1031 DST Calculator — '+(isMulti?funds.length+' offerings':BV.escapeHTML(funds[0].sponsor+' — '+funds[0].name))+'</div></div>'+toggleHtml+'</div>'
+    +'<div class="dst-offerings-bar">'+pills+'</div>'
+    +primaryHtml+advancedHtml+resultsHtml+disclaimer;
+}
+
+function dstRecalc() {
+  const gv=(id)=>{const el=document.getElementById(id);return el?parseFloat(el.value):null;};
+  STATE.dstOverrides={
+    vacancyRate:(gv('dst-vacancy')||5)/100, depLife:gv('dst-dep-life')||27.5,
+    taxRate:(gv('dst-tax-rate')||32)/100, dstLoadPct:(gv('dst-load')||15)/100,
+    sponsorFeePct:(gv('dst-sponsor-fee')||0.75)/100, advisorFeePct:(gv('dst-advisor-fee')||0.5)/100,
+    exitAppr:(gv('dst-exit-appr')||15)/100, holdOverride:gv('dst-hold-override')||null,
+    relinqSalePrice:gv('dst-relinq-sale')||0, relinqDebt:gv('dst-relinq-debt')||0
+  };
+  renderApp();toast('Recalculated with updated assumptions');
+}
+
+function dstPostRender() {
+  const funds=STATE.basket.map(id=>STATE.funds.find(f=>f.id===id)).filter(Boolean);
+  if(!funds.length) return;
+  const client=STATE.client;const isMulti=funds.length>1;const viewMode=STATE.dstCalcView||'blended';
+  const overrides=STATE.dstOverrides||{};
+  const drawChart=(inp)=>{
+    const cid='dst-cf-chart-'+(inp.fundId||'blend');const canvas=document.getElementById(cid);
+    if(!canvas||!window.Chart) return;
+    const model=DST.runModel(inp);
+    const labels=Array.from({length:model.hold},(_,i)=>'Yr '+(i+1));
+    new Chart(canvas,{type:'bar',data:{labels,datasets:[{label:'Annual CF (Client)',data:model.cfSeries,backgroundColor:'rgba(11,31,59,0.65)',borderRadius:6,borderWidth:0}]},
+      options:{responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{display:false}},scales:{x:{ticks:{font:{size:10}}},y:{beginAtZero:true,ticks:{font:{size:10},callback:(v)=>'$'+(v/1000).toFixed(0)+'K'}}}}});
+  };
+  if(viewMode==='blended'||!isMulti){drawChart(DST.blendInputs(funds,client,overrides));}
+  else{funds.forEach(f=>drawChart(DST.fromFund(f,client,overrides)));}
 }
 
 // ── Boot ──
