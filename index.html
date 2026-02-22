@@ -277,6 +277,131 @@ a{color:inherit;text-decoration:none}button{cursor:pointer;font-family:var(--fon
 ::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--mist);border-radius:3px}::-webkit-scrollbar-thumb:hover{background:var(--fog)}
 @media(max-width:900px){:root{--nav-w:0px}#sidebar{display:none}#main{padding:18px}.dashboard-grid{grid-template-columns:1fr}.quick-stats{grid-template-columns:repeat(2,1fr)}.offering-grid{grid-template-columns:1fr}#view-toggle .view-btn span.label-text{display:none}.offering-table{font-size:12px}.offering-table td,.offering-table th{padding:7px 8px}.detail-two-col{grid-template-columns:1fr}.kd-grid{grid-template-columns:1fr}.detail-prev-next button{max-width:80px}}
 /* ═══════════════════════════════════════════
+   DST PORTFOLIO BUILDER
+═══════════════════════════════════════════ */
+.pb-layout{display:grid;grid-template-columns:1.05fr 0.95fr;gap:16px;align-items:start}
+@media(max-width:980px){.pb-layout{grid-template-columns:1fr}}
+.pb-panel{background:var(--white);border:1.5px solid var(--mist);border-radius:var(--radius-lg);overflow:hidden}
+.pb-panel-hdr{padding:14px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--mist);background:linear-gradient(180deg,var(--white),var(--surface));gap:10px;flex-wrap:wrap}
+.pb-panel-hdr h3{margin:0;font-size:14px;font-weight:700;color:var(--navy);letter-spacing:-0.01em}
+.pb-panel-body{padding:16px 18px}
+.pb-client-bar{background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 100%);border-radius:var(--radius-lg);padding:18px 22px;margin-bottom:14px;color:var(--white);position:relative;overflow:hidden}
+.pb-client-bar::after{content:'';position:absolute;right:-30px;top:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,0.04)}
+.pb-client-bar-title{font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:rgba(255,255,255,0.5);margin-bottom:10px}
+.pb-client-bar-name{font-size:16px;font-weight:700;color:var(--white);margin-bottom:12px}
+.pb-client-bar-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pb-client-input-wrap label{font-size:11px;font-weight:600;color:rgba(255,255,255,0.7);display:block;margin-bottom:4px}
+.pb-client-input{height:38px;padding:0 12px;border-radius:var(--radius);border:1px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.10);color:#fff;font-size:14px;font-weight:700;font-family:var(--mono);outline:none;width:100%;transition:all var(--transition)}
+.pb-client-input:focus{border-color:rgba(255,255,255,0.4);background:rgba(255,255,255,0.16);box-shadow:0 0 0 3px rgba(255,255,255,0.08)}
+.pb-client-input::placeholder{color:rgba(255,255,255,0.35)}
+.pb-client-hint{font-size:10px;color:rgba(255,255,255,0.45);margin-top:3px}
+.pb-kpi-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.pb-kpi{background:var(--surface);border:1px solid var(--mist);border-radius:var(--radius);padding:12px 14px}
+.pb-kpi-label{font-size:10px;font-weight:700;color:var(--fog);text-transform:uppercase;letter-spacing:0.07em}
+.pb-kpi-val{font-size:20px;font-weight:800;color:var(--navy);letter-spacing:-0.02em;margin-top:4px;line-height:1;font-family:var(--mono)}
+.pb-kpi-sub{font-size:11px;color:var(--slate2);margin-top:6px;font-weight:500}
+.pb-progress{height:8px;background:var(--surface2);border-radius:4px;overflow:hidden;margin-top:8px;border:1px solid var(--mist)}
+.pb-progress-fill{height:100%;border-radius:3px;transition:width 0.5s cubic-bezier(0.4,0,0.2,1)}
+.pb-progress-fill.equity{background:linear-gradient(90deg,var(--navy2),#3B82F6)}
+.pb-progress-fill.debt{background:linear-gradient(90deg,#7C3AED,#3B82F6)}
+.pb-progress-fill.over{background:linear-gradient(90deg,var(--red),#F87171)}
+.pb-table-wrap{border:1px solid var(--mist);border-radius:var(--radius);overflow-x:auto;background:var(--white);margin-top:14px}
+.pb-table{width:100%;border-collapse:collapse;font-size:12.5px}
+.pb-table thead th{background:var(--surface2);padding:9px 10px;text-align:left;font-size:10px;font-weight:700;color:var(--slate2);text-transform:uppercase;letter-spacing:0.06em;border-bottom:1px solid var(--mist);white-space:nowrap;position:sticky;top:0;z-index:5}
+.pb-table thead th.r{text-align:right}
+.pb-table tbody tr{border-bottom:1px solid var(--surface2);transition:background var(--transition)}
+.pb-table tbody tr:hover{background:var(--surface)}
+.pb-table tbody tr:last-child{border-bottom:none}
+.pb-table td{padding:8px 10px;vertical-align:middle;white-space:nowrap}
+.pb-table td.r{text-align:right;font-family:var(--mono);font-size:12px;font-weight:600;color:var(--navy)}
+.pb-table .deal-name{font-weight:700;color:var(--navy);font-size:12px;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pb-table .deal-sub{font-size:10.5px;color:var(--slate2);margin-top:1px}
+.pb-alloc-input{width:100px;height:30px;padding:0 8px;border:1.5px solid var(--mist);border-radius:6px;font-family:var(--mono);font-size:12px;font-weight:600;color:var(--navy);background:var(--white);outline:none;transition:all var(--transition)}
+.pb-alloc-input:focus{border-color:var(--navy2);box-shadow:0 0 0 3px rgba(28,58,99,0.08)}
+.pb-alloc-input.needs-input{border-color:var(--amber);background:var(--amber-lt);animation:pbPulse 2s ease-in-out 2}
+@keyframes pbPulse{0%,100%{box-shadow:none}50%{box-shadow:0 0 0 4px rgba(180,83,9,0.12)}}
+.pb-pct-bar{width:50px;height:6px;background:var(--surface2);border-radius:3px;overflow:hidden;display:inline-block;vertical-align:middle;margin-left:4px}
+.pb-pct-fill{height:100%;background:var(--navy2);border-radius:3px;transition:width 0.3s ease}
+.pb-totals-row td{background:var(--ice);font-weight:700;border-top:2px solid var(--navy2)}
+.pb-remove-btn{width:24px;height:24px;border-radius:50%;border:1px solid var(--mist);background:var(--white);color:var(--slate2);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all var(--transition);line-height:1}
+.pb-remove-btn:hover{background:var(--red-lt);color:var(--red);border-color:var(--red)}
+.pb-analytics{margin-top:16px}
+.pb-analytics-title{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.pb-blended-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px}
+@media(max-width:980px){.pb-blended-grid{grid-template-columns:repeat(2,1fr)}}
+.pb-blended-tile{background:var(--surface);border:1px solid var(--mist);border-radius:var(--radius);padding:12px}
+.pb-blended-tile .label{font-size:10px;font-weight:700;color:var(--fog);text-transform:uppercase;letter-spacing:0.06em}
+.pb-blended-tile .val{font-size:18px;font-weight:800;color:var(--navy);margin-top:4px;font-family:var(--mono);letter-spacing:-0.02em}
+.pb-blended-tile .sub{font-size:11px;color:var(--slate2);margin-top:3px}
+.pb-charts-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px}
+@media(max-width:980px){.pb-charts-row{grid-template-columns:1fr}}
+.pb-chart-card{background:var(--white);border:1px solid var(--mist);border-radius:var(--radius);padding:14px}
+.pb-chart-card-title{font-size:11px;font-weight:700;color:var(--slate2);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px}
+.pb-chart-box{height:200px;position:relative}
+.pb-diversification{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+@media(max-width:980px){.pb-diversification{grid-template-columns:1fr}}
+.pb-div-item{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--surface);border:1px solid var(--mist);border-radius:var(--radius)}
+.pb-div-check{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
+.pb-div-check.pass{background:var(--green-lt);color:var(--green);border:1px solid #BBF7D0}
+.pb-div-check.warn{background:var(--amber-lt);color:var(--amber);border:1px solid #FDE68A}
+.pb-div-check.fail{background:var(--red-lt);color:var(--red);border:1px solid #FECACA}
+.pb-div-text{font-size:12px;color:var(--navy);font-weight:600}
+.pb-div-sub{font-size:11px;color:var(--slate2);font-weight:400;margin-top:1px}
+.pb-income-table{width:100%;border-collapse:collapse;font-size:12px;border:1px solid var(--mist);border-radius:var(--radius);overflow:hidden}
+.pb-income-table th{background:var(--surface2);padding:7px 10px;text-align:center;font-size:10px;font-weight:700;color:var(--slate2);text-transform:uppercase;letter-spacing:0.06em;border-bottom:1px solid var(--mist)}
+.pb-income-table th:first-child{text-align:left}
+.pb-income-table td{padding:7px 10px;text-align:center;border-bottom:1px solid var(--surface2);font-family:var(--mono);font-weight:500;color:var(--navy)}
+.pb-income-table td:first-child{text-align:left;font-family:var(--font);font-weight:600;color:var(--slate)}
+.pb-income-table .total-row td{background:var(--ice);font-weight:700;border-top:2px solid var(--navy2)}
+.pb-mkt-card{background:var(--white);border:1.5px solid var(--mist);border-radius:var(--radius);padding:14px;transition:all var(--transition)}
+.pb-mkt-card:hover{border-color:var(--slate2);box-shadow:0 4px 16px rgba(0,0,0,0.06)}
+.pb-mkt-card.in-portfolio{border-color:var(--navy2);background:var(--ice)}
+.pb-mkt-card-name{font-size:13px;font-weight:700;color:var(--navy);line-height:1.25}
+.pb-mkt-card-sponsor{font-size:11px;color:var(--slate2);margin-top:1px}
+.pb-mkt-metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:8px 0}
+.pb-mkt-metrics .m{background:var(--surface);border-radius:6px;padding:6px 8px}
+.pb-mkt-metrics .m .l{font-size:9px;font-weight:700;color:var(--fog);text-transform:uppercase;letter-spacing:0.06em}
+.pb-mkt-metrics .m .v{font-size:13px;font-weight:700;color:var(--navy);margin-top:2px;font-family:var(--mono)}
+.pb-mkt-badges{display:flex;gap:4px;flex-wrap:wrap;margin:6px 0}
+.pb-mkt-badge{font-size:10px;padding:2px 8px;border-radius:20px;border:1px solid var(--mist);background:var(--surface);color:var(--slate);font-weight:600}
+.pb-mkt-badge.dst{border-color:rgba(59,130,246,0.3);background:rgba(59,130,246,0.06);color:#1D4ED8}
+.pb-mkt-card-actions{display:flex;align-items:center;gap:6px;padding-top:8px;border-top:1px solid var(--surface2)}
+.pb-mkt-add-btn{padding:5px 12px;border-radius:6px;border:1.5px solid var(--navy2);background:var(--white);color:var(--navy);font-size:11px;font-weight:700;cursor:pointer;transition:all var(--transition)}
+.pb-mkt-add-btn:hover{background:var(--navy);color:var(--white)}
+.pb-mkt-add-btn.added{background:var(--navy);color:var(--white);border-color:var(--navy)}
+.pb-mkt-alloc-inline{display:flex;align-items:center;gap:6px}
+.pb-mkt-alloc-inline input{width:90px;height:28px;padding:0 8px;border:1.5px solid var(--mist);border-radius:6px;font-family:var(--mono);font-size:11px;font-weight:600;color:var(--navy);outline:none}
+.pb-mkt-alloc-inline input:focus{border-color:var(--navy2)}
+.pb-portfolio-tabs{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.pb-portfolio-tab{padding:5px 12px;border-radius:20px;border:1.5px solid var(--mist);background:var(--white);font-size:12px;font-weight:600;color:var(--slate);cursor:pointer;transition:all var(--transition)}
+.pb-portfolio-tab:hover{border-color:var(--slate2);color:var(--navy)}
+.pb-portfolio-tab.active{background:var(--navy);color:var(--white);border-color:var(--navy)}
+.pb-actions-bar{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;padding-top:14px;border-top:1px solid var(--mist)}
+.pb-disclaimer{font-size:10.5px;color:var(--slate2);line-height:1.5;margin-top:14px;padding:12px 14px;background:var(--surface);border-radius:var(--radius);border:1px solid var(--mist)}
+.pb-search-input{width:100%;height:34px;padding:0 12px;border:1.5px solid var(--mist);border-radius:var(--radius);font-size:12.5px;color:var(--navy);background:var(--white);outline:none;transition:border-color var(--transition)}
+.pb-search-input:focus{border-color:var(--navy2);box-shadow:0 0 0 3px rgba(28,58,99,0.08)}
+.pb-search-input::placeholder{color:var(--fog)}
+.pb-filter-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.pb-filter-select{height:30px;padding:0 24px 0 8px;border:1.5px solid var(--mist);border-radius:6px;font-size:11px;font-weight:600;color:var(--slate);background:var(--white);cursor:pointer;outline:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 12 12'%3E%3Cpath fill='%235C7A99' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center}
+.pb-filter-select:focus{border-color:var(--navy2)}
+.pb-quick-toggle{display:flex;align-items:center;gap:5px;padding:4px 10px;border:1.5px solid var(--mist);border-radius:20px;font-size:11px;font-weight:600;color:var(--slate);cursor:pointer;background:var(--white);user-select:none;transition:all var(--transition)}
+.pb-quick-toggle:hover{border-color:var(--slate2)}
+.pb-quick-toggle.active{border-color:var(--navy2);background:var(--ice);color:var(--navy)}
+.pb-quick-toggle input{display:none}
+.pb-mkt-list{display:grid;gap:10px;margin-top:12px;max-height:calc(100vh - 340px);overflow-y:auto;padding-right:4px}
+.pb-mkt-list::-webkit-scrollbar{width:5px}
+.pb-mkt-list::-webkit-scrollbar-track{background:transparent}
+.pb-mkt-list::-webkit-scrollbar-thumb{background:var(--mist);border-radius:3px}
+.pb-empty{padding:32px 20px;text-align:center}
+.pb-empty-icon{font-size:36px;margin-bottom:12px}
+.pb-empty h4{font-size:14px;color:var(--navy);margin:0 0 6px}
+.pb-empty p{font-size:12px;color:var(--slate2);margin:0;line-height:1.6}
+.pb-suitability{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:700}
+.pb-suitability.high{background:var(--green-lt);color:var(--green);border:1px solid #BBF7D0}
+.pb-suitability.medium{background:var(--amber-lt);color:var(--amber);border:1px solid #FDE68A}
+.pb-suitability.low{background:var(--surface);color:var(--slate2);border:1px solid var(--mist)}
+
+/* ═══════════════════════════════════════════
    BASKET VIEW — Imported from Tear Sheet
 ═══════════════════════════════════════════ */
 .bv{font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;color:rgba(9,14,25,0.92);direction:ltr!important}
@@ -489,7 +614,11 @@ const STATE = {
   incomeChart: null,
   dstCalcView: 'blended',
   dstOverrides: null,
-  headers: []
+  headers: [],
+  pb: loadPortfolioBuilder(),
+  pbSearch: '',
+  pbFilters: { propType: 'all', sponsor: 'all', sector: 'all', quickDst: false },
+  pbCharts: {}
 };
 
 function loadClient() {
@@ -497,6 +626,12 @@ function loadClient() {
 }
 function saveClient() { localStorage.setItem('afl_client', JSON.stringify(STATE.client)); }
 function saveBasket() { localStorage.setItem('afl_basket', JSON.stringify(STATE.basket)); }
+function loadPortfolioBuilder() {
+  try { const r = localStorage.getItem('afl_pb_v2'); if (r) { const d = JSON.parse(r); if (d && Array.isArray(d.portfolios) && d.portfolios.length) return d; } } catch(e) {}
+  return { portfolios: [{ id: 'p_default', name: 'My Portfolio', allocations: {} }], activeId: 'p_default' };
+}
+function savePB() { localStorage.setItem('afl_pb_v2', JSON.stringify(STATE.pb)); }
+function activePB() { return STATE.pb.portfolios.find(p => p.id === STATE.pb.activeId) || STATE.pb.portfolios[0]; }
 function fmtPct(v) { return v != null && !isNaN(v) ? v.toFixed(2) + '%' : '—'; }
 function fmtMoney(v) { if (v == null || isNaN(v)) return '—'; if (v >= 1e6) return '$' + (v / 1e6).toFixed(1) + 'M'; if (v >= 1e3) return '$' + (v / 1e3).toFixed(0) + 'K'; return '$' + v.toLocaleString(); }
 function fmtMoneyFull(v) { return v != null && !isNaN(v) ? '$' + v.toLocaleString() : '—'; }
@@ -694,6 +829,7 @@ function renderApp() {
     case 'dashboard': html = renderDashboard(); break;
     case 'browse': html = renderBrowse(); break;
     case 'basket': html = renderBasket(); break;
+    case 'portfolio_builder': html = renderPortfolioBuilder(); break;
     case 'model': html = renderModel(); break;
     default: html = renderPlaceholder(STATE.view);
   }
@@ -703,7 +839,7 @@ function renderApp() {
 
 function renderPlaceholder(view) {
   const labels = {
-    portfolio_builder: 'Portfolio Builder', model: 'Model for Client', comp_dashboard: 'Compliance Dashboard',
+    portfolio_builder: 'DST Portfolio Builder', model: 'Model for Client', comp_dashboard: 'Compliance Dashboard',
     comp_review: 'Offering Review Queue', comp_reports: 'Compliance Reports', comp_audit: 'Audit Trail',
     report_summary: 'Client Report Summary', report_builder: 'Report Builder', report_templates: 'Report Templates'
   };
@@ -715,7 +851,7 @@ function buildNav() {
     { icon: '📊', label: 'Dashboard', view: 'dashboard' },
     { icon: '🔍', label: 'Browse Offerings', view: 'browse', badge: STATE.funds.length },
     { icon: '🛒', label: 'Basket', view: 'basket', badge: STATE.basket.length || null },
-    { icon: '📐', label: 'Portfolio Builder', view: 'portfolio_builder' },
+    { icon: '📐', label: 'DST Portfolio Builder', view: 'portfolio_builder', badge: Object.keys(activePB().allocations).length || null },
     { icon: '🧮', label: 'Model for Client', view: 'model' }
   ];
   const compNav = [
@@ -1131,7 +1267,7 @@ function renderOfferingDetail() {
   const docRow = `<div class="doc-btn-row"><span class="doc-label">Documents</span>${docBtns.map(d => `<button class="btn btn-sm btn-secondary" ${d.url ? `onclick="window.open('${d.url}','_blank')"` : 'disabled style="opacity:0.4"'}>${d.icon} ${d.label}</button>`).join('')}</div>`;
   const actionBar = `<div class="action-bar">
     <button class="btn ${inBasket ? 'btn-primary' : 'btn-secondary'}" onclick="toggleBasket(${fund.id})">${inBasket ? '✓ In Basket' : '🛒 Add to Basket'}</button>
-    <button class="btn btn-secondary" onclick="toast('Portfolio Builder coming Phase 2','error')">📐 Build Portfolio</button>
+    <button class="btn btn-secondary" onclick="pbAddFromDetail(${fund.id})">📐 Build Portfolio</button>
     <button class="btn btn-secondary" onclick="toast('Model coming Phase 2','error')">🧮 Model for Client</button>
     <button class="btn btn-ghost" onclick="toast('Compliance Report coming Phase 2','error')">🛡️ Compliance Report</button>
   </div>`;
@@ -2028,6 +2164,616 @@ function basketDrawIncomeChart() {
 
 
 /* ═══════════════════════════════════════════
+   DST PORTFOLIO BUILDER — Full Module
+═══════════════════════════════════════════ */
+const PB = {};
+PB.e = (s) => String(s||'').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+PB.fmtM = (v) => { if (v == null || isNaN(v) || v === 0) return '$0'; if (v >= 1e6) return '$' + (v/1e6).toFixed(1) + 'M'; if (v >= 1e3) return '$' + (v/1e3).toFixed(0) + 'K'; return '$' + Math.round(v).toLocaleString(); };
+PB.fmtMFull = (v) => (v != null && !isNaN(v)) ? '$' + Math.round(v).toLocaleString() : '$0';
+PB.fmtP = (v) => (v != null && !isNaN(v)) ? v.toFixed(2) + '%' : '—';
+PB.parseCurrency = (s) => { if (typeof s === 'number') return s; let str = String(s||'').replace(/[$,\s]/g, ''); let n = parseFloat(str); return isFinite(n) ? n : 0; };
+PB.clamp01 = (x) => Math.max(0, Math.min(1, x));
+
+// Compute portfolio metrics from allocations + fund data
+PB.compute = () => {
+  const p = activePB();
+  const equity = STATE.client.exchangeAmount || 0;
+  const debtTarget = STATE.client.debtReplacement || 0;
+  const entries = Object.entries(p.allocations || {});
+  const selected = entries.map(([fid, alloc]) => {
+    const fund = STATE.funds.find(f => String(f.id) === String(fid));
+    return { fid, alloc: Number(alloc || 0), fund };
+  }).filter(x => x.fund);
+
+  let invested = 0, totalPurchase = 0, totalLoan = 0, wYieldNum = 0, wYieldDen = 0, wLtvNum = 0, wLtvDen = 0;
+  const sponsors = new Set(), assetClasses = new Set(), locations = new Set();
+
+  for (const x of selected) {
+    const E = x.alloc > 0 ? x.alloc : 0;
+    if (E <= 0) continue;
+    invested += E;
+    const ltv = (x.fund.ltv || 0) / 100; // platform stores as pct number
+    const purchase = ltv < 1 ? E / (1 - ltv) : 0;
+    const loan = purchase - E;
+    totalPurchase += purchase;
+    totalLoan += loan;
+    x._purchase = purchase;
+    x._loan = loan;
+    const y1 = x.fund.y1coc || 0;
+    wYieldNum += E * y1;
+    wYieldDen += E;
+    if (ltv > 0) { wLtvNum += purchase * ltv; wLtvDen += purchase; }
+    if (x.fund.sponsor) sponsors.add(x.fund.sponsor);
+    if (x.fund.propType) assetClasses.add(x.fund.propType);
+    if (x.fund.location) locations.add(x.fund.location);
+  }
+  const wYield = wYieldDen > 0 ? wYieldNum / wYieldDen : 0;
+  const wLtv = wLtvDen > 0 ? (wLtvNum / wLtvDen) * 100 : 0;
+  const estAnnualIncome = equity > 0 ? invested * (wYield / 100) : 0;
+  const avgHold = selected.filter(x => x.alloc > 0 && x.fund.holdPeriod).length > 0
+    ? selected.filter(x => x.alloc > 0).reduce((s, x) => s + (x.fund.holdPeriod || 7) * x.alloc, 0) / invested : 0;
+
+  return { selected, invested, equity, debtTarget, totalPurchase, totalLoan, wYield, wLtv, estAnnualIncome, avgHold, sponsors, assetClasses, locations };
+};
+
+// Diversification checks
+PB.diversificationChecks = (m) => {
+  const checks = [];
+  const count = m.selected.filter(x => x.alloc > 0).length;
+  checks.push({ pass: count >= 3, warn: count === 2, label: `${count} offering${count !== 1 ? 's' : ''} selected`, sub: count >= 3 ? 'Good diversification' : count === 2 ? 'Consider adding a 3rd' : 'Add more offerings' });
+  checks.push({ pass: m.sponsors.size >= 2, warn: m.sponsors.size === 1 && count > 1, label: `${m.sponsors.size} sponsor${m.sponsors.size !== 1 ? 's' : ''}`, sub: m.sponsors.size >= 2 ? 'Multi-sponsor portfolio' : 'Single sponsor concentration' });
+  checks.push({ pass: m.assetClasses.size >= 2, warn: m.assetClasses.size === 1 && count > 1, label: `${m.assetClasses.size} asset class${m.assetClasses.size !== 1 ? 'es' : ''}`, sub: m.assetClasses.size >= 2 ? 'Diversified by property type' : 'Consider varying asset classes' });
+  // Concentration check
+  const maxPct = m.invested > 0 ? Math.max(...m.selected.map(x => x.alloc > 0 ? x.alloc / m.invested : 0)) : 0;
+  checks.push({ pass: maxPct <= 0.40, warn: maxPct > 0.40 && maxPct <= 0.60, label: `Max concentration ${(maxPct * 100).toFixed(0)}%`, sub: maxPct <= 0.40 ? 'Well-balanced allocations' : maxPct <= 0.60 ? 'Moderate concentration' : 'High concentration risk' });
+  // Equity progress
+  const eqPct = m.equity > 0 ? m.invested / m.equity : 0;
+  checks.push({ pass: eqPct >= 0.95 && eqPct <= 1.05, warn: eqPct < 0.95, label: m.equity > 0 ? `${(eqPct * 100).toFixed(0)}% equity deployed` : 'No equity target set', sub: eqPct >= 0.95 && eqPct <= 1.05 ? 'Fully allocated' : eqPct > 1.05 ? 'Over-allocated!' : 'Equity remaining' });
+  // Debt replacement
+  if (m.debtTarget > 0) {
+    const debtPct = m.totalLoan / m.debtTarget;
+    checks.push({ pass: debtPct >= 0.95, warn: debtPct >= 0.5, label: `Debt replacement ${(debtPct * 100).toFixed(0)}%`, sub: debtPct >= 0.95 ? 'Target met' : `${PB.fmtM(m.debtTarget - m.totalLoan)} remaining` });
+  }
+  return checks;
+};
+
+// Suitability score (reuse platform logic)
+PB.suitScore = (fund) => {
+  const c = STATE.client;
+  if (!c.riskTolerance && !c.exchangeAmount) return null;
+  let score = 50;
+  if (c.riskTolerance === 'conservative' && fund.ltv && fund.ltv < 60) score += 15;
+  if (c.riskTolerance === 'conservative' && fund.ltv && fund.ltv > 70) score -= 20;
+  if (c.riskTolerance === 'aggressive' && fund.y1coc && fund.y1coc > 6) score += 10;
+  if (c.exchangeAmount && fund.minInvest && fund.minInvest <= c.exchangeAmount) score += 10;
+  if (c.exchangeAmount && fund.minInvest && fund.minInvest > c.exchangeAmount) score -= 30;
+  if (c.objectives && c.objectives.includes('Income') && fund.y1coc && fund.y1coc > (STATE.peer.avgY1CoC || 5)) score += 10;
+  return Math.max(0, Math.min(100, score));
+};
+
+// Filter marketplace funds
+PB.filteredFunds = () => {
+  const f = STATE.pbFilters;
+  const q = (STATE.pbSearch || '').toLowerCase().trim();
+  let funds = [...STATE.funds];
+  if (f.propType !== 'all') funds = funds.filter(x => x.propType === f.propType);
+  if (f.sponsor !== 'all') funds = funds.filter(x => x.sponsor === f.sponsor);
+  if (f.sector !== 'all') funds = funds.filter(x => x.sector === f.sector);
+  if (f.quickDst) funds = funds.filter(x => (x.propType||'').toLowerCase().includes('dst') || (x._raw && STATE.headers && (() => { const ci = STATE.headers.findIndex(h => h.trim() === 'Offering Structure'); return ci >= 0 && x._raw[ci] && String(x._raw[ci].v||x._raw[ci].f||'').toLowerCase().includes('dst'); })()));
+  if (q) funds = funds.filter(x => `${x.sponsor} ${x.name} ${x.location} ${x.propType} ${x.sector}`.toLowerCase().includes(q));
+  return funds;
+};
+
+// Add offering from detail view
+function pbAddFromDetail(fundId) {
+  const p = activePB();
+  if (!p.allocations[String(fundId)]) {
+    p.allocations[String(fundId)] = 0;
+    savePB();
+  }
+  navigateTo('portfolio_builder');
+  setTimeout(() => {
+    const el = document.querySelector(`input[data-pb-alloc="${fundId}"]`);
+    if (el) { el.scrollIntoView({behavior:'smooth',block:'center'}); el.focus(); el.select(); }
+  }, 120);
+}
+
+// Toggle offering in portfolio
+function pbToggle(fundId) {
+  const p = activePB();
+  const fid = String(fundId);
+  if (p.allocations[fid] != null) {
+    delete p.allocations[fid];
+    toast('Removed from portfolio');
+  } else {
+    p.allocations[fid] = 0;
+    toast('Added — enter allocation amount');
+  }
+  savePB();
+  renderApp();
+  if (p.allocations[fid] != null) {
+    setTimeout(() => {
+      const el = document.querySelector(`input[data-pb-alloc="${fid}"]`);
+      if (el) { el.classList.add('needs-input'); el.scrollIntoView({behavior:'smooth',block:'center'}); el.focus(); el.select(); }
+    }, 100);
+  }
+}
+
+// Update allocation from table input
+function pbUpdateAlloc(fundId) {
+  const inp = document.querySelector(`input[data-pb-alloc="${fundId}"]`);
+  if (!inp) return;
+  const p = activePB();
+  const fund = STATE.funds.find(f => String(f.id) === String(fundId));
+  let val = PB.parseCurrency(inp.value);
+  const min = fund ? (fund.minInvest || 0) : 0;
+  if (val > 0 && min > 0 && val < min) { val = min; toast(`Minimum enforced: ${PB.fmtMFull(min)}`); }
+  p.allocations[String(fundId)] = val;
+  inp.value = val > 0 ? PB.fmtMFull(val) : '';
+  if (val > 0) inp.classList.remove('needs-input');
+  else inp.classList.add('needs-input');
+  savePB();
+  pbRefreshKPIs();
+}
+
+// Update inline allocation from marketplace card
+function pbInlineAlloc(fundId) {
+  const inp = document.querySelector(`input[data-pb-mkt-alloc="${fundId}"]`);
+  if (!inp) return;
+  const p = activePB();
+  const fund = STATE.funds.find(f => String(f.id) === String(fundId));
+  let val = PB.parseCurrency(inp.value);
+  const min = fund ? (fund.minInvest || 0) : 0;
+  if (val > 0 && min > 0 && val < min) { val = min; toast(`Minimum enforced: ${PB.fmtMFull(min)}`); }
+  if (!p.allocations.hasOwnProperty(String(fundId))) p.allocations[String(fundId)] = 0;
+  p.allocations[String(fundId)] = val;
+  inp.value = val > 0 ? PB.fmtMFull(val) : '';
+  savePB();
+  renderApp();
+}
+
+// Remove offering
+function pbRemove(fundId) {
+  const p = activePB();
+  delete p.allocations[String(fundId)];
+  savePB();
+  renderApp();
+}
+
+// Portfolio management
+function pbNewPortfolio() {
+  const name = prompt('Portfolio name?', 'New Portfolio');
+  if (!name) return;
+  const id = 'p_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2,6);
+  STATE.pb.portfolios.unshift({ id, name: name.trim() || 'New Portfolio', allocations: {} });
+  STATE.pb.activeId = id;
+  savePB(); renderApp();
+}
+function pbRenamePortfolio() {
+  const p = activePB();
+  const name = prompt('Rename portfolio:', p.name);
+  if (!name) return;
+  p.name = name.trim() || p.name;
+  savePB(); renderApp();
+}
+function pbDeletePortfolio() {
+  if (STATE.pb.portfolios.length <= 1) { toast('Keep at least one portfolio', 'error'); return; }
+  const p = activePB();
+  if (!confirm(`Delete "${p.name}"? This cannot be undone.`)) return;
+  STATE.pb.portfolios = STATE.pb.portfolios.filter(x => x.id !== p.id);
+  STATE.pb.activeId = STATE.pb.portfolios[0].id;
+  savePB(); renderApp();
+}
+function pbSwitchPortfolio(id) {
+  STATE.pb.activeId = id;
+  savePB(); renderApp();
+}
+
+// Client equity/debt inputs from the portfolio builder panel
+function pbUpdateEquity() {
+  const inp = document.getElementById('pb-equity-input');
+  if (!inp) return;
+  const val = PB.parseCurrency(inp.value);
+  STATE.client.exchangeAmount = val;
+  saveClient();
+  inp.value = val > 0 ? PB.fmtMFull(val) : '';
+  pbRefreshKPIs();
+  updateClientBadge();
+}
+function pbUpdateDebt() {
+  const inp = document.getElementById('pb-debt-input');
+  if (!inp) return;
+  const val = PB.parseCurrency(inp.value);
+  STATE.client.debtReplacement = val;
+  saveClient();
+  inp.value = val > 0 ? PB.fmtMFull(val) : '';
+  pbRefreshKPIs();
+}
+
+// Refresh KPI section without full re-render (smooth updates)
+function pbRefreshKPIs() {
+  const m = PB.compute();
+  const eqPct = m.equity > 0 ? PB.clamp01(m.invested / m.equity) : 0;
+  const debtPct = m.debtTarget > 0 ? PB.clamp01(m.totalLoan / m.debtTarget) : 0;
+  const isOver = m.equity > 0 && m.invested > m.equity;
+
+  const el = (id) => document.getElementById(id);
+  if (el('pb-kpi-invested')) el('pb-kpi-invested').textContent = PB.fmtMFull(m.invested);
+  if (el('pb-equity-bar')) { el('pb-equity-bar').style.width = (eqPct * 100).toFixed(1) + '%'; el('pb-equity-bar').className = 'pb-progress-fill ' + (isOver ? 'over' : 'equity'); }
+  if (el('pb-equity-sub')) el('pb-equity-sub').textContent = m.equity > 0 ? `${PB.fmtM(m.invested)} of ${PB.fmtM(m.equity)}${isOver ? ' — OVER-ALLOCATED' : ` — ${PB.fmtM(Math.max(0, m.equity - m.invested))} remaining`}` : 'Set exchange equity to track progress';
+  if (el('pb-kpi-debt')) el('pb-kpi-debt').textContent = PB.fmtMFull(m.totalLoan);
+  if (el('pb-debt-bar')) el('pb-debt-bar').style.width = (debtPct * 100).toFixed(1) + '%';
+  if (el('pb-debt-sub')) el('pb-debt-sub').textContent = m.debtTarget > 0 ? `${PB.fmtM(m.totalLoan)} of ${PB.fmtM(m.debtTarget)} — ${PB.fmtM(Math.max(0, m.debtTarget - m.totalLoan))} remaining` : 'Optional — set a target to track';
+  if (el('pb-kpi-yield')) el('pb-kpi-yield').textContent = m.wYield > 0 ? PB.fmtP(m.wYield) : '—';
+  if (el('pb-kpi-ltv')) el('pb-kpi-ltv').textContent = m.wLtv > 0 ? PB.fmtP(m.wLtv) : '—';
+
+  // Update pct column in table
+  m.selected.forEach(x => {
+    const pctEl = document.querySelector(`[data-pb-pct="${x.fid}"]`);
+    if (pctEl && m.invested > 0 && x.alloc > 0) {
+      const pct = (x.alloc / m.invested * 100);
+      pctEl.innerHTML = `${pct.toFixed(1)}%<div class="pb-pct-bar"><div class="pb-pct-fill" style="width:${pct}%"></div></div>`;
+    }
+    const purchEl = document.querySelector(`[data-pb-purchase="${x.fid}"]`);
+    const loanEl = document.querySelector(`[data-pb-loan="${x.fid}"]`);
+    if (purchEl) purchEl.textContent = x._purchase ? PB.fmtM(x._purchase) : '—';
+    if (loanEl) loanEl.textContent = x._loan ? PB.fmtM(x._loan) : '—';
+  });
+}
+
+// ── Main Render ──
+function renderPortfolioBuilder() {
+  const p = activePB();
+  const m = PB.compute();
+  const mktFunds = PB.filteredFunds();
+  const e = PB.e;
+  const clientName = STATE.client.clientName || '';
+  const sponsors = [...new Set(STATE.funds.map(f => f.sponsor).filter(Boolean))].sort();
+  const propTypes = [...new Set(STATE.funds.map(f => f.propType).filter(Boolean))].sort();
+  const sectors = [...new Set(STATE.funds.map(f => f.sector).filter(Boolean))].sort();
+  const f = STATE.pbFilters;
+
+  // ── Page Header ──
+  const header = `<div class="page-header">
+    <div><div class="page-title">DST Portfolio Builder</div>
+    <div class="page-subtitle">${clientName ? e(clientName) + ' — ' : ''}${p.name} — ${m.selected.filter(x=>x.alloc>0).length} offering${m.selected.filter(x=>x.alloc>0).length!==1?'s':''}</div></div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <div class="pb-portfolio-tabs">
+        ${STATE.pb.portfolios.map(pt => `<button class="pb-portfolio-tab ${pt.id===STATE.pb.activeId?'active':''}" onclick="pbSwitchPortfolio('${e(pt.id)}')">${e(pt.name)}</button>`).join('')}
+        <button class="btn btn-sm btn-ghost" onclick="pbNewPortfolio()">+ New</button>
+        <button class="btn btn-sm btn-ghost" onclick="pbRenamePortfolio()">Rename</button>
+        ${STATE.pb.portfolios.length > 1 ? `<button class="btn btn-sm btn-ghost" onclick="pbDeletePortfolio()" style="color:var(--red)">Delete</button>` : ''}
+      </div>
+    </div>
+  </div>`;
+
+  // ── LEFT: Marketplace ──
+  const marketplaceHtml = `<div class="pb-panel">
+    <div class="pb-panel-hdr">
+      <h3>Marketplace</h3>
+      <span class="badge">${mktFunds.length} offerings</span>
+    </div>
+    <div class="pb-panel-body">
+      <input class="pb-search-input" placeholder="Search sponsor, name, location..." value="${e(STATE.pbSearch)}" oninput="STATE.pbSearch=this.value;renderApp()">
+      <div class="pb-filter-row">
+        <select class="pb-filter-select" onchange="STATE.pbFilters.propType=this.value;renderApp()">
+          <option value="all">All Types</option>
+          ${propTypes.map(t => `<option value="${e(t)}" ${f.propType===t?'selected':''}>${e(t)}</option>`).join('')}
+        </select>
+        <select class="pb-filter-select" onchange="STATE.pbFilters.sponsor=this.value;renderApp()">
+          <option value="all">All Sponsors</option>
+          ${sponsors.map(s => `<option value="${e(s)}" ${f.sponsor===s?'selected':''}>${e(s)}</option>`).join('')}
+        </select>
+        <select class="pb-filter-select" onchange="STATE.pbFilters.sector=this.value;renderApp()">
+          <option value="all">All Sectors</option>
+          ${sectors.map(s => `<option value="${e(s)}" ${f.sector===s?'selected':''}>${e(s)}</option>`).join('')}
+        </select>
+        <label class="pb-quick-toggle ${f.quickDst?'active':''}">
+          <input type="checkbox" ${f.quickDst?'checked':''} onchange="STATE.pbFilters.quickDst=this.checked;renderApp()">
+          <span>DST Only</span>
+        </label>
+      </div>
+      <div class="pb-mkt-list">
+        ${mktFunds.length === 0 ? '<div class="pb-empty"><div class="pb-empty-icon">🔍</div><h4>No matches</h4><p>Adjust your filters to see offerings.</p></div>' :
+          mktFunds.map(fund => {
+            const fid = String(fund.id);
+            const inPf = p.allocations.hasOwnProperty(fid);
+            const allocAmt = inPf ? Number(p.allocations[fid] || 0) : 0;
+            const suit = PB.suitScore(fund);
+            const suitHtml = suit != null ? `<span class="pb-suitability ${suit >= 70 ? 'high' : suit >= 50 ? 'medium' : 'low'}">${suit >= 70 ? '★' : suit >= 50 ? '◆' : '○'} ${suit}</span>` : '';
+            const isDst = (fund.propType||'').toLowerCase().includes('dst') || (fund._raw && STATE.headers && (() => { const ci = STATE.headers.findIndex(h => h.trim() === 'Offering Structure'); return ci >= 0 && fund._raw[ci] && String(fund._raw[ci].v||fund._raw[ci].f||'').toLowerCase().includes('dst'); })());
+            return `<div class="pb-mkt-card ${inPf ? 'in-portfolio' : ''}">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+                <div>
+                  <div class="pb-mkt-card-name">${e(fund.name)}</div>
+                  <div class="pb-mkt-card-sponsor">${e(fund.sponsor)}</div>
+                </div>
+                ${suitHtml}
+              </div>
+              <div class="pb-mkt-badges">
+                ${fund.propType ? `<span class="pb-mkt-badge">${e(fund.propType)}</span>` : ''}
+                ${isDst ? '<span class="pb-mkt-badge dst">DST</span>' : ''}
+                ${fund.location ? `<span class="pb-mkt-badge">${e(fund.location)}</span>` : ''}
+              </div>
+              <div class="pb-mkt-metrics">
+                <div class="m"><div class="l">Min</div><div class="v">${fund.minInvest ? PB.fmtM(fund.minInvest) : '—'}</div></div>
+                <div class="m"><div class="l">LTV</div><div class="v">${fund.ltv ? PB.fmtP(fund.ltv) : '—'}</div></div>
+                <div class="m"><div class="l">Y1 CoC</div><div class="v">${fund.y1coc ? PB.fmtP(fund.y1coc) : '—'}</div></div>
+                <div class="m"><div class="l">Remaining</div><div class="v">${fund.equityRemaining ? PB.fmtM(fund.equityRemaining) : '—'}</div></div>
+              </div>
+              <div class="pb-mkt-card-actions">
+                <button class="pb-mkt-add-btn ${inPf ? 'added' : ''}" onclick="pbToggle(${fund.id})">${inPf ? '✓ In Portfolio' : '+ Add'}</button>
+                ${inPf ? `<div class="pb-mkt-alloc-inline">
+                  <input data-pb-mkt-alloc="${fund.id}" placeholder="$0" value="${allocAmt > 0 ? PB.fmtMFull(allocAmt) : ''}"
+                    onblur="pbInlineAlloc(${fund.id})" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur()}">
+                </div>` : ''}
+              </div>
+            </div>`;
+          }).join('')
+        }
+      </div>
+    </div>
+  </div>`;
+
+  // ── RIGHT: Portfolio Panel ──
+  const eqPct = m.equity > 0 ? PB.clamp01(m.invested / m.equity) : 0;
+  const debtPct = m.debtTarget > 0 ? PB.clamp01(m.totalLoan / m.debtTarget) : 0;
+  const isOver = m.equity > 0 && m.invested > m.equity;
+
+  // Portfolio table rows
+  const allocEntries = Object.entries(p.allocations).map(([fid, alloc]) => {
+    const fund = STATE.funds.find(f => String(f.id) === fid);
+    return { fid, alloc: Number(alloc || 0), fund };
+  }).filter(x => x.fund);
+
+  let tableRows = '';
+  if (allocEntries.length === 0) {
+    tableRows = `<tr><td colspan="8" style="padding:20px;text-align:center;color:var(--slate2);font-size:12px">Add deals from the marketplace to begin building.</td></tr>`;
+  } else {
+    tableRows = allocEntries.map(x => {
+      const f = x.fund;
+      const ltv = (f.ltv || 0) / 100;
+      const purchase = (x.alloc > 0 && ltv < 1) ? x.alloc / (1 - ltv) : 0;
+      const loan = purchase > 0 ? purchase - x.alloc : 0;
+      const pct = m.invested > 0 && x.alloc > 0 ? (x.alloc / m.invested * 100) : 0;
+      return `<tr>
+        <td><div class="deal-name" title="${e(f.sponsor+' — '+f.name)}">${e(f.name)}</div><div class="deal-sub">${e(f.sponsor)}</div></td>
+        <td class="r">${f.minInvest ? PB.fmtM(f.minInvest) : '—'}</td>
+        <td><input class="pb-alloc-input ${x.alloc <= 0 ? 'needs-input' : ''}" data-pb-alloc="${x.fid}" value="${x.alloc > 0 ? PB.fmtMFull(x.alloc) : ''}" placeholder="$0"
+          onblur="pbUpdateAlloc('${x.fid}')" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur()}"></td>
+        <td class="r" data-pb-pct="${x.fid}">${pct > 0 ? pct.toFixed(1) + '%<div class=pb-pct-bar><div class=pb-pct-fill style=width:' + pct + '%></div></div>' : '—'}</td>
+        <td class="r">${f.ltv ? PB.fmtP(f.ltv) : '—'}</td>
+        <td class="r" data-pb-purchase="${x.fid}">${purchase ? PB.fmtM(purchase) : '—'}</td>
+        <td class="r" data-pb-loan="${x.fid}">${loan ? PB.fmtM(loan) : '—'}</td>
+        <td><button class="pb-remove-btn" onclick="pbRemove('${x.fid}')" title="Remove">✕</button></td>
+      </tr>`;
+    }).join('');
+    // Totals row
+    tableRows += `<tr class="pb-totals-row">
+      <td style="font-weight:700;color:var(--navy)">TOTALS</td>
+      <td></td>
+      <td class="r" style="font-weight:800;color:var(--navy)">${PB.fmtMFull(m.invested)}</td>
+      <td class="r">${m.invested > 0 ? '100%' : '—'}</td>
+      <td class="r">${m.wLtv > 0 ? PB.fmtP(m.wLtv) : '—'}</td>
+      <td class="r">${m.totalPurchase ? PB.fmtM(m.totalPurchase) : '—'}</td>
+      <td class="r">${m.totalLoan ? PB.fmtM(m.totalLoan) : '—'}</td>
+      <td></td>
+    </tr>`;
+  }
+
+  const portfolioHtml = `<div class="pb-panel">
+    <div class="pb-panel-hdr">
+      <div>
+        <h3>Your Portfolio — ${e(p.name)}</h3>
+        <div style="font-size:11px;color:var(--slate2)">Allocations with minimum enforcement</div>
+      </div>
+    </div>
+    <div class="pb-panel-body">
+      <div class="pb-client-bar">
+        <div class="pb-client-bar-title">${clientName ? e(clientName) : 'Client'} — Exchange Parameters</div>
+        <div class="pb-client-bar-grid">
+          <div class="pb-client-input-wrap">
+            <label>Exchange Equity (required)</label>
+            <input class="pb-client-input" id="pb-equity-input" value="${m.equity > 0 ? PB.fmtMFull(m.equity) : ''}" placeholder="$0" inputmode="decimal"
+              onblur="pbUpdateEquity()" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur()}">
+            <div class="pb-client-hint">Total equity to allocate across offerings</div>
+          </div>
+          <div class="pb-client-input-wrap">
+            <label>Debt Replacement (optional)</label>
+            <input class="pb-client-input" id="pb-debt-input" value="${m.debtTarget > 0 ? PB.fmtMFull(m.debtTarget) : ''}" placeholder="$0" inputmode="decimal"
+              onblur="pbUpdateDebt()" onkeydown="if(event.key==='Enter'){event.preventDefault();this.blur()}">
+            <div class="pb-client-hint">Target for boot analysis tracking</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pb-kpi-row">
+        <div class="pb-kpi">
+          <div class="pb-kpi-label">Invested Equity</div>
+          <div class="pb-kpi-val" id="pb-kpi-invested">${PB.fmtMFull(m.invested)}</div>
+          <div class="pb-progress"><div class="pb-progress-fill ${isOver ? 'over' : 'equity'}" id="pb-equity-bar" style="width:${(eqPct*100).toFixed(1)}%"></div></div>
+          <div class="pb-kpi-sub" id="pb-equity-sub">${m.equity > 0 ? `${PB.fmtM(m.invested)} of ${PB.fmtM(m.equity)}${isOver ? ' — OVER-ALLOCATED' : ` — ${PB.fmtM(Math.max(0, m.equity - m.invested))} remaining`}` : 'Set exchange equity to track progress'}</div>
+        </div>
+        <div class="pb-kpi">
+          <div class="pb-kpi-label">Debt Replacement</div>
+          <div class="pb-kpi-val" id="pb-kpi-debt">${PB.fmtMFull(m.totalLoan)}</div>
+          <div class="pb-progress"><div class="pb-progress-fill debt" id="pb-debt-bar" style="width:${(debtPct*100).toFixed(1)}%"></div></div>
+          <div class="pb-kpi-sub" id="pb-debt-sub">${m.debtTarget > 0 ? `${PB.fmtM(m.totalLoan)} of ${PB.fmtM(m.debtTarget)} — ${PB.fmtM(Math.max(0, m.debtTarget - m.totalLoan))} remaining` : 'Optional — set a target to track'}</div>
+        </div>
+      </div>
+      <div class="pb-kpi-row">
+        <div class="pb-kpi">
+          <div class="pb-kpi-label">Weighted Year-1 Cash Yield</div>
+          <div class="pb-kpi-val" id="pb-kpi-yield">${m.wYield > 0 ? PB.fmtP(m.wYield) : '—'}</div>
+        </div>
+        <div class="pb-kpi">
+          <div class="pb-kpi-label">Weighted Avg LTV</div>
+          <div class="pb-kpi-val" id="pb-kpi-ltv">${m.wLtv > 0 ? PB.fmtP(m.wLtv) : '—'}</div>
+        </div>
+      </div>
+
+      <div class="pb-table-wrap" style="max-height:380px;overflow:auto">
+        <table class="pb-table">
+          <thead><tr>
+            <th style="min-width:140px">Deal</th>
+            <th class="r">Min</th>
+            <th>Alloc ($)</th>
+            <th class="r">%</th>
+            <th class="r">LTV</th>
+            <th class="r">Purch. Exp.</th>
+            <th class="r">Loan Exp.</th>
+            <th></th>
+          </tr></thead>
+          <tbody>${tableRows}</tbody>
+        </table>
+      </div>
+      <div style="margin-top:8px;font-size:10.5px;color:var(--fog)">Exposure math: <span style="font-family:var(--mono)">purchase = E/(1−LTV)</span>, <span style="font-family:var(--mono)">loan = purchase − E</span></div>
+    </div>
+  </div>`;
+
+  // ── ANALYTICS SECTION (below the two-panel layout) ──
+  const activeSelected = m.selected.filter(x => x.alloc > 0);
+  let analyticsHtml = '';
+
+  if (activeSelected.length > 0) {
+    // Blended metrics tiles
+    const blendedTiles = `<div class="pb-blended-grid">
+      <div class="pb-blended-tile"><div class="label">Total Purchase Exposure</div><div class="val">${PB.fmtM(m.totalPurchase)}</div></div>
+      <div class="pb-blended-tile"><div class="label">Total Loan Exposure</div><div class="val">${PB.fmtM(m.totalLoan)}</div></div>
+      <div class="pb-blended-tile"><div class="label">Est. Annual Income</div><div class="val">${PB.fmtM(m.estAnnualIncome)}</div><div class="sub">Based on weighted Y1 CoC</div></div>
+      <div class="pb-blended-tile"><div class="label">Wtd Avg Hold Period</div><div class="val">${m.avgHold > 0 ? m.avgHold.toFixed(1) + ' yrs' : '—'}</div></div>
+      <div class="pb-blended-tile"><div class="label">Sponsors</div><div class="val">${m.sponsors.size}</div><div class="sub">${[...m.sponsors].slice(0,3).join(', ')}${m.sponsors.size > 3 ? '…' : ''}</div></div>
+      <div class="pb-blended-tile"><div class="label">Asset Classes</div><div class="val">${m.assetClasses.size}</div><div class="sub">${[...m.assetClasses].slice(0,3).join(', ')}${m.assetClasses.size > 3 ? '…' : ''}</div></div>
+      <div class="pb-blended-tile"><div class="label">Locations</div><div class="val">${m.locations.size}</div></div>
+      <div class="pb-blended-tile"><div class="label">Offerings</div><div class="val">${activeSelected.length}</div></div>
+    </div>`;
+
+    // Charts (rendered in postRender)
+    const chartsHtml = `<div class="pb-charts-row">
+      <div class="pb-chart-card">
+        <div class="pb-chart-card-title">Allocation by Offering</div>
+        <div class="pb-chart-box"><canvas id="pb-chart-alloc"></canvas></div>
+      </div>
+      <div class="pb-chart-card">
+        <div class="pb-chart-card-title">Allocation by Asset Class</div>
+        <div class="pb-chart-box"><canvas id="pb-chart-asset"></canvas></div>
+      </div>
+    </div>`;
+
+    // Diversification scorecard
+    const checks = PB.diversificationChecks(m);
+    const divHtml = `<div class="pb-analytics-title">Diversification Scorecard</div>
+    <div class="pb-diversification">
+      ${checks.map(c => `<div class="pb-div-item">
+        <div class="pb-div-check ${c.pass ? 'pass' : c.warn ? 'warn' : 'fail'}">${c.pass ? '✓' : c.warn ? '!' : '✕'}</div>
+        <div><div class="pb-div-text">${e(c.label)}</div><div class="pb-div-sub">${e(c.sub)}</div></div>
+      </div>`).join('')}
+    </div>`;
+
+    // Income projections table (Years 1-5)
+    let incomeTableHtml = '';
+    const maxYrs = 5;
+    const hasIncomeData = activeSelected.some(x => x.fund.income && x.fund.income.some(v => v != null));
+    if (hasIncomeData && m.invested > 0) {
+      const yearHeaders = Array.from({length: maxYrs}, (_, i) => `<th>Year ${i + 1}</th>`).join('');
+      const offeringRows = activeSelected.map(x => {
+        const inc = x.fund.income || [];
+        return `<tr>
+          <td>${e(x.fund.name)}</td>
+          ${Array.from({length: maxYrs}, (_, i) => {
+            const rate = inc[i] != null ? inc[i] : null;
+            const dist = rate != null ? x.alloc * rate / 100 : null;
+            return `<td>${dist != null ? PB.fmtM(dist) : '—'}</td>`;
+          }).join('')}
+        </tr>`;
+      }).join('');
+      // Blended totals row
+      const totalRow = `<tr class="total-row">
+        <td>Portfolio Total</td>
+        ${Array.from({length: maxYrs}, (_, i) => {
+          let total = 0; let hasData = false;
+          activeSelected.forEach(x => {
+            const rate = (x.fund.income || [])[i];
+            if (rate != null) { total += x.alloc * rate / 100; hasData = true; }
+          });
+          return `<td>${hasData ? PB.fmtM(total) : '—'}</td>`;
+        }).join('')}
+      </tr>`;
+      incomeTableHtml = `<div class="pb-analytics-title" style="margin-top:16px">Projected Income Distributions</div>
+      <div class="pb-table-wrap">
+        <table class="pb-income-table">
+          <thead><tr><th style="text-align:left">Offering</th>${yearHeaders}</tr></thead>
+          <tbody>${offeringRows}${totalRow}</tbody>
+        </table>
+      </div>
+      <div style="font-size:10px;color:var(--fog);margin-top:4px">Based on CoC rates from offering data × allocation amounts. Not guaranteed.</div>`;
+    }
+
+    analyticsHtml = `<div class="pb-analytics">
+      <div class="pb-analytics-title">Portfolio Analytics</div>
+      ${blendedTiles}${chartsHtml}${divHtml}${incomeTableHtml}
+    </div>`;
+  }
+
+  // ── Action buttons ──
+  const actionsHtml = activeSelected.length > 0 ? `<div class="pb-actions-bar">
+    <button class="btn btn-primary" onclick="navigateTo('model')">🧮 Model for Client</button>
+    <button class="btn btn-secondary" onclick="navigateTo('basket')">🛒 View in Basket</button>
+    <button class="btn btn-ghost" onclick="toast('PDF export coming soon')">📄 Export PDF</button>
+  </div>` : '';
+
+  // ── Disclaimer ──
+  const disclaimerHtml = `<div class="pb-disclaimer"><strong>Disclaimer:</strong> For Broker Dealer and Investment Advisor home office due diligence use only. Always validate data with official offering documents and compliance requirements. Alts Fund LINK, LLC is not responsible for data errors or omissions. Data is for informational purposes only.</div>`;
+
+  return `${header}
+    <div class="pb-layout">${marketplaceHtml}${portfolioHtml}</div>
+    ${analyticsHtml}${actionsHtml}${disclaimerHtml}`;
+}
+
+// ── Post-render: draw charts ──
+function pbPostRender() {
+  // Destroy old charts
+  Object.values(STATE.pbCharts).forEach(c => { try { c.destroy(); } catch(e){} });
+  STATE.pbCharts = {};
+
+  const m = PB.compute();
+  const active = m.selected.filter(x => x.alloc > 0);
+  if (!active.length || !window.Chart) return;
+
+  const palette = ['#0B1F3B','#1C3A63','#3B82F6','#6366F1','#7C3AED','#14B8A6','#0EA5E9','#F59E0B','#EC4899','#10B981'];
+
+  // Allocation by Offering donut
+  const allocCanvas = document.getElementById('pb-chart-alloc');
+  if (allocCanvas) {
+    STATE.pbCharts.alloc = new Chart(allocCanvas, {
+      type: 'doughnut',
+      data: {
+        labels: active.map(x => x.fund.name.length > 20 ? x.fund.name.slice(0,20)+'…' : x.fund.name),
+        datasets: [{ data: active.map(x => x.alloc), backgroundColor: active.map((_, i) => palette[i % palette.length]), borderWidth: 2, borderColor: '#fff' }]
+      },
+      options: { responsive: true, maintainAspectRatio: false, animation: { duration: 600 }, plugins: { legend: { position: 'right', labels: { boxWidth: 10, padding: 8, font: { size: 10, family: 'DM Sans', weight: '600' }, color: '#5C7A99' } } } }
+    });
+  }
+
+  // Allocation by Asset Class donut
+  const assetCanvas = document.getElementById('pb-chart-asset');
+  if (assetCanvas) {
+    const byAsset = {};
+    active.forEach(x => { const cls = x.fund.propType || 'Other'; byAsset[cls] = (byAsset[cls] || 0) + x.alloc; });
+    const assetEntries = Object.entries(byAsset).sort((a,b) => b[1] - a[1]);
+    STATE.pbCharts.asset = new Chart(assetCanvas, {
+      type: 'doughnut',
+      data: {
+        labels: assetEntries.map(e => e[0]),
+        datasets: [{ data: assetEntries.map(e => e[1]), backgroundColor: assetEntries.map((_, i) => palette[(i + 3) % palette.length]), borderWidth: 2, borderColor: '#fff' }]
+      },
+      options: { responsive: true, maintainAspectRatio: false, animation: { duration: 600 }, plugins: { legend: { position: 'right', labels: { boxWidth: 10, padding: 8, font: { size: 10, family: 'DM Sans', weight: '600' }, color: '#5C7A99' } } } }
+    });
+  }
+}
+
+
+/* ═══════════════════════════════════════════
    EVENT HANDLERS & INIT
 ═══════════════════════════════════════════ */
 function attachViewHandlers() {
@@ -2035,6 +2781,8 @@ function attachViewHandlers() {
     requestAnimationFrame(() => basketPostRender());
   } else if (STATE.view === 'model') {
     requestAnimationFrame(() => dstPostRender());
+  } else if (STATE.view === 'portfolio_builder') {
+    requestAnimationFrame(() => pbPostRender());
   } else {
     if (STATE.incomeChart) { STATE.incomeChart.destroy(); STATE.incomeChart = null; }
   }
