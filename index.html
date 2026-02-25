@@ -2251,7 +2251,7 @@ function _renderBasketInner() {
   // ── Build suitability scores ──
   const suitScores = selectedFunds.map(sf => {
     const pf = platformFunds.find(x => x.id === sf.id);
-    return pf ? computeSuitScore(pf) : null;
+    return pf ? computeDashboardSuitScore(pf, STATE.client) : null;
   });
   const blendedSuit = suitScores.filter(x => x != null).length ? Math.round(suitScores.filter(x=>x!=null).reduce((a,b)=>a+b,0)/suitScores.filter(x=>x!=null).length) : null;
   const suitClass = (sc) => sc == null ? 'none' : sc >= 75 ? 'high' : sc >= 50 ? 'medium' : 'low';
