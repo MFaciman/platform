@@ -181,9 +181,9 @@ a{color:inherit;text-decoration:none}button{cursor:pointer;font-family:var(--fon
 .form-select{height:38px;padding:0 32px 0 12px;border:1.5px solid var(--mist);border-radius:var(--radius);font-size:13.5px;color:var(--navy);background:var(--white);cursor:pointer;outline:none;width:100%;transition:border-color var(--transition);-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%235C7A99' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center}
 .form-select:focus{border-color:var(--navy2);box-shadow:0 0 0 3px rgba(28,58,99,0.08)}
 .checkbox-group{display:flex;flex-wrap:wrap;gap:8px}
-.checkbox-pill{display:flex;align-items:center;gap:6px;padding:6px 12px;border:1.5px solid var(--mist);border-radius:20px;cursor:pointer;font-size:12.5px;font-weight:500;color:var(--slate);transition:all var(--transition);background:var(--white);user-select:none}
+.checkbox-pill{display:flex;align-items:center;gap:6px;padding:6px 12px;border:1.5px solid var(--mist);border-radius:20px;cursor:pointer;font-size:12.5px;font-weight:500;color:var(--slate);transition:all var(--transition);background:var(--white);user-select:none;-webkit-user-select:none}
 .checkbox-pill:hover{border-color:var(--slate2);color:var(--navy);background:var(--surface)}
-.checkbox-pill input{width:0;height:0;opacity:0;position:absolute}
+.checkbox-pill input{width:0;height:0;opacity:0;position:absolute;pointer-events:none}
 .checkbox-pill.checked{border-color:var(--navy2);background:var(--ice);color:var(--navy);font-weight:600}
 .form-section-label{font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--fog);margin-bottom:10px;margin-top:4px;padding-bottom:6px;border-bottom:1px solid var(--mist)}
 .dashboard-grid{display:grid;grid-template-columns:340px 1fr;gap:20px;align-items:start}
@@ -896,8 +896,32 @@ function openProfileModal() {
         <div class="modal-header"><div><div class="modal-title">Client Profile</div><div class="modal-subtitle">Configure client parameters for suitability matching</div></div><button class="modal-close" onclick="closeModal()">✕</button></div>
         <div class="modal-body">
           <div class="form-grid">
+
+            <div class="form-group form-grid-full" style="border-bottom:1px solid var(--mist);padding-bottom:14px;margin-bottom:4px">
+              <div style="font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--slate2);text-transform:uppercase;margin-bottom:10px">Advisor Info</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+                <div><label class="form-label">Financial Advisor Name</label><input class="form-input" id="cp-fa-name" value="${c.faName || ''}" placeholder="Jane Smith, CFP"></div>
+                <div><label class="form-label">Firm / Broker-Dealer</label><input class="form-input" id="cp-firm" value="${c.firm || ''}" placeholder="Broker-dealer"></div>
+              </div>
+              <div>
+                <label class="form-label">Firm Logo</label>
+                <div style="display:flex;align-items:center;gap:12px">
+                  ${c.firmLogo ? `<img id="cp-logo-preview" src="${c.firmLogo}" style="height:36px;max-width:140px;object-fit:contain;border:1px solid var(--mist);border-radius:6px;padding:4px;background:#fff">` : `<div id="cp-logo-preview" style="height:36px;width:100px;border:1.5px dashed var(--mist);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--slate2)">No logo</div>`}
+                  <label style="cursor:pointer;display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border:1.5px solid var(--mist);border-radius:8px;font-size:12px;font-weight:500;color:var(--slate);background:var(--white);transition:all var(--transition)" onmouseover="this.style.borderColor='var(--navy)'" onmouseout="this.style.borderColor='var(--mist)'">
+                    📁 Upload Logo
+                    <input type="file" accept="image/*" style="display:none" onchange="cpHandleLogoUpload(this)">
+                  </label>
+                  ${c.firmLogo ? `<button onclick="cpClearLogo()" style="font-size:11px;color:var(--slate2);background:none;border:none;cursor:pointer;padding:0">✕ Remove</button>` : ''}
+                </div>
+                <div style="font-size:10.5px;color:var(--slate2);margin-top:5px">PNG or SVG recommended. Appears on client-facing reports.</div>
+              </div>
+            </div>
+
+            <div class="form-group form-grid-full" style="margin-bottom:4px">
+              <div style="font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--slate2);text-transform:uppercase;margin-bottom:10px">Client Info</div>
+            </div>
+
             <div class="form-group"><label class="form-label">Client Name</label><input class="form-input" id="cp-name" value="${c.name || ''}" placeholder="Full name"></div>
-            <div class="form-group"><label class="form-label">Firm / BD</label><input class="form-input" id="cp-firm" value="${c.firm || ''}" placeholder="Broker-dealer"></div>
             <div class="form-group"><label class="form-label">Age</label><input class="form-input" type="number" id="cp-age" value="${c.age || ''}" placeholder="65"></div>
             <div class="form-group"><label class="form-label">Filing Status</label><select class="form-select" id="cp-filing"><option value="">Select</option><option value="single" ${c.filing === 'single' ? 'selected' : ''}>Single</option><option value="married" ${c.filing === 'married' ? 'selected' : ''}>Married Filing Jointly</option><option value="trust" ${c.filing === 'trust' ? 'selected' : ''}>Trust</option></select></div>
             <div class="form-group"><label class="form-label">1031 Exchange Amount</label><input class="form-input" id="cp-exchange" value="${c.exchangeAmount || ''}" placeholder="$500,000"></div>
@@ -906,8 +930,21 @@ function openProfileModal() {
             <div class="form-group"><label class="form-label">Risk Tolerance</label><select class="form-select" id="cp-risk"><option value="">Select</option><option value="conservative" ${c.riskTolerance === 'conservative' ? 'selected' : ''}>Conservative</option><option value="moderate" ${c.riskTolerance === 'moderate' ? 'selected' : ''}>Moderate</option><option value="growth" ${c.riskTolerance === 'growth' ? 'selected' : ''}>Growth</option></select></div>
             <div class="form-group"><label class="form-label">Investment Horizon</label><select class="form-select" id="cp-horizon"><option value="">Select</option><option value="short" ${c.horizon === 'short' ? 'selected' : ''}>Short (3-5 yr)</option><option value="medium" ${c.horizon === 'medium' ? 'selected' : ''}>Medium (5-10 yr)</option><option value="long" ${c.horizon === 'long' ? 'selected' : ''}>Long (10+ yr)</option></select></div>
             <div class="form-group"><label class="form-label">State</label><input class="form-input" id="cp-state" value="${c.state || ''}" placeholder="CA, TX, FL..."></div>
-            <div class="form-group form-grid-full"><label class="form-label">Investment Objective</label><div class="checkbox-group" id="cp-objectives">${['Income', 'Preservation', 'Growth', 'Tax Deferral', 'Diversification', 'Estate Planning'].map(o => `<label class="checkbox-pill ${(c.objectives || []).includes(o) ? 'checked' : ''}" onclick="this.classList.toggle('checked')"><input type="checkbox" value="${o}" ${(c.objectives || []).includes(o) ? 'checked' : ''}>${o}</label>`).join('')}</div></div>
-            <div class="form-group form-grid-full"><label class="form-label">Property Type Preferences</label><div class="checkbox-group" id="cp-proptypes">${['Multifamily', 'Industrial', 'NNN Retail', 'Medical', 'Office', 'Self-Storage', 'Hospitality', 'Senior Living', 'Student Housing'].map(p => `<label class="checkbox-pill ${(c.propTypes || []).includes(p) ? 'checked' : ''}" onclick="this.classList.toggle('checked')"><input type="checkbox" value="${p}" ${(c.propTypes || []).includes(p) ? 'checked' : ''}>${p}</label>`).join('')}</div></div>
+
+            <div class="form-group form-grid-full">
+              <label class="form-label">Investment Objective <span style="font-size:10.5px;font-weight:400;color:var(--slate2)">(select one)</span></label>
+              <div class="checkbox-group" id="cp-objectives">
+                ${['Income', 'Preservation', 'Growth', 'Tax Deferral', 'Diversification', 'Estate Planning'].map(o => `<div class="checkbox-pill ${(c.objectives || []).includes(o) ? 'checked' : ''}" data-val="${o}" onclick="cpObjectiveClick(this)">${o}</div>`).join('')}
+              </div>
+            </div>
+
+            <div class="form-group form-grid-full">
+              <label class="form-label">Property Type Preferences <span style="font-size:10.5px;font-weight:400;color:var(--slate2)">(select all that apply)</span></label>
+              <div class="checkbox-group" id="cp-proptypes">
+                ${['Multifamily', 'Industrial', 'NNN Retail', 'Medical', 'Office', 'Self-Storage', 'Hospitality', 'Senior Living', 'Student Housing'].map(p => `<div class="checkbox-pill ${(c.propTypes || []).includes(p) ? 'checked' : ''}" data-val="${p}" onclick="cpPropTypeClick(this)">${p}</div>`).join('')}
+              </div>
+            </div>
+
             <div class="form-group form-grid-full"><label class="form-label">Notes</label><textarea class="form-input" id="cp-notes" style="height:60px;padding:10px;resize:vertical" placeholder="Additional notes...">${c.notes || ''}</textarea></div>
           </div>
         </div>
@@ -919,7 +956,9 @@ function openProfileModal() {
 function saveProfile() {
   STATE.client = {
     name: document.getElementById('cp-name').value.trim(),
+    faName: document.getElementById('cp-fa-name').value.trim(),
     firm: document.getElementById('cp-firm').value.trim(),
+    firmLogo: STATE._pendingLogo !== undefined ? STATE._pendingLogo : (STATE.client.firmLogo || null),
     age: parseInt(document.getElementById('cp-age').value) || null,
     filing: document.getElementById('cp-filing').value,
     exchangeAmount: parseMoney(document.getElementById('cp-exchange').value),
@@ -928,10 +967,11 @@ function saveProfile() {
     riskTolerance: document.getElementById('cp-risk').value,
     horizon: document.getElementById('cp-horizon').value,
     state: document.getElementById('cp-state').value.trim(),
-    objectives: [...document.querySelectorAll('#cp-objectives .checked input')].map(i => i.value),
-    propTypes: [...document.querySelectorAll('#cp-proptypes .checked input')].map(i => i.value),
+    objectives: [...document.querySelectorAll('#cp-objectives .checked')].map(el => el.dataset.val),
+    propTypes: [...document.querySelectorAll('#cp-proptypes .checked')].map(el => el.dataset.val),
     notes: document.getElementById('cp-notes').value.trim()
   };
+  STATE._pendingLogo = undefined;
   saveClient();
   updateClientBadge();
   closeModal();
@@ -947,12 +987,13 @@ function closeModal() { document.getElementById('modal-container').innerHTML = '
 function renderDashboard() {
   const c = STATE.client;
   const fs = STATE.funds;
-  const hasClient = !!c.name;
+  const hasClient = !!(c.name && (c.riskTolerance || c.exchangeAmount || c.age || (c.objectives && c.objectives.length) || (c.propTypes && c.propTypes.length) || c.horizon));
   const profileCard = `
     <div class="profile-card">
+      ${c.firmLogo ? `<div style="padding:12px 16px 0;display:flex;align-items:center;gap:10px"><img src="${c.firmLogo}" style="height:28px;max-width:110px;object-fit:contain"></div>` : ''}
       <div class="profile-card-header"><h3>Active Client</h3>
         <div class="profile-card-name">${c.name || 'No Client Set'}</div>
-        <div class="profile-card-firm">${c.firm || 'Configure client profile to begin'}</div>
+        <div class="profile-card-firm">${c.faName ? `${c.faName}${c.firm ? ' · ' + c.firm : ''}` : (c.firm || 'Configure client profile to begin')}</div>
       </div>
       <div class="profile-card-body">
         ${hasClient ? `
@@ -960,7 +1001,8 @@ function renderDashboard() {
           ${c.age ? `<div class="profile-row"><span class="profile-key">Age</span><span class="profile-val">${c.age}</span></div>` : ''}
           ${c.riskTolerance ? `<div class="profile-row"><span class="profile-key">Risk Tolerance</span><span class="profile-val" style="text-transform:capitalize">${c.riskTolerance}</span></div>` : ''}
           ${c.horizon ? `<div class="profile-row"><span class="profile-key">Horizon</span><span class="profile-val" style="text-transform:capitalize">${c.horizon}</span></div>` : ''}
-          ${c.objectives && c.objectives.length ? `<div class="profile-row"><span class="profile-key">Objectives</span><span class="profile-val" style="font-size:11px">${c.objectives.join(', ')}</span></div>` : ''}
+          ${c.objectives && c.objectives.length ? `<div class="profile-row"><span class="profile-key">Objective</span><span class="profile-val" style="font-size:11px">${c.objectives.join(', ')}</span></div>` : ''}
+          ${c.propTypes && c.propTypes.length ? `<div class="profile-row"><span class="profile-key">Prop Types</span><span class="profile-val" style="font-size:11px">${c.propTypes.join(', ')}</span></div>` : ''}
           ${c.state ? `<div class="profile-row"><span class="profile-key">State</span><span class="profile-val">${c.state}</span></div>` : ''}
         ` : '<div style="text-align:center;padding:12px 0;color:var(--slate2);font-size:13px">Click to set up client profile</div>'}
       </div>
@@ -970,18 +1012,10 @@ function renderDashboard() {
       </div>
     </div>`;
 
-  const suitScores = hasClient ? fs.slice(0, 5).map(f => {
-    let score = 50;
-    if (c.riskTolerance === 'conservative' && f.ltv && f.ltv < 60) score += 15;
-    if (c.riskTolerance === 'conservative' && f.ltv && f.ltv > 70) score -= 20;
-    if (c.riskTolerance === 'growth' && f.y1coc && f.y1coc > 6) score += 15;
-    if (c.exchangeAmount && f.minInvest && f.minInvest <= c.exchangeAmount * 0.3) score += 10;
-    if (c.propTypes && c.propTypes.length && c.propTypes.some(p => f.propType.toLowerCase().includes(p.toLowerCase()))) score += 15;
-    if (c.objectives && c.objectives.includes('Income') && f.y1coc && f.y1coc > (STATE.peer.avgY1CoC || 5)) score += 10;
-    if (c.age && f.holdPeriod && (c.age + f.holdPeriod) > 85) score -= 15;
-    score = Math.max(10, Math.min(98, score));
+  const suitScores = hasClient ? fs.map(f => {
+    const score = computeDashboardSuitScore(f, c);
     return { ...f, suitScore: score };
-  }).sort((a, b) => b.suitScore - a.suitScore) : [];
+  }).filter(f => f.suitScore !== null).sort((a, b) => b.suitScore - a.suitScore) : [];
 
   const topPicks = hasClient ? suitScores.slice(0, 3).map((f, i) => `
     <div class="offering-card card-enter" style="animation-delay:${i * 0.08}s" onclick="navigateTo('offering_detail',${f.id})">
@@ -3040,6 +3074,140 @@ function dstPostRender() {
   };
   if(viewMode==='blended'||!isMulti){drawChart(DST.blendInputs(funds,client,overrides));}
   else{funds.forEach(f=>drawChart(DST.fromFund(f,client,overrides)));}
+}
+
+// ── Client Profile Pill Click Handlers ──────────────────────────────────────
+
+// Investment Objective: single-select (deselects others when one is chosen)
+function cpObjectiveClick(el) {
+  const isChecked = el.classList.contains('checked');
+  // Deselect all
+  document.querySelectorAll('#cp-objectives .checkbox-pill').forEach(p => p.classList.remove('checked'));
+  // If it wasn't checked before, select it; if it was checked, clicking again deselects (toggle off)
+  if (!isChecked) el.classList.add('checked');
+}
+
+// Property Type Preferences: multi-select (toggle each independently)
+function cpPropTypeClick(el) {
+  el.classList.toggle('checked');
+}
+
+// Logo upload handler
+function cpHandleLogoUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 500000) { toast('Logo must be under 500KB'); return; }
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    STATE._pendingLogo = e.target.result;
+    const preview = document.getElementById('cp-logo-preview');
+    if (preview) {
+      preview.src = e.target.result;
+      preview.tagName === 'IMG'
+        ? (preview.src = e.target.result)
+        : (() => {
+            const img = document.createElement('img');
+            img.id = 'cp-logo-preview';
+            img.src = e.target.result;
+            img.style.cssText = 'height:36px;max-width:140px;object-fit:contain;border:1px solid var(--mist);border-radius:6px;padding:4px;background:#fff';
+            preview.replaceWith(img);
+          })();
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+function cpClearLogo() {
+  STATE._pendingLogo = null;
+  const preview = document.getElementById('cp-logo-preview');
+  if (preview) {
+    const placeholder = document.createElement('div');
+    placeholder.id = 'cp-logo-preview';
+    placeholder.style.cssText = 'height:36px;width:100px;border:1.5px dashed var(--mist);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--slate2)';
+    placeholder.textContent = 'No logo';
+    preview.replaceWith(placeholder);
+  }
+}
+
+// ── Fixed Dashboard Match Scoring ───────────────────────────────────────────
+// Overrides the inline suitScore calculation — called in renderDashboard via
+// computeDashboardSuitScore(f, c) instead of the old inline block.
+function computeDashboardSuitScore(f, c) {
+  // Count how many meaningful profile fields are actually filled in
+  const filledFields = [
+    c.riskTolerance, c.exchangeAmount, c.age, c.horizon,
+    c.objectives && c.objectives.length,
+    c.propTypes && c.propTypes.length
+  ].filter(Boolean).length;
+
+  // If fewer than 2 real fields are set, don't show a score
+  if (filledFields < 2) return null;
+
+  let score = 50; // baseline
+  let factors = 0;
+
+  // Risk tolerance vs LTV
+  if (c.riskTolerance && f.ltv != null) {
+    factors++;
+    if (c.riskTolerance === 'conservative') {
+      if (f.ltv < 50) score += 18;
+      else if (f.ltv < 60) score += 10;
+      else if (f.ltv > 70) score -= 20;
+    } else if (c.riskTolerance === 'moderate') {
+      if (f.ltv >= 45 && f.ltv <= 65) score += 12;
+      else if (f.ltv > 75) score -= 10;
+    } else if (c.riskTolerance === 'growth') {
+      if (f.y1coc && f.y1coc > 6) score += 15;
+    }
+  }
+
+  // Exchange amount vs minimum investment
+  if (c.exchangeAmount && f.minInvest != null) {
+    factors++;
+    if (f.minInvest > c.exchangeAmount) score -= 40; // can't afford it
+    else if (f.minInvest <= c.exchangeAmount * 0.25) score += 15; // good diversification room
+    else if (f.minInvest <= c.exchangeAmount * 0.5) score += 8;
+  }
+
+  // Property type match
+  if (c.propTypes && c.propTypes.length && f.propType) {
+    factors++;
+    const propMatch = c.propTypes.some(p => f.propType.toLowerCase().includes(p.toLowerCase()));
+    if (propMatch) score += 18;
+    else score -= 8;
+  }
+
+  // Investment objective match
+  if (c.objectives && c.objectives.length) {
+    factors++;
+    const obj = c.objectives[0];
+    if (obj === 'Income' && f.y1coc && f.y1coc > (STATE.peer.avgY1CoC || 5)) score += 12;
+    if (obj === 'Preservation' && f.ltv && f.ltv < 55) score += 12;
+    if (obj === 'Growth' && f.y1coc && f.y1coc > 6) score += 12;
+    if (obj === 'Tax Deferral') score += 8; // DSTs inherently support this
+  }
+
+  // Horizon vs hold period
+  if (c.horizon && f.holdPeriod) {
+    factors++;
+    const horizonYrs = c.horizon === 'short' ? 4 : c.horizon === 'medium' ? 7 : 12;
+    const diff = Math.abs(f.holdPeriod - horizonYrs);
+    if (diff <= 1) score += 12;
+    else if (diff <= 3) score += 5;
+    else score -= 8;
+  }
+
+  // Age + hold period (avoid funds that run past age 85)
+  if (c.age && f.holdPeriod) {
+    factors++;
+    if ((c.age + f.holdPeriod) > 85) score -= 15;
+    else score += 5;
+  }
+
+  // If we had very few scoring factors, compress toward middle (less confident)
+  if (factors < 2) score = 50 + (score - 50) * 0.4;
+
+  return Math.max(5, Math.min(98, Math.round(score)));
 }
 
 // ── Boot ──
