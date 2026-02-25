@@ -6,6 +6,12 @@
 <title>Browse Offerings — AFL</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!-- Load shared.js when running standalone (shell will have already loaded it in production) -->
+<script>
+if (!window.AFL) {
+  document.write('<script src="shared.js"><\/script>');
+}
+</script>
 <style>
 /* ── Design tokens ── */
 :root {
@@ -1583,6 +1589,24 @@ body { font-family: var(--font); background: var(--surface); color: var(--slate)
 
   // ── Export ───────────────────────────────────────────────
   window.currentModule = { init };
+
+  // ── Auto-init when running standalone (not inside shell) ──
+  // Shell sets window._aflShellActive = true before injecting modules.
+  // When browsing browse.html directly, we self-init after shared.js loads.
+  if (!window._aflShellActive) {
+    function tryInit() {
+      if (window.AFL) {
+        init({});
+      } else {
+        setTimeout(tryInit, 50);
+      }
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', tryInit);
+    } else {
+      tryInit();
+    }
+  }
 
 })();
 </script>
