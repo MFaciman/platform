@@ -277,6 +277,149 @@ a{color:inherit;text-decoration:none}button{cursor:pointer;font-family:var(--fon
 ::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--mist);border-radius:3px}::-webkit-scrollbar-thumb:hover{background:var(--fog)}
 @media(max-width:900px){:root{--nav-w:0px}#sidebar{display:none}#main{padding:18px}.dashboard-grid{grid-template-columns:1fr}.quick-stats{grid-template-columns:repeat(2,1fr)}.offering-grid{grid-template-columns:1fr}#view-toggle .view-btn span.label-text{display:none}.offering-table{font-size:12px}.offering-table td,.offering-table th{padding:7px 8px}.detail-two-col{grid-template-columns:1fr}.kd-grid{grid-template-columns:1fr}.detail-prev-next button{max-width:80px}}
 /* ═══════════════════════════════════════════
+   OFFERING DETAIL / BASKET VIEW
+═══════════════════════════════════════════ */
+.od-mode-bar{background:#fff;border-bottom:1px solid var(--mist);padding:0 24px;display:flex;align-items:center;gap:12px;height:44px;position:sticky;top:0;z-index:60;box-shadow:0 1px 3px rgba(11,31,59,0.08)}
+.od-mode-toggle{display:flex;background:var(--surface);border-radius:8px;padding:3px;gap:2px}
+.od-mode-btn{padding:5px 14px;border-radius:6px;border:none;background:transparent;font-size:12px;font-weight:500;color:var(--slate2);font-family:var(--font);cursor:pointer;transition:all .18s;display:flex;align-items:center;gap:5px}
+.od-mode-btn.active{background:#fff;color:var(--navy);font-weight:700;box-shadow:0 1px 3px rgba(11,31,59,0.08)}
+.od-breadcrumb{font-size:12.5px;color:var(--slate2);display:flex;align-items:center;gap:7px}
+.od-breadcrumb strong{color:var(--navy)}
+.od-prev-next{margin-left:auto;display:flex;gap:5px}
+.od-prev-next button{padding:4px 11px;font-size:11.5px;font-weight:500;border:1.5px solid var(--mist);border-radius:6px;background:#fff;color:var(--navy);font-family:var(--font);cursor:pointer}
+.od-hero{background:var(--navy);overflow:hidden}
+.od-hero-inner{display:grid;grid-template-columns:1fr 430px}
+.od-hero-left{padding:22px 28px;display:flex;flex-direction:column;justify-content:space-between;gap:14px}
+.od-sponsor-row{display:flex;align-items:center;gap:11px}
+.od-sponsor-logo{background:#fff;border-radius:9px;width:46px;height:46px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--navy);text-align:center;line-height:1.3;padding:4px;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,0.3)}
+.od-sponsor-logo-sm{background:#fff;border-radius:7px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:7.5px;font-weight:700;color:var(--navy);text-align:center;line-height:1.2;padding:3px;flex-shrink:0}
+.od-sponsor-logos-row{display:flex;gap:6px;align-items:center}
+.od-sponsor-name{font-size:11.5px;color:rgba(255,255,255,0.5);font-weight:500}
+.od-offering-name{font-size:22px;font-weight:800;color:#fff;letter-spacing:-.03em;line-height:1.2}
+.od-offering-location{font-size:12px;color:rgba(255,255,255,0.45);margin-top:2px}
+.od-hero-badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
+.od-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
+.od-badge-open{background:#16A34A;color:#fff}
+.od-badge-closing{background:var(--amber);color:#fff}
+.od-badge-closed{background:var(--slate);color:#fff}
+.od-badge-prop{background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.9);border:1px solid rgba(255,255,255,0.2)}
+.od-badge-sector{background:rgba(59,130,246,0.2);color:#93C5FD;border:1px solid rgba(59,130,246,0.25)}
+.od-hero-right{display:grid;grid-template-columns:1fr 1fr;overflow:hidden;border-left:1px solid rgba(255,255,255,0.08)}
+.od-hero-map-panel{background:#0d1e36;display:flex;flex-direction:column;overflow:hidden;border-right:1px solid rgba(255,255,255,0.06)}
+.od-hero-video-panel{background:#0a1628;display:flex;flex-direction:column;overflow:hidden}
+.od-hero-panel-label{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,0.3);padding:8px 10px 4px;flex-shrink:0}
+.od-hero-panel-content{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;min-height:160px}
+.od-map-svg{width:100%;height:100%;padding:4px 8px 8px}
+.od-state-default{fill:#1C3A63;stroke:#0B1F3B;stroke-width:0.5}
+.od-state-1{fill:#3B82F6;stroke:#0B1F3B;stroke-width:0.5}
+.od-state-2{fill:#8B5CF6;stroke:#0B1F3B;stroke-width:0.5}
+.od-state-3{fill:#F59E0B;stroke:#0B1F3B;stroke-width:0.5}
+.od-kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);background:var(--navy2);border-top:1px solid rgba(255,255,255,0.08)}
+.od-kpi{padding:12px 18px;border-right:1px solid rgba(255,255,255,0.07)}
+.od-kpi:last-child{border-right:none}
+.od-kpi-lbl{font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:3px}
+.od-kpi-val{font-size:21px;font-weight:800;color:#fff;letter-spacing:-.025em;line-height:1}
+.od-kpi-sub{font-size:10.5px;color:rgba(255,255,255,0.38);margin-top:3px}
+.od-kpi-good{color:#34D399;font-weight:600}
+.od-kpi-bad{color:#F87171;font-weight:600}
+.od-kpi-bar{height:3px;background:rgba(255,255,255,0.1);border-radius:2px;margin-top:6px;overflow:hidden}
+.od-kpi-fill{height:100%;border-radius:2px}
+.od-dd-row{background:#fff;border-bottom:1px solid var(--mist);padding:0 24px;display:flex;align-items:stretch;overflow-x:auto}
+.od-dd-group{display:flex;flex-direction:column;padding:12px 0;flex:1;min-width:0}
+.od-dd-group-label{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--fog);margin-bottom:9px;white-space:nowrap}
+.od-dd-icons{display:flex;gap:5px;flex-wrap:wrap}
+.od-dd-sep{width:1px;background:var(--mist);margin:10px 18px;flex-shrink:0}
+.od-dd-btn-wrap{position:relative}
+.od-dd-btn{display:flex;flex-direction:column;align-items:center;gap:4px;padding:7px 9px;border:1.5px solid var(--mist);border-radius:9px;background:#fff;cursor:pointer;transition:all .18s;min-width:58px;font-family:var(--font);text-decoration:none}
+.od-dd-btn:hover{border-color:var(--navy2);background:var(--ice)}
+.od-dd-btn.disabled{opacity:0.35;cursor:default;pointer-events:none}
+.od-dd-icon{width:34px;height:34px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.od-dd-icon.ai{background:linear-gradient(135deg,#EFF6FF,#DBEAFE)}
+.od-dd-icon.doc{background:linear-gradient(135deg,#F0FDF4,#DCFCE7)}
+.od-dd-icon.news{background:linear-gradient(135deg,#FFF7ED,#FED7AA)}
+.od-dd-icon.track{background:linear-gradient(135deg,#F5F3FF,#EDE9FE)}
+.od-dd-icon.team{background:linear-gradient(135deg,#ECFEFF,#CFFAFE)}
+.od-dd-icon.raise{background:linear-gradient(135deg,#FFF1F2,#FFE4E6)}
+.od-dd-icon.update{background:linear-gradient(135deg,#FEFCE8,#FEF9C3);font-size:11px;font-weight:700;color:var(--amber);line-height:1.2;text-align:center}
+.od-dd-lbl{font-size:9.5px;font-weight:600;color:var(--slate);text-align:center;line-height:1.2}
+.od-dd-dropdown{position:absolute;top:calc(100% + 5px);left:50%;transform:translateX(-50%);background:#fff;border:1.5px solid var(--mist);border-radius:10px;box-shadow:0 12px 32px rgba(11,31,59,0.14);min-width:180px;z-index:200;padding:5px;display:none}
+.od-dd-btn-wrap:hover .od-dd-dropdown{display:block}
+.od-dd-drop-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:7px;cursor:pointer;font-size:12px;color:var(--navy);text-decoration:none}
+.od-dd-drop-item:hover{background:var(--ice)}
+.od-dd-drop-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.od-dd-drop-name{font-weight:600;font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:130px}
+.od-dd-drop-sub{font-size:10px;color:var(--slate2)}
+.od-dd-drop-divider{height:1px;background:var(--mist);margin:3px 0}
+.od-action-bar{display:flex;align-items:center;gap:7px;padding:9px 24px;background:var(--surface2);border-bottom:1px solid var(--mist)}
+.od-action-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.od-suit-chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;font-size:12px;font-weight:700}
+.od-suit-chip.high{background:var(--green-lt);border:1.5px solid #BBF7D0;color:var(--green)}
+.od-suit-chip.medium{background:var(--amber-lt);border:1.5px solid #FDE68A;color:var(--amber)}
+.od-suit-chip.low{background:var(--red-lt);border:1.5px solid #FECACA;color:var(--red)}
+.od-suit-chip.none{background:var(--surface);border:1.5px solid var(--mist);color:var(--slate2);cursor:pointer}
+.od-analyst{padding:18px 24px;display:grid;gap:14px}
+.od-panel{background:#fff;border:1px solid var(--mist);border-radius:14px;padding:18px 20px;box-shadow:0 1px 3px rgba(11,31,59,0.08)}
+.od-panel-title{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--slate2);margin-bottom:13px}
+.od-two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.od-suit-panel-high{background:linear-gradient(135deg,var(--green-lt),#F0FDF4);border:1.5px solid #BBF7D0;border-radius:14px;padding:17px 20px}
+.od-suit-panel-none{background:var(--surface);border:1.5px dashed var(--mist);border-radius:14px;padding:17px 20px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;min-height:160px}
+.od-suit-score-big{font-size:40px;font-weight:800;letter-spacing:-.04em;line-height:1}
+.od-suit-factors{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:12px}
+.od-sf{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--navy)}
+.od-sf-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.od-mg{display:grid;gap:9px}
+.od-mt{background:var(--surface);border:1px solid var(--mist);border-radius:var(--radius);padding:11px 13px}
+.od-mt-lbl{font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--slate2);margin-bottom:3px}
+.od-mt-val{font-size:19px;font-weight:700;color:var(--navy);letter-spacing:-.02em}
+.od-mt-sub{font-size:10.5px;margin-top:3px}
+.od-peer-chip{display:inline-flex;align-items:center;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:700}
+.od-peer-chip.g{background:var(--green-lt);color:var(--green)}
+.od-peer-chip.b{background:var(--red-lt);color:var(--red)}
+.od-peer-chip.n{background:var(--ice);color:var(--slate2)}
+.od-pbar{height:7px;background:var(--mist);border-radius:4px;overflow:hidden;margin-top:7px}
+.od-pfill{height:100%;border-radius:4px}
+.od-disc-box{display:flex;align-items:center;gap:10px;margin-bottom:13px;padding:9px 13px;border-radius:var(--radius)}
+.od-disc-pos{background:var(--green-lt);border:1.5px solid #BBF7D0}
+.od-disc-neg{background:var(--amber-lt);border:1.5px solid #FDE68A}
+.od-kd-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.od-kd{display:flex;align-items:flex-start;gap:8px;padding:11px 13px;border-radius:var(--radius);border:1.5px solid;font-size:12px;line-height:1.5}
+.od-kd.pos{background:var(--green-lt);border-color:#BBF7D0;color:var(--green)}
+.od-kd.neg{background:var(--red-lt);border-color:#FECACA;color:var(--red)}
+.od-kd.neu{background:var(--ice);border-color:var(--mist);color:var(--slate)}
+.od-kd-ico{font-size:15px;flex-shrink:0;margin-top:1px}
+.od-chart-wrap{height:170px;position:relative}
+.od-proj-table{width:100%;border-collapse:collapse;font-size:12.5px}
+.od-proj-table th{padding:7px 11px;background:var(--navy);color:rgba(255,255,255,0.6);font-size:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;text-align:center}
+.od-proj-table th.hl{color:#fff;background:var(--navy2)}
+.od-proj-table th:first-child{text-align:left;border-radius:8px 0 0 0}
+.od-proj-table th:last-child{border-radius:0 8px 0 0}
+.od-proj-table td{padding:8px 11px;border-bottom:1px solid var(--mist);text-align:center}
+.od-proj-table td:first-child{text-align:left;font-weight:600;color:var(--slate)}
+.od-proj-table td.hl{background:var(--ice);font-weight:700;color:var(--navy2)}
+.od-proj-table tr:last-child td{border-bottom:none}
+.od-comp-table{width:100%;border-collapse:collapse;font-size:12.5px}
+.od-comp-table th{padding:8px 12px;text-align:center;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;border-bottom:2px solid var(--mist)}
+.od-comp-table th:first-child{text-align:left}
+.od-comp-table th.o1{color:#3B82F6;border-bottom-color:#3B82F6}
+.od-comp-table th.o2{color:#8B5CF6;border-bottom-color:#8B5CF6}
+.od-comp-table th.o3{color:#F59E0B;border-bottom-color:#F59E0B}
+.od-comp-table th.blend{color:var(--navy);border-bottom-color:var(--navy)}
+.od-comp-table th.peer-col{color:var(--slate2);border-bottom-color:var(--slate2)}
+.od-comp-table td{padding:8px 12px;border-bottom:1px solid var(--mist);text-align:center;color:var(--navy)}
+.od-comp-table td:first-child{text-align:left;font-weight:600;color:var(--slate);font-size:12px}
+.od-comp-table tr:last-child td{border-bottom:none}
+.od-comp-table tr:hover td{background:var(--surface)}
+.od-comp-table .best{font-weight:700;color:var(--green)}
+.od-comp-table .blend-col{background:var(--ice);font-weight:700}
+.od-tag-1{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:12px;font-size:10.5px;font-weight:700;background:#EFF6FF;color:#1D4ED8;border:1px solid #BFDBFE}
+.od-tag-2{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:12px;font-size:10.5px;font-weight:700;background:#F5F3FF;color:#6D28D9;border:1px solid #DDD6FE}
+.od-tag-3{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:12px;font-size:10.5px;font-weight:700;background:#FFFBEB;color:#B45309;border:1px solid #FDE68A}
+.od-sponsor-banner{display:flex;align-items:center;gap:14px;padding:14px;background:var(--surface);border-radius:var(--radius);margin-bottom:12px}
+.od-sponsor-logo-lg{width:58px;height:58px;background:#fff;border:1px solid var(--mist);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:var(--navy);text-align:center;padding:5px;line-height:1.3;flex-shrink:0}
+.od-narr{font-size:13px;line-height:1.78;color:var(--navy)}
+@media(max-width:900px){.od-hero-inner{grid-template-columns:1fr}.od-hero-right{display:none}.od-two-col{grid-template-columns:1fr}.od-kd-grid{grid-template-columns:1fr 1fr}.od-kpi-strip{grid-template-columns:repeat(2,1fr)}}
+
+/* ═══════════════════════════════════════════
    DST PORTFOLIO BUILDER
 ═══════════════════════════════════════════ */
 .pb-layout{display:grid;grid-template-columns:1.05fr 0.95fr;gap:16px;align-items:start}
@@ -527,161 +670,6 @@ a{color:inherit;text-decoration:none}button{cursor:pointer;font-family:var(--fon
 .bv-select-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .bv-select-x{flex-shrink:0;width:20px;height:20px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:rgba(153,27,27,0.08);color:var(--red);font-size:11px;font-weight:800;cursor:pointer;transition:background .12s}
 .bv-select-x:hover{background:rgba(153,27,27,0.16)}
-/* ═══════════════════════════════════════════
-   OFFERING DETAIL VIEW v2 — Premium Single + Multi
-═══════════════════════════════════════════ */
-.od-wrap{background:var(--surface);min-height:100%}
-.od-mode-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:0;padding:0 0 16px;gap:12px;flex-wrap:wrap}
-.od-mode-toggle{display:flex;background:var(--white);border:1.5px solid var(--mist);border-radius:10px;padding:3px;gap:2px}
-.od-mode-btn{padding:6px 16px;border-radius:8px;border:none;background:transparent;font-size:12px;font-weight:600;color:var(--slate2);cursor:pointer;transition:all var(--transition);white-space:nowrap}
-.od-mode-btn.active{background:var(--navy);color:var(--white)}
-.od-offering-tag{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;border:1.5px solid}
-.od-tag-1{background:rgba(29,78,216,0.08);border-color:rgba(29,78,216,0.25);color:#1D4ED8}
-.od-tag-2{background:rgba(124,58,237,0.08);border-color:rgba(124,58,237,0.25);color:#7C3AED}
-.od-tag-3{background:rgba(180,83,9,0.08);border-color:rgba(180,83,9,0.25);color:#B45309}
-/* Hero */
-.od-hero{background:linear-gradient(160deg,#0B1F3B 0%,#1C3A63 60%,#2A4D7A 100%);border-radius:var(--radius-xl);overflow:hidden;margin-bottom:16px;position:relative}
-.od-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 700px 400px at 85% 50%,rgba(59,130,246,0.15),transparent 60%)}
-.od-hero-inner{padding:24px 28px;position:relative;z-index:1}
-.od-hero-top{display:grid;grid-template-columns:1fr auto;gap:20px;align-items:start}
-@media(max-width:900px){.od-hero-top{grid-template-columns:1fr}}
-.od-hero-left{}
-.od-sponsor-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-.od-sponsor-logo{width:38px;height:38px;border-radius:8px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.18);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:rgba(255,255,255,0.9);flex-shrink:0;overflow:hidden}
-.od-sponsor-logo img{width:100%;height:100%;object-fit:contain}
-.od-sponsor-meta{line-height:1.3}
-.od-sponsor-name{font-size:12px;font-weight:700;color:rgba(255,255,255,0.7);letter-spacing:0.02em}
-.od-sponsor-exp{font-size:10.5px;color:rgba(255,255,255,0.45)}
-.od-hero-name{font-size:22px;font-weight:800;color:#fff;letter-spacing:-0.02em;line-height:1.2;margin-bottom:8px}
-.od-hero-badges{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
-.od-hero-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.88);font-size:11px;font-weight:700;backdrop-filter:blur(4px)}
-.od-hero-badge.status-open{border-color:rgba(52,211,153,0.4);background:rgba(52,211,153,0.12);color:#34D399}
-.od-hero-badge.status-closing{border-color:rgba(251,191,36,0.4);background:rgba(251,191,36,0.12);color:#FBF024}
-.od-hero-badge.status-coming{border-color:rgba(96,165,250,0.4);background:rgba(96,165,250,0.12);color:#60A5FA}
-.od-hero-badge.status-closed{border-color:rgba(248,113,113,0.4);background:rgba(248,113,113,0.1);color:#F87171}
-.od-hero-location{font-size:12px;color:rgba(255,255,255,0.55);display:flex;align-items:center;gap:5px}
-/* KPI Strip */
-.od-kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:0;background:var(--white);border:1.5px solid var(--mist);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:16px;box-shadow:var(--shadow-sm)}
-@media(max-width:700px){.od-kpi-strip{grid-template-columns:repeat(2,1fr)}}
-.od-kpi-cell{padding:14px 18px;border-right:1px solid var(--mist);position:relative}
-.od-kpi-cell:last-child{border-right:none}
-.od-kpi-label{font-size:10px;font-weight:700;color:var(--fog);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px}
-.od-kpi-value{font-size:22px;font-weight:800;color:var(--navy);letter-spacing:-0.03em;line-height:1;font-family:var(--mono)}
-.od-kpi-peer{font-size:10.5px;color:var(--slate2);margin-top:4px}
-.od-kpi-peer .up{color:var(--green);font-weight:700}
-.od-kpi-peer .down{color:var(--red);font-weight:700}
-.od-kpi-peer .neutral{color:var(--fog);font-weight:600}
-/* DD Icons Row */
-.od-dd-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;padding:12px 16px;background:var(--white);border:1.5px solid var(--mist);border-radius:var(--radius-lg);align-items:center;box-shadow:var(--shadow-sm)}
-.od-dd-group{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.od-dd-group-label{font-size:10px;font-weight:700;color:var(--fog);text-transform:uppercase;letter-spacing:0.08em;white-space:nowrap;margin-right:2px}
-.od-dd-divider{width:1px;height:28px;background:var(--mist);margin:0 6px;flex-shrink:0}
-.od-doc-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:6px;border:1.5px solid var(--mist);background:var(--white);color:var(--navy);font-size:11px;font-weight:700;cursor:pointer;transition:all var(--transition);text-decoration:none;white-space:nowrap;position:relative}
-.od-doc-btn:hover:not(:disabled){border-color:var(--navy2);background:var(--ice);color:var(--navy)}
-.od-doc-btn:disabled,.od-doc-btn.unavailable{opacity:0.38;cursor:not-allowed;pointer-events:none}
-.od-doc-btn.has-dropdown{padding-right:24px}
-.od-doc-btn.has-dropdown::after{content:'▾';position:absolute;right:8px;font-size:9px;opacity:0.6}
-/* Action Bar */
-.od-action-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
-.od-suit-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;margin-left:auto}
-.od-suit-chip.high{background:var(--green-lt);color:var(--green);border:1.5px solid #BBF7D0}
-.od-suit-chip.medium{background:var(--amber-lt);color:var(--amber);border:1.5px solid #FDE68A}
-.od-suit-chip.low{background:var(--red-lt);color:var(--red);border:1.5px solid #FECACA}
-.od-suit-chip.none{background:var(--surface2);color:var(--slate2);border:1.5px solid var(--mist)}
-/* Body Grid */
-.od-body{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
-@media(max-width:900px){.od-body{grid-template-columns:1fr}}
-.od-body-full{grid-column:1/-1}
-/* Analyst panels */
-.od-panel{background:var(--white);border:1.5px solid var(--mist);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-sm)}
-.od-panel-hdr{padding:12px 18px;border-bottom:1px solid var(--mist);background:linear-gradient(180deg,var(--white),var(--surface));display:flex;align-items:center;justify-content:space-between;gap:8px}
-.od-panel-title{font-size:11px;font-weight:700;color:var(--slate);text-transform:uppercase;letter-spacing:0.07em}
-.od-panel-hint{font-size:10.5px;color:var(--fog)}
-.od-panel-body{padding:16px 18px}
-/* Suitability panel */
-.od-suit-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--surface2);font-size:12.5px}
-.od-suit-row:last-child{border-bottom:none}
-.od-suit-key{color:var(--slate2);font-weight:500}
-.od-suit-val{font-weight:700;color:var(--navy);text-align:right}
-.od-suit-score-ring{width:68px;height:68px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;flex-shrink:0;margin-right:12px;border:3px solid}
-.od-suit-score-ring.high{background:var(--green-lt);color:var(--green);border-color:#BBF7D0}
-.od-suit-score-ring.medium{background:var(--amber-lt);color:var(--amber);border-color:#FDE68A}
-.od-suit-score-ring.low{background:var(--red-lt);color:var(--red);border-color:#FECACA}
-/* Raise Status */
-.od-raise-bar{height:10px;background:var(--surface2);border-radius:5px;overflow:hidden;margin:8px 0 4px}
-.od-raise-fill{height:100%;background:linear-gradient(90deg,var(--navy2),#3B82F6);border-radius:5px;transition:width 1s cubic-bezier(.4,0,.2,1)}
-.od-raise-stat-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px}
-.od-raise-stat{background:var(--surface);border-radius:var(--radius);padding:10px 12px;text-align:center}
-.od-raise-stat-val{font-size:15px;font-weight:800;color:var(--navy);font-family:var(--mono)}
-.od-raise-stat-label{font-size:10px;font-weight:700;color:var(--fog);text-transform:uppercase;letter-spacing:0.06em;margin-top:2px}
-/* Valuation */
-.od-val-hero{display:flex;align-items:center;gap:12px;padding:14px;border-radius:var(--radius);margin-bottom:12px}
-.od-val-hero.discount{background:var(--green-lt);border:1.5px solid #BBF7D0}
-.od-val-hero.premium{background:var(--amber-lt);border:1.5px solid #FDE68A}
-.od-val-hero.neutral{background:var(--surface2);border:1.5px solid var(--mist)}
-.od-val-pct{font-size:26px;font-weight:800;letter-spacing:-0.03em;line-height:1}
-.od-val-pct.discount{color:var(--green)}
-.od-val-pct.premium{color:var(--amber)}
-.od-val-label{font-size:13px;font-weight:700;color:var(--navy)}
-.od-val-sub{font-size:11px;color:var(--slate2);margin-top:2px}
-.od-val-kv{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
-.od-val-kv-item{background:var(--surface);border-radius:var(--radius);padding:10px 12px}
-.od-val-kv-label{font-size:10px;font-weight:700;color:var(--fog);text-transform:uppercase;letter-spacing:0.06em}
-.od-val-kv-value{font-size:14px;font-weight:700;color:var(--navy);font-family:var(--mono);margin-top:2px}
-/* Key Drivers */
-.od-kd-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-@media(max-width:700px){.od-kd-grid{grid-template-columns:1fr}}
-.od-kd-item{display:flex;align-items:flex-start;gap:8px;padding:10px 12px;border-radius:var(--radius);border:1px solid;font-size:12px;line-height:1.5;color:var(--navy)}
-.od-kd-icon{font-size:13px;flex-shrink:0;margin-top:1px}
-.od-kd-item.positive{background:var(--green-lt);border-color:#BBF7D0}
-.od-kd-item.caution{background:var(--amber-lt);border-color:#FDE68A}
-.od-kd-item.info{background:var(--blue-lt);border-color:#BFDBFE}
-.od-kd-item.neutral{background:var(--surface);border-color:var(--mist)}
-/* Multi-offering comparison table */
-.od-comp-wrap{background:var(--white);border:1.5px solid var(--mist);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:16px;box-shadow:var(--shadow-sm)}
-.od-comp-sticky-header{display:grid;background:var(--surface2);border-bottom:2px solid var(--mist);position:sticky;top:0;z-index:10}
-.od-comp-row{display:grid;border-bottom:1px solid var(--surface2)}
-.od-comp-row:last-child{border-bottom:none}
-.od-comp-row.section-head{background:var(--ice);border-top:1.5px solid var(--mist)}
-.od-comp-cell{padding:9px 14px;font-size:12.5px;display:flex;align-items:center;border-right:1px solid var(--surface2)}
-.od-comp-cell:last-child{border-right:none}
-.od-comp-cell.field{font-weight:600;color:var(--slate);font-size:11.5px;background:var(--surface);flex-shrink:0}
-.od-comp-cell.sec-label{font-weight:700;font-size:11px;color:var(--navy2);text-transform:uppercase;letter-spacing:0.07em;grid-column:1/-1;background:var(--ice)}
-.od-comp-cell.val{font-family:var(--mono);font-weight:600}
-.od-comp-cell.best .val{color:var(--green);font-weight:800}
-.od-comp-cell.worst .val{color:var(--red)}
-/* Map area in hero right */
-.od-hero-right{display:flex;flex-direction:column;gap:10px;min-width:260px;max-width:320px}
-@media(max-width:900px){.od-hero-right{max-width:100%}}
-.od-map-card{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.14);border-radius:12px;padding:12px;backdrop-filter:blur(4px)}
-.od-map-title{font-size:10px;font-weight:700;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px}
-.od-map-box{height:140px;border-radius:8px;overflow:hidden;background:rgba(11,31,59,0.4)}
-.od-map-legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
-.od-map-leg-item{display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:rgba(255,255,255,0.6)}
-.od-map-leg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
-.od-map-leg-dot-1{background:#3B82F6}
-.od-map-leg-dot-2{background:#9333EA}
-.od-map-leg-dot-3{background:#D97706}
-/* Sponsor panel */
-.od-sponsor-stat-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
-.od-sponsor-stat{background:var(--surface);border-radius:var(--radius);padding:10px 14px;flex:1;min-width:90px;text-align:center}
-.od-sponsor-stat-val{font-size:16px;font-weight:800;color:var(--navy);font-family:var(--mono);letter-spacing:-0.02em}
-.od-sponsor-stat-label{font-size:10px;font-weight:700;color:var(--fog);text-transform:uppercase;letter-spacing:0.06em;margin-top:2px}
-/* Distribution chart */
-.od-chart-box{height:200px;position:relative;margin-top:8px}
-/* Projection table */
-.od-proj-table{width:100%;border-collapse:collapse;font-size:12px}
-.od-proj-table th{background:var(--surface2);padding:7px 10px;text-align:center;font-size:10px;font-weight:700;color:var(--slate2);text-transform:uppercase;letter-spacing:0.06em;border-bottom:1px solid var(--mist)}
-.od-proj-table th:first-child{text-align:left}
-.od-proj-table td{padding:7px 10px;text-align:center;border-bottom:1px solid var(--surface2);font-family:var(--mono);color:var(--navy);font-weight:500}
-.od-proj-table td:first-child{text-align:left;font-family:var(--font);font-weight:600;color:var(--slate);font-size:11.5px}
-.od-proj-table tr:last-child td{border-bottom:none}
-.od-proj-table .highlight-row td{background:var(--ice);font-weight:700}
-/* Offering tags in multi mode */
-.od-offering-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
-/* Blended badge */
-.od-blended-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:10.5px;font-weight:700;background:rgba(124,58,237,0.1);color:#7C3AED;border:1px solid rgba(124,58,237,0.25)}
-
 /* ── DST Calculator ── */
 .dst-offerings-bar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
 .dst-offering-pill{display:inline-flex;align-items:center;padding:4px 12px;border-radius:999px;background:var(--ice);border:1px solid var(--mist);font-size:11px;font-weight:600;color:var(--navy)}
@@ -850,7 +838,7 @@ function fetchSheetData() {
         let monthsOnMarket = null;
         if (oOpen) { monthsOnMarket = Math.round((now - oOpen) / (30.44 * 86400000)); if (monthsOnMarket < 0) monthsOnMarket = null; }
 
-        const obj = {
+        return {
           id: idx,
           name: g('Offering Name') || 'Unnamed',
           sponsor: g('Sponsor') || '',
@@ -869,7 +857,7 @@ function fetchSheetData() {
           pctRaised: pctRaised,
           pctRemaining: pctRemaining,
           ltv: parsePct(g('Loan to Value')),
-          dscr: parsePct(g('DSCR')),
+          dscr: null,
           dscrStress: null,
           holdPeriod: parseInt(g('Hold Period')) || null,
           occupancy: parsePct(g('% Leased')),
@@ -877,14 +865,12 @@ function fetchSheetData() {
           appraisedValue: parseMoneyM(g('Appraised Valuation')),
           loadedPrice: parseMoneyM(g('Loaded Price')),
           units: parseInt(g('# Assets')) || null,
-          sqft: parseFloat(String(g('Total Square Footage') || '').replace(/[,\s]/g, '')) || null,
+          sqft: null,
           pricePerUnit: null,
-          pricePerSqFt: null, // computed below
+          pricePerSqFt: null,
           acqCapRate: parsePct(g('Acquisition Cap Rate')),
           avgLeaseTerm: parseFloat(g('Average Lease Term Remaining')) || null,
-          tenantCredit: g('Tenant Credit Quality') || '',
-          sponsorLogoUrl: g('Sponsor Logo URL') || '',
-          quarterlyUpdateUrl: g('Quarterly Update URL') || '',
+          tenantCredit: '',
           leaseTerms: g('Lease Terms') || '',
           debtTerms: g('Debt Terms') || '',
           rentEscalations: g('Rent Escalations') || '',
@@ -917,17 +903,8 @@ function fetchSheetData() {
           closeDate: oClose,
           monthsOnMarket: monthsOnMarket,
           income: income,
-          raiseVelocity: null,
           _raw: row.c
         };
-        // Computed: Price per SF
-        if (obj.purchasePrice && obj.sqft && obj.sqft > 0) obj.pricePerSqFt = obj.purchasePrice / obj.sqft;
-        // Computed: Raise velocity per month
-        if (obj.filedRaise && obj.equityRemaining != null && obj.monthsOnMarket && obj.monthsOnMarket > 0) {
-          const raised = obj.filedRaise - obj.equityRemaining;
-          if (raised > 0) obj.raiseVelocity = raised / obj.monthsOnMarket;
-        }
-        return obj;
       }).filter(f => f.name !== 'Unnamed');
       computePeerStats();
       dot.className = 'pulse-dot'; txt.textContent = STATE.funds.length + ' offerings live';
@@ -1919,7 +1896,7 @@ BV.summarizeStates = (states, max) => { max = max || 6; const arr = BV.uniqSorte
 BV.pctDelta = (a, b) => { if (!BV.isNum(a) || !BV.isNum(b) || b === 0) return null; return (a - b) / b * 100; };
 BV.moneyDelta = (a, b) => { if (!BV.isNum(a) || !BV.isNum(b)) return null; return a - b; };
 
-BV.iconSvg = (type) => { const common = 'width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"'; const wrap = (inner) => '<span class="ico"><svg ' + common + '>' + inner + '</svg></span>'; const icons = { brochure: wrap('<path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"/><path d="M14 2v5h5"/><path d="M9 13h6"/><path d="M9 17h6"/>'), ppm: wrap('<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 6h8"/><path d="M8 10h8"/>'), video: wrap('<path d="M15 10l4.5-2.5v9L15 14"/><rect x="3" y="7" width="12" height="10" rx="2" ry="2"/>'), ai_offering_chat: wrap('<path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/><path d="M8 9h8"/><path d="M8 13h6"/>'), track_record: wrap('<path d="M3 3v18h18"/><path d="M7 14l3-3 3 2 5-6"/>'), sponsor_news: wrap('<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10"/><path d="M7 12h6"/><path d="M7 16h8"/>'), sales_team_map: wrap('<path d="M21 10c0 6-9 12-9 12S3 16 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>'), quarterly_update: wrap('<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/><path d="M8 14h8"/><path d="M8 18h5"/>') }; return icons[type] || wrap('<circle cx="12" cy="12" r="9"/>'); };
+BV.iconSvg = (type) => { const common = 'width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"'; const wrap = (inner) => '<span class="ico"><svg ' + common + '>' + inner + '</svg></span>'; const icons = { brochure: wrap('<path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"/><path d="M14 2v5h5"/><path d="M9 13h6"/><path d="M9 17h6"/>'), ppm: wrap('<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 6h8"/><path d="M8 10h8"/>'), video: wrap('<path d="M15 10l4.5-2.5v9L15 14"/><rect x="3" y="7" width="12" height="10" rx="2" ry="2"/>'), ai_offering_chat: wrap('<path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/><path d="M8 9h8"/><path d="M8 13h6"/>'), track_record: wrap('<path d="M3 3v18h18"/><path d="M7 14l3-3 3 2 5-6"/>'), sponsor_news: wrap('<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10"/><path d="M7 12h6"/><path d="M7 16h8"/>'), sales_team_map: wrap('<path d="M21 10c0 6-9 12-9 12S3 16 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>') }; return icons[type] || wrap('<circle cx="12" cy="12" r="9"/>'); };
 
 // ── Percentile rank ──
 BV.lowerBound = (arr, x) => { let lo = 0, hi = arr.length; while (lo < hi) { const mid = (lo + hi) >> 1; if (arr[mid] < x) lo = mid + 1; else hi = mid; } return lo; };
@@ -1939,14 +1916,11 @@ BV.adaptFund = (f) => {
   const m = {};
   m.year1_coc = f.y1coc;
   m.ltv = f.ltv;
-  m.dscr = f.dscr;
   m.cap_rate = f.acqCapRate;
   m.hold_period_years = f.holdPeriod;
   m.minimum_investment = f.minInvest;
   m.pct_leased = f.occupancy;
   m.num_assets = f.units;
-  m.total_sqft = f.sqft;
-  m.price_per_sqft = f.pricePerSqFt;
   m.rent_escalations = BV.parseNumberLoose(f.rentEscalations);
   m.avg_lease_term_remaining = f.avgLeaseTerm;
   m.purchase_price_unloaded = f.purchasePrice;
@@ -1956,8 +1930,6 @@ BV.adaptFund = (f) => {
   m.current_raise = f.currentRaise;
   m.remaining_raise = f.equityRemaining;
   m.pct_raise_remaining = f.pctRemaining;
-  m.raise_velocity = f.raiseVelocity;
-  m.months_on_market = f.monthsOnMarket;
   m.offering_open = f.openDate;
   m.offering_close = f.closeDate;
   m.states = BV.extractStates(f.location);
@@ -1970,23 +1942,16 @@ BV.adaptFund = (f) => {
     displayLabel: f.sponsor + ' — ' + f.name,
     asset_class: f.propType,
     sector_focus: f.sector || f.focus || '',
-    focus: f.focus || '',
     offering_structure: f.propType,
     distribution_frequency: f.distFrequency,
     debt_terms: f.debtTerms,
     lease_terms: f.leaseTerms,
-    tenant_credit: f.tenantCredit || '',
-    sponsor_experience: f.sponsorExperience || '',
-    sponsor_logo_url: f.sponsorLogoUrl || '',
-    quarterly_update_url: f.quarterlyUpdateUrl || '',
     preferred: f.preferred,
     promote: f.promote,
     upreit_721: f.upReit,
     gp_commit: f.gpCommit,
     property_locations: f.location,
     year_built_avg: f.buildingAge,
-    status: f.status,
-    months_on_market: f.monthsOnMarket,
     metrics: m,
     docs: {
       brochure: BV.normalizeDocUrl(f.brochureUrl),
@@ -1995,16 +1960,15 @@ BV.adaptFund = (f) => {
       ai_offering_chat: BV.normalizeDocUrl(f.aiChatUrl),
       track_record: BV.normalizeDocUrl(f.trackRecordUrl),
       sponsor_news: BV.normalizeDocUrl(f.sponsorNewsUrl),
-      sales_team_map: BV.normalizeDocUrl(f.salesTeamUrl),
-      quarterly_update: BV.normalizeDocUrl(f.quarterlyUpdateUrl)
+      sales_team_map: BV.normalizeDocUrl(f.salesTeamUrl)
     },
     __rawRow: rawRow
   };
 };
 
 // ── Peer stats for basket ──
-BV.PEER_KEYS = ['year1_coc','ltv','dscr','hold_period_years','minimum_investment','pct_leased','rent_escalations','avg_lease_term_remaining','num_assets','purchase_price_unloaded','appraised_valuation','loaded_price','cap_rate','price_per_sqft'];
-BV.SNAPSHOT_KEYS = ['year1_coc','ltv','dscr','hold_period_years','minimum_investment','pct_leased','rent_escalations','avg_lease_term_remaining','num_assets'];
+BV.PEER_KEYS = ['year1_coc','ltv','hold_period_years','minimum_investment','pct_leased','rent_escalations','avg_lease_term_remaining','num_assets','purchase_price_unloaded','appraised_valuation','loaded_price','cap_rate'];
+BV.SNAPSHOT_KEYS = ['year1_coc','ltv','hold_period_years','minimum_investment','pct_leased','rent_escalations','avg_lease_term_remaining','num_assets'];
 BV.INCOME_KEYS = Array.from({length:10}, (_,i) => 'income_y' + (i+1));
 BV.DISCLOSURES = 'For informational purposes only. This material does not constitute investment advice, an offer to sell, or a solicitation of an offer to buy any security or interest. Figures are shown as provided in the underlying data source and may be incomplete, unaudited, or subject to change. Verify all information with official offering documents and your firm\'s compliance requirements. Peer averages shown are simple averages of the currently listed offerings in the data set (excluding blanks/NA). For Broker Dealer and Investment Advisor home office due diligence use only. Always validate data with official offering documents and compliance requirements. Alts Fund LINK, LLC is not responsible for data errors or omissions.';
 
@@ -2020,19 +1984,17 @@ BV.computePeerStats = (allFunds) => {
 };
 
 BV.metricLabel = (key) => {
-  const labels = { year1_coc:'Year 1 Cash-on-Cash', ltv:'Loan-to-Value (LTV)', dscr:'DSCR', hold_period_years:'Hold Period', minimum_investment:'Minimum Investment (Sum)', pct_leased:'Occupancy (% Leased)', rent_escalations:'Rent Escalations', avg_lease_term_remaining:'Avg Lease Term Remaining', num_assets:'# Assets', purchase_price_unloaded:'Purchase Price (Unloaded)', appraised_valuation:'Appraised Valuation', loaded_price:'Loaded Price', cap_rate:'Acquisition Cap Rate', price_per_sqft:'Price Per SF' };
+  const labels = { year1_coc:'Year 1 Cash-on-Cash', ltv:'Loan-to-Value (LTV)', hold_period_years:'Hold Period', minimum_investment:'Minimum Investment (Sum)', pct_leased:'Occupancy (% Leased)', rent_escalations:'Rent Escalations', avg_lease_term_remaining:'Avg Lease Term Remaining', num_assets:'# Assets', purchase_price_unloaded:'Purchase Price (Unloaded)', appraised_valuation:'Appraised Valuation', loaded_price:'Loaded Price', cap_rate:'Acquisition Cap Rate' };
   if (/^income_y\d+$/.test(key)) return 'Client Income (%) — Year ' + key.match(/\d+/)[0];
   return labels[key] || key;
 };
 
 BV.metricFormatter = (key, val) => {
   if (!BV.isNum(val)) return '—';
-  if (key === 'dscr') return val.toFixed(2) + 'x';
   if (key === 'minimum_investment') return BV.fmtMoney(val);
   if (key === 'hold_period_years' || key === 'avg_lease_term_remaining') return val.toFixed(1) + ' yrs';
   if (key === 'num_assets') return Math.round(val) + '';
   if (key === 'purchase_price_unloaded' || key === 'appraised_valuation' || key === 'loaded_price') return BV.fmtMoney(val);
-  if (key === 'price_per_sqft') return '$' + Math.round(val).toLocaleString() + '/SF';
   return BV.fmtPct(val, 2);
 };
 
@@ -2142,7 +2104,7 @@ BV.renderPurchaseValuation = (agg) => {
 };
 
 // ── Render: Doc buttons ──
-BV.DOC_TYPES = ['brochure','ppm','video','ai_offering_chat','track_record','sponsor_news','sales_team_map','quarterly_update'];
+BV.DOC_TYPES = ['brochure','ppm','video','ai_offering_chat','track_record','sponsor_news','sales_team_map'];
 BV.docAvailability = (funds) => { const avail = {}; for (const t of BV.DOC_TYPES) avail[t] = funds.some(f => f.docs && f.docs[t]); return avail; };
 
 BV.renderDocButtons = (selectedFunds) => {
@@ -2209,526 +2171,298 @@ BV.renderVerticalCompTable = (selectedFunds, headers) => {
   return '<div class="sec"><div class="secHdr"><div class="h">Vertical Side-by-Side Comparison</div><div class="hint">All columns except Year 1–10 and doc URLs • Sticky headers</div></div><div class="secBody"><div class="vcompWrap"><div class="vcompTop"><div class="t">Comparison Table</div><div class="s">Scroll down — headers stay pinned</div></div><div class="vcompScroller"><table class="vcompTable">' + thead + '<tbody>' + bodyRows + '</tbody></table></div></div></div></div>';
 };
 
-// ── Main renderBasket() — Premium Single + Multi Offering View ──
+// ── Main renderBasket() ──
 function renderBasket() {
-  try {
-  return _renderBasketInner();
-  } catch(err) {
-    console.error('renderBasket crash:', err);
-    return '<div class="page-header"><div><div class="page-title">Offering Detail</div></div></div><div class="empty-state"><div class="empty-state-icon">⚠️</div><h3>View Error</h3><p style="font-family:monospace;font-size:11px;color:red">' + String(err) + '</p><p style="font-size:11px;color:var(--slate2)">Check browser console for full stack trace.</p></div>';
-  }
-}
-function _renderBasketInner() {
   const basketIds = STATE.basket;
   const platformFunds = basketIds.map(id => STATE.funds.find(f => f.id === id)).filter(Boolean);
-  if (!platformFunds.length) {
-    return '<div class="page-header"><div><div class="page-title">Offering Detail</div><div class="page-subtitle">Add offerings from Browse to view full tear sheet analysis</div></div></div><div class="empty-state"><div class="empty-state-icon">📋</div><h3>No Offering Selected</h3><p>Add up to 3 offerings from Browse to unlock the full tear sheet — KPI strip, raise status, valuation analysis, income projections, and side-by-side comparison.</p><button class="btn btn-primary" onclick="navigateTo(\'browse\')">Browse Offerings</button></div>';
+  if (!platformFunds.length) return '<div class="page-header"><div><div class="page-title">Offering Detail</div><div class="page-subtitle">Click any offering to view — add up to 3 to compare side-by-side</div></div></div><div class="empty-state"><div class="empty-state-icon">📋</div><h3>No Offering Selected</h3><p>Browse offerings and click to open a full tear sheet, or add multiple to compare them in portfolio view.</p><button class="btn btn-primary" onclick="navigateTo(\'browse\')">Browse Offerings</button></div>';
+  try { return _renderBasketInner(platformFunds); }
+  catch(err) {
+    console.error('renderBasket error:', err);
+    return '<div class="empty-state"><div class="empty-state-icon">⚠️</div><h3>View Error</h3><p style="font-family:monospace;color:red;font-size:11px">' + String(err) + '</p></div>';
   }
+}
 
-  const selectedFunds = platformFunds.map(BV.adaptFund).filter(Boolean);
+function _renderBasketInner(platformFunds) {
+  const e = BV.escapeHTML;
+  const n = platformFunds.length;
+  const isMulti = n > 1;
+  const c = STATE.client;
+  const hasClient = !!(c && c.name);
   const allAdapted = STATE.funds.map(BV.adaptFund).filter(Boolean);
   const peer = BV.computePeerStats(allAdapted);
-  const n = selectedFunds.length;
-  const isMulti = n > 1;
-  const e = BV.escapeHTML;
-  const c = STATE.client;
-  const hasClient = !!(c && c.name && (c.riskTolerance || c.exchangeAmount));
+  const TAG_COLORS = ['#3B82F6','#8B5CF6','#F59E0B'];
+  const TAG_CLS = ['od-tag-1','od-tag-2','od-tag-3'];
+  const TAG_NUMS = ['①','②','③'];
+  const fmtP = (v,d=2) => BV.isNum(v) ? v.toFixed(d)+'%' : '—';
+  const fmtM = v => BV.isNum(v) ? (v>=1e6?'$'+(v/1e6).toFixed(1)+'M':v>=1e3?'$'+(v/1e3).toFixed(0)+'K':'$'+Math.round(v)) : '—';
 
-  // Offering color tags
-  const TAG_COLORS = ['od-tag-1','od-tag-2','od-tag-3'];
-  const TAG_LABELS = ['①','②','③'];
-  const MAP_COLORS = ['#3B82F6','#9333EA','#D97706'];
-
-  // ── Nav Header ──
+  // ── Nav header ──
   const offeringOpts = STATE.funds.map(f => {
     const checked = STATE.basket.includes(f.id);
     const disabled = !checked && STATE.basket.length >= 3;
-    return '<label class="bv-select-item' + (checked?' checked':'') + (disabled?' disabled':'') + '" onclick="event.stopPropagation()"><input type="checkbox" value="' + f.id + '"' + (checked?' checked':'') + (disabled?' disabled':'') + ' onchange="bvToggleOffering(' + f.id + ')"><span class="bv-select-name">' + e(f.sponsor + ' — ' + f.name) + '</span>' + (checked ? '<span class="bv-select-x" onclick="event.preventDefault();bvToggleOffering(' + f.id + ')">✕</span>' : '') + '</label>';
+    return '<label class="bv-select-item'+(checked?' checked':'')+(disabled?' disabled':'')+'" onclick="event.stopPropagation()"><input type="checkbox" value="'+f.id+'"'+(checked?' checked':'')+(disabled?' disabled':'')+' onchange="bvToggleOffering('+f.id+')"><span class="bv-select-name">'+e(f.sponsor+' — '+f.name)+'</span>'+(checked?'<span class="bv-select-x" onclick="event.preventDefault();bvToggleOffering('+f.id+')">✕</span>':'')+'</label>';
   }).join('');
+  const navHeader = '<div class="page-header"><div><div class="page-title">Offering Detail</div><div class="page-subtitle">'+n+' offering'+(n>1?'s':'')+' selected'+(isMulti?' — portfolio view':'')+'</div></div><div style="display:flex;gap:8px;align-items:center"><div class="bv-dropdown-wrap"><button class="btn btn-secondary" onclick="document.getElementById(\'bv-offering-dropdown\').classList.toggle(\'open\')">Offerings ('+n+'/3) ▾</button><div class="bv-dropdown" id="bv-offering-dropdown">'+offeringOpts+'</div></div><button class="btn btn-secondary" onclick="navigateTo(\'browse\')">← Browse</button>'+(n>1?'<button class="btn btn-ghost" onclick="STATE.basket=[STATE.basket[0]];saveBasket();renderApp()">Single View</button>':'')+'<button class="btn btn-ghost" onclick="STATE.basket=[];saveBasket();renderApp();toast(\'Basket cleared\')">Clear All</button></div></div>';
 
-  const navHeader = '<div class="page-header"><div><div class="page-title">Offering Detail</div><div class="page-subtitle">' + n + ' offering' + (n>1?'s':'') + ' selected' + (isMulti ? ' — portfolio view' : '') + '</div></div><div style="display:flex;gap:8px;align-items:center"><div class="bv-dropdown-wrap"><button class="btn btn-secondary" onclick="document.getElementById(\'bv-offering-dropdown\').classList.toggle(\'open\')">Offerings (' + n + '/3) ▾</button><div class="bv-dropdown" id="bv-offering-dropdown">' + offeringOpts + '</div></div><button class="btn btn-secondary" onclick="navigateTo(\'browse\')">← Browse</button><button class="btn btn-ghost" onclick="STATE.basket=[];saveBasket();renderApp();toast(\'Basket cleared\')">Clear All</button></div></div>';
+  // ── Mode bar ──
+  const modeBar = '<div class="od-mode-bar"><div class="od-mode-toggle"><button class="od-mode-btn'+(isMulti?'':' active')+'" onclick="if(STATE.basket.length>1){STATE.basket=[STATE.basket[0]];saveBasket();renderApp()}" title="Single offering view"><div style="width:7px;height:7px;border-radius:50%;background:#3B82F6;flex-shrink:0"></div> Single Offering</button><button class="od-mode-btn'+(isMulti?' active':'')+'" onclick="if(STATE.basket.length<2)toast(\'Add 2-3 offerings to compare\');" title="Portfolio comparison view"><div style="width:7px;height:7px;border-radius:50%;background:#8B5CF6;flex-shrink:0"></div> Portfolio View'+(n>1?'<span style="font-size:9px;background:var(--navy2);color:#fff;border-radius:10px;padding:1px 6px;margin-left:4px">'+n+'</span>':'')+'</button></div><div class="od-breadcrumb"><span style="color:var(--blue);cursor:pointer" onclick="navigateTo(\'browse\')">Browse</span> › <strong>'+e(isMulti?n+'-Offering Portfolio':platformFunds[0].name)+'</strong></div><div class="od-prev-next"><button onclick="navigateTo(\'browse\')">← Browse</button></div></div>';
 
-  // ── Build suitability scores ──
-  const suitScores = selectedFunds.map(sf => {
-    const pf = platformFunds.find(x => x.id === sf.id);
-    return pf ? computeDashboardSuitScore(pf, STATE.client) : null;
-  });
-  const blendedSuit = suitScores.filter(x => x != null).length ? Math.round(suitScores.filter(x=>x!=null).reduce((a,b)=>a+b,0)/suitScores.filter(x=>x!=null).length) : null;
-  const suitClass = (sc) => sc == null ? 'none' : sc >= 75 ? 'high' : sc >= 50 ? 'medium' : 'low';
-  const suitLabel = (sc) => sc == null ? (hasClient ? 'Calculating...' : 'Set up client') : sc + '% match';
+  // ── Hero left ──
+  const heroLeft = (() => {
+    if (!isMulti) {
+      const f = platformFunds[0];
+      const initials = (f.sponsor||'?').split(' ').map(w=>w[0]).join('').substring(0,4).toUpperCase();
+      const logoHtml = f.sponsorLogoUrl
+        ? '<img src="'+e(f.sponsorLogoUrl)+'" style="width:46px;height:46px;border-radius:9px;object-fit:contain;background:#fff;padding:4px;box-shadow:0 2px 8px rgba(0,0,0,.3)">'
+        : '<div class="od-sponsor-logo">'+e(initials)+'</div>';
+      const statusCls = f.status==='Open'?'od-badge-open':f.status&&f.status.includes('Clos')?'od-badge-closing':'od-badge-closed';
+      const states = BV.extractStates(f.location||'');
+      return '<div class="od-sponsor-row" style="margin-bottom:13px">'+logoHtml+'<div><div class="od-sponsor-name">'+e(f.sponsor||'')+'</div><div style="font-size:10.5px;color:rgba(255,255,255,.28)">'+(f.sponsorOfferings?f.sponsorOfferings+' offerings':'')+(f.sponsorAum?' · $'+f.sponsorAum+' AUM':'')+'</div></div></div><div class="od-offering-name">'+e(f.name||'')+'</div>'+(states.length?'<div class="od-offering-location">📍 '+states.slice(0,6).join(' · ')+(f.propType?' &nbsp;·&nbsp; '+e(f.propType):'')+'</div>':'')+'<div class="od-hero-badges"><span class="od-badge '+statusCls+'">● '+e(f.status||'Open')+'</span>'+(f.propType?'<span class="od-badge od-badge-prop">◆ '+e(f.propType)+'</span>':'')+(f.sector?'<span class="od-badge od-badge-sector">'+e(f.sector)+'</span>':'')+'</div>';
+    }
+    const logosHtml = platformFunds.slice(0,3).map((f,i) => {
+      const init = (f.sponsor||'?').split(' ').map(w=>w[0]).join('').substring(0,3).toUpperCase();
+      return f.sponsorLogoUrl
+        ? '<img src="'+e(f.sponsorLogoUrl)+'" style="width:34px;height:34px;border-radius:7px;object-fit:contain;background:#fff;border:2px solid '+TAG_COLORS[i]+'">'
+        : '<div class="od-sponsor-logo-sm" style="border:2px solid '+TAG_COLORS[i]+'">'+e(init)+'</div>';
+    }).join('');
+    const listHtml = platformFunds.map((f,i)=>'<div style="display:flex;align-items:center;gap:7px;font-size:11.5px;color:rgba(255,255,255,.55)"><span class="'+TAG_CLS[i]+'">'+TAG_NUMS[i]+'</span>'+e(f.name||'')+'</div>').join('');
+    const types = [...new Set(platformFunds.map(f=>f.propType).filter(Boolean))];
+    return '<div class="od-sponsor-logos-row" style="margin-bottom:11px">'+logosHtml+'<div style="margin-left:4px"><div style="font-size:10.5px;color:rgba(255,255,255,.4)">'+n+' Sponsors · '+n+' Offerings</div><div style="font-size:10px;color:rgba(255,255,255,.25)">Blended portfolio metrics</div></div></div><div class="od-offering-name" style="font-size:18px">'+n+'-Offering Blended Portfolio</div><div style="display:flex;flex-direction:column;gap:4px;margin-top:8px">'+listHtml+'</div><div class="od-hero-badges" style="margin-top:10px"><span class="od-badge od-badge-open">● All Open</span>'+types.map(t=>'<span class="od-badge od-badge-prop">◆ '+e(t)+'</span>').join('')+'</div>';
+  })();
 
-  // ── Offering tags (multi mode) ──
-  const offeringTagsHtml = isMulti ? '<div class="od-offering-tags">' + selectedFunds.map((sf,i) => '<span class="od-offering-tag ' + TAG_COLORS[i] + '">' + TAG_LABELS[i] + ' ' + e(sf.offering_name) + '</span>').join('') + '</div>' : '';
+  // ── SVG map (state blocks) ──
+  const SM = {WA:[40,50,60,50],OR:[105,50,60,50],CA:[40,105,125,100],ID:[170,50,60,80],MT:[235,50,55,55],WY:[235,108,55,55],ND:[295,50,50,50],SD:[295,103,50,50],NE:[295,156,50,50],MN:[348,50,50,50],IA:[348,103,50,50],MO:[348,156,50,50],WI:[401,50,50,60],IL:[401,113,50,45],MI:[454,50,50,50],IN:[454,103,50,55],OH:[507,73,55,55],PA:[562,80,50,50],NY:[615,80,35,40],NJ:[615,123,35,30],MD:[562,133,50,35],VA:[507,130,55,48],WV:[507,130,30,30],KY:[454,160,50,48],TN:[454,210,50,48],NC:[562,168,50,48],SC:[507,180,52,48],GA:[507,232,52,55],FL:[454,317,100,45],AL:[454,260,50,55],MS:[400,262,50,55],AR:[400,210,50,50],LA:[400,315,50,45],TX:[295,265,105,75],OK:[348,208,50,55],KS:[295,208,50,55],CO:[235,165,55,60],NM:[170,228,60,55],AZ:[170,228,60,55],UT:[100,228,65,60],NV:[170,155,60,70],DE:[615,123,15,20],ME:[675,50,25,30],DC:[590,145,10,10]};
+  const allStateEntries = isMulti
+    ? platformFunds.flatMap((f,i)=>BV.extractStates(f.location||'').map(s=>({s,i})))
+    : BV.extractStates(platformFunds[0].location||'').map(s=>({s,i:0}));
+  const stateCI = {};
+  allStateEntries.forEach(({s,i})=>{ if(!stateCI[s]) stateCI[s]=i; });
+  const rects = Object.entries(SM).map(([ab,[x,y,w,h]])=>{
+    const ci=stateCI[ab];
+    return '<rect class="'+(ci!==undefined?'od-state-'+(ci+1):'od-state-default')+'" x="'+x+'" y="'+y+'" width="'+w+'" height="'+h+'" rx="2"/>';
+  }).join('');
+  const labels = Object.entries(stateCI).map(([ab,ci])=>{
+    const c2=SM[ab]; if(!c2) return '';
+    return '<text x="'+(c2[0]+c2[2]/2)+'" y="'+(c2[1]+c2[3]/2+4)+'" fill="#fff" font-size="9" font-weight="700" text-anchor="middle" font-family="DM Sans,sans-serif">'+ab+'</text>';
+  }).join('');
+  const legend = isMulti
+    ? platformFunds.map((f,i)=>'<rect x="40" y="'+(430+i*16)+'" width="10" height="10" fill="'+TAG_COLORS[i]+'" rx="2"/><text x="55" y="'+(440+i*16)+'" fill="rgba(255,255,255,.45)" font-size="9" font-family="DM Sans,sans-serif">'+e((f.name||'').substring(0,28))+'</text>').join('')
+    : '<rect x="40" y="430" width="10" height="10" fill="#3B82F6" rx="2"/><text x="55" y="440" fill="rgba(255,255,255,.45)" font-size="9" font-family="DM Sans,sans-serif">Property locations</text>';
+  const mapSvg = '<svg class="od-map-svg" viewBox="0 0 960 580" xmlns="http://www.w3.org/2000/svg">'+rects+labels+legend+'</svg>';
 
-  // ── Hero ──
-  const heroHtml = renderODHero(selectedFunds, peer, e, isMulti, TAG_COLORS, TAG_LABELS, MAP_COLORS);
+  // ── KPI strip ──
+  const suitScores = platformFunds.map(f=>computeDashboardSuitScore(f,c));
+  const kpis = (() => {
+    const avg = k => { const vs=platformFunds.map(f=>f[k]).filter(BV.isNum); return vs.length?vs.reduce((a,b)=>a+b,0)/vs.length:null; };
+    const ltv=avg('ltv'), coc=avg('y1coc'), occ=avg('occupancy');
+    const pLtv=peer?.averages?.ltv, pCoc=peer?.averages?.year1_coc;
+    const kpi = (lbl,val,sub,bar,barClr) => '<div class="od-kpi"><div class="od-kpi-lbl">'+lbl+'</div><div class="od-kpi-val">'+val+'</div><div class="od-kpi-sub">'+sub+'</div>'+(BV.isNum(bar)?'<div class="od-kpi-bar"><div class="od-kpi-fill" style="width:'+Math.min(Math.max(bar,0),100)+'%;background:'+barClr+'"></div></div>':'')+'</div>';
+    const delta=(a,b,higher)=>BV.isNum(a)&&BV.isNum(b)?'<span class="od-kpi-'+(((a>b)===higher)?'good':'bad')+'">'+(a>b?'↑':'↓')+Math.abs(a-b).toFixed(2)+'% vs peers</span>':'';
+    if(!isMulti){
+      const f=platformFunds[0];
+      const pctR=BV.isNum(f.pctRemaining)?Math.max(0,Math.min(100,100-f.pctRemaining)):null;
+      return [
+        kpi(isMulti?'Blended LTV':'Loan to Value', fmtP(ltv), delta(ltv,pLtv,false), ltv, '#34D399'),
+        kpi(isMulti?'Blended Y1 CoC':'Y1 Cash on Cash', fmtP(coc), delta(coc,pCoc,true), coc, '#3B82F6'),
+        kpi('Occupancy', fmtP(occ), '◆ '+(BV.isNum(f.avgLeaseTerm)?f.avgLeaseTerm.toFixed(1)+' yr WALT':'—')+(BV.isNum(f.dscr)?' · DSCR '+f.dscr.toFixed(1)+'x':''), occ, '#A78BFA'),
+        kpi('Equity Remaining', fmtM(f.equityRemaining), BV.isNum(pctR)?'<span class="od-kpi-'+(pctR>60?'bad':'good')+'">'+pctR.toFixed(0)+'%</span> raised of '+fmtM(f.filedRaise):'', pctR, '#FBBF24')
+      ].join('');
+    }
+    const totalMin=platformFunds.map(f=>f.minInvest).filter(BV.isNum).reduce((a,b)=>a+b,0)||null;
+    return [
+      kpi('Blended LTV', fmtP(ltv), delta(ltv,pLtv,false)+' <span style="color:rgba(255,255,255,.3)">wtd avg</span>', ltv, '#34D399'),
+      kpi('Blended Y1 CoC', fmtP(coc), delta(coc,pCoc,true), coc, '#3B82F6'),
+      kpi('Avg Occupancy', fmtP(occ), delta(occ,peer?.averages?.pct_leased,true), occ, '#A78BFA'),
+      kpi('Combined Min.', totalMin?'$'+(totalMin/1e3).toFixed(0)+'K':'—', platformFunds.map(f=>f.minInvest?'$'+(f.minInvest/1e3).toFixed(0)+'K':'?').join(' · '), null, '')
+    ].join('');
+  })();
+  const kpiStrip = '<div class="od-kpi-strip">'+kpis+'</div>';
 
-  // ── KPI Strip ──
-  const kpiKeys = [
-    { key:'ltv', label:'Loan-to-Value', higher:'lower_better' },
-    { key:'year1_coc', label:'Yr 1 Cash-on-Cash', higher:'higher_better' },
-    { key:'pct_leased', label:'Occupancy', higher:'higher_better' },
-    { key:'dscr', label:'DSCR', higher:'higher_better', fmt:(v)=>BV.isNum(v)?v.toFixed(2)+'x':'—' }
-  ];
-  const kpiStripHtml = renderODKpiStrip(selectedFunds, peer, kpiKeys, e, isMulti);
+  // ── DD row ──
+  const ddBtn = (icon, iconCls, lbl, urls, names2, disabled) => {
+    if(disabled) return '<div class="od-dd-btn-wrap"><div class="od-dd-btn disabled"><div class="od-dd-icon '+iconCls+'">'+icon+'</div><div class="od-dd-lbl">'+lbl+'</div></div></div>';
+    const valid = (urls||[]).filter(Boolean);
+    if(!valid.length) return '<div class="od-dd-btn-wrap"><div class="od-dd-btn disabled"><div class="od-dd-icon '+iconCls+'">'+icon+'</div><div class="od-dd-lbl">'+lbl+'</div></div></div>';
+    if(valid.length===1||!isMulti) return '<div class="od-dd-btn-wrap"><a class="od-dd-btn" href="'+e(valid[0])+'" target="_blank"><div class="od-dd-icon '+iconCls+'">'+icon+'</div><div class="od-dd-lbl">'+lbl+'</div></a></div>';
+    const items = (urls||[]).map((url,i)=>url
+      ?'<a class="od-dd-drop-item" href="'+e(url)+'" target="_blank"><div class="od-dd-drop-dot" style="background:'+TAG_COLORS[i]+'"></div><div><div class="od-dd-drop-name">'+e((names2||[])[i]||'')+'</div></div></a><div class="od-dd-drop-divider"></div>'
+      :'<div class="od-dd-drop-item" style="opacity:.4"><div class="od-dd-drop-dot" style="background:var(--fog)"></div><div><div class="od-dd-drop-name">'+e((names2||[])[i]||'')+'</div><div class="od-dd-drop-sub">Not available</div></div></div><div class="od-dd-drop-divider"></div>'
+    ).join('').replace(/<div class="od-dd-drop-divider"><\/div>$/,'');
+    return '<div class="od-dd-btn-wrap"><div class="od-dd-btn"><div class="od-dd-icon '+iconCls+'">'+icon+'</div><div class="od-dd-lbl">'+lbl+'</div></div><div class="od-dd-dropdown">'+items+'</div></div>';
+  };
+  const fNames = platformFunds.map(f=>f.name||'');
+  const ddRow = '<div class="od-dd-row">'
+    +'<div class="od-dd-group"><div class="od-dd-group-label">Offering Due Diligence</div><div class="od-dd-icons">'
+    +ddBtn('📄','doc','Executive<br>Summary',platformFunds.map(f=>f.brochureUrl),fNames)
+    +ddBtn('📋','doc','PPM',platformFunds.map(f=>f.ppmUrl),fNames)
+    +ddBtn('📈','raise','Monthly<br>Raise',platformFunds.map(f=>f.raiseUrl),fNames)
+    +ddBtn('🤖','ai','AI<br>Chat',platformFunds.map(f=>f.aiChatUrl),fNames)
+    +'</div></div><div class="od-dd-sep"></div>'
+    +'<div class="od-dd-group"><div class="od-dd-group-label">Sponsor Due Diligence</div><div class="od-dd-icons">'
+    +ddBtn('📰','news','Sponsor<br>News',platformFunds.map(f=>f.sponsorNewsUrl),fNames)
+    +ddBtn('📊','track','Track<br>Record',platformFunds.map(f=>f.trackRecordUrl),fNames)
+    +ddBtn('👥','team','Sales<br>Team',platformFunds.map(f=>f.salesTeamUrl),fNames)
+    +ddBtn('🎬','ai','Sponsor<br>Video',platformFunds.map(f=>f.videoUrl),fNames)
+    +'</div></div><div class="od-dd-sep"></div>'
+    +'<div class="od-dd-group" style="flex:0 0 auto"><div class="od-dd-group-label">Latest Updates</div><div class="od-dd-icons">'
+    +ddBtn('<span style="font-size:11px;font-weight:700;color:var(--amber)">Q4<br>2025</span>','update','Q4 Update',platformFunds.map(f=>f.quarterlyUpdateUrl),fNames)
+    +'</div></div></div>';
 
-  // ── DD Icon Row ──
-  const ddRowHtml = renderODDdRow(selectedFunds, e, isMulti);
+  // ── Action bar ──
+  const blendScore = suitScores.filter(BV.isNum).length ? Math.round(suitScores.filter(BV.isNum).reduce((a,b)=>a+b,0)/suitScores.filter(BV.isNum).length) : null;
+  const suitChip = hasClient && BV.isNum(blendScore)
+    ? '<div class="od-suit-chip '+(blendScore>=70?'high':blendScore>=45?'medium':'low')+'">★ '+blendScore+'% match — '+e(c.name)+'</div>'
+    : '<div class="od-suit-chip none" onclick="openProfileModal()">+ Set up client for match score</div>';
+  const actionBar = '<div class="od-action-bar"><button class="btn btn-primary">🛒 Add to Basket</button><button class="btn btn-secondary" onclick="navigateTo(\'portfolio_builder\')">📐 Build Portfolio</button><button class="btn btn-secondary">📤 Share Tear Sheet</button><button class="btn btn-secondary" onclick="navigateTo(\'model\')">🧮 Model for Client</button><div class="od-action-right">'+suitChip+'</div></div>';
 
-  // ── Action Bar ──
-  const suitDisplay = isMulti ? blendedSuit : suitScores[0];
-  const actionBarHtml = '<div class="od-action-bar">' +
-    '<button class="btn btn-primary" onclick="toast(\'Added to basket\')">+ Add to Basket</button>' +
-    '<button class="btn btn-secondary" onclick="navigateTo(\'portfolio_builder\')">📐 Build Portfolio</button>' +
-    '<button class="btn btn-secondary" onclick="toast(\'Share link copied\')">🔗 Share Tear Sheet</button>' +
-    '<button class="btn btn-secondary" onclick="navigateTo(\'model\')">🧮 Model for Client</button>' +
-    '<span class="od-suit-chip ' + suitClass(suitDisplay) + '">' +
-    (hasClient ? '🎯 ' + suitLabel(suitDisplay) : '👤 ' + (c.name ? suitLabel(suitDisplay) : 'Set up client profile')) +
-    '</span>' +
-    '</div>';
+  // ── Suitability panel ──
+  const suitPanel = (() => {
+    if(!hasClient) return '<div class="od-suit-panel-none"><div style="font-size:28px">👤</div><div style="font-size:13px;font-weight:600;color:var(--slate)">No Client Profile Set</div><div style="font-size:12px;color:var(--slate2);line-height:1.5;max-width:220px">Add a client to see a personalized suitability score and income projections.</div><button class="btn btn-secondary" style="font-size:12px" onclick="openProfileModal()">+ Set Up Client Profile</button></div>';
+    if(isMulti) {
+      const rows = platformFunds.map((f,i)=>{
+        const s=suitScores[i];
+        return '<div style="display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid rgba(0,0,0,.07)"><span style="font-size:11.5px;color:var(--navy)">'+TAG_NUMS[i]+' '+e((f.name||'').substring(0,24))+'</span>'+(BV.isNum(s)?'<span style="font-weight:800;font-size:15px;color:'+(s>=70?'var(--green)':s>=45?'var(--amber)':'var(--red)')+'">'+s+'%</span>':'<span style="color:var(--fog)">—</span>')+'</div>';
+      }).join('');
+      return '<div class="od-suit-panel-high"><div style="font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--green);margin-bottom:7px">Suitability — '+e(c.name)+'</div><div style="display:flex;align-items:flex-end;gap:10px;margin-bottom:10px"><div class="od-suit-score-big" style="color:var(--green)">'+(BV.isNum(blendScore)?blendScore+'%':'—')+'</div><div style="font-size:12px;font-weight:600;color:var(--green);padding-bottom:5px">Blended</div></div>'+rows+'</div>';
+    }
+    const f=platformFunds[0], s=suitScores[0];
+    const facts = [
+      BV.isNum(f.ltv)?{pass:f.ltv<60,txt:'LTV '+(f.ltv<60?'below':'above')+' 60% threshold'}:null,
+      BV.isNum(f.minInvest)&&BV.isNum(c.exchangeAmount)?{pass:f.minInvest<=c.exchangeAmount,txt:'Min invest '+(f.minInvest<=c.exchangeAmount?'fits':'exceeds')+' exchange'}:null,
+      BV.isNum(f.y1coc)?{pass:f.y1coc>=4,txt:'Y1 CoC '+(f.y1coc>=4?'above':'below')+' 4% threshold'}:null,
+      BV.isNum(f.occupancy)?{pass:f.occupancy>=95,txt:'Occupancy '+(f.occupancy>=95?'strong':'below 95%')+' at '+f.occupancy.toFixed(0)+'%'}:null,
+    ].filter(Boolean);
+    return '<div class="od-suit-panel-high"><div style="font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--green);margin-bottom:7px">Suitability — '+e(c.name)+'</div><div style="display:flex;align-items:flex-end;gap:10px"><div class="od-suit-score-big" style="color:'+(BV.isNum(s)?s>=70?'var(--green)':s>=45?'var(--amber)':'var(--red)':'var(--slate)')+'">'+( BV.isNum(s)?s+'%':'—')+'</div><div style="font-size:12px;font-weight:600;color:var(--green);padding-bottom:5px">'+(BV.isNum(s)?s>=70?'Strong Match':s>=45?'Moderate':'Low Match':'No Score')+'</div></div>'+(c.exchangeAmount||c.riskTolerance?'<div style="font-size:11px;color:var(--slate2);margin:5px 0 11px">'+(c.exchangeAmount?'$'+(c.exchangeAmount/1e3).toFixed(0)+'K exchange':'')+' '+(c.riskTolerance?'· '+e(c.riskTolerance):'')+'</div>':'')+'<div class="od-suit-factors">'+facts.map(f=>'<div class="od-sf"><div class="od-sf-dot" style="background:'+(f.pass?'var(--green)':'var(--red)')+'"></div>'+f.txt+'</div>').join('')+'</div></div>';
+  })();
 
-  // ── Body Panels ──
-  const suitPanel = renderODSuitPanel(selectedFunds, suitScores, hasClient, c, e, isMulti);
-  const raisePanel = renderODRaisePanel(selectedFunds, e, isMulti);
-  const valPanel = renderODValPanel(selectedFunds, e, isMulti);
-  const debtLeasePanel = renderODDebtLeasePanel(selectedFunds, e, isMulti);
-  const kdPanel = renderODKeyDriversPanel(selectedFunds, peer, e, isMulti);
-  const distPanel = renderODDistPanel(selectedFunds, e);
-  const projPanel = renderODProjPanel(selectedFunds, c, e, isMulti);
-  const sponsorPanel = renderODSponsorPanel(selectedFunds, e, isMulti);
+  // ── Raise panel ──
+  const raisePanel = '<div class="od-panel"><div class="od-panel-title">📊 Raise Status & Timeline</div>'+platformFunds.map((f,i)=>{
+    const pctR = BV.isNum(f.pctRemaining)?Math.max(0,Math.min(100,100-f.pctRemaining)):0;
+    const raised = BV.isNum(f.filedRaise)&&BV.isNum(f.equityRemaining)?f.filedRaise-f.equityRemaining:null;
+    return (isMulti?'<div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--mist)"><span class="'+TAG_CLS[i]+'" style="font-size:11px;margin-bottom:6px;display:inline-block">'+TAG_NUMS[i]+' '+e((f.name||'').substring(0,28))+'</span><br>':'')
+      +'<div class="od-mg" style="grid-template-columns:repeat(4,1fr);gap:8px">'
+      +'<div class="od-mt"><div class="od-mt-lbl">Filed Raise</div><div class="od-mt-val" style="font-size:15px">'+fmtM(f.filedRaise)+'</div></div>'
+      +'<div class="od-mt"><div class="od-mt-lbl">Raised</div><div class="od-mt-val" style="font-size:15px">'+fmtM(raised)+'</div><div class="od-mt-sub">'+pctR.toFixed(0)+'% of total</div><div class="od-pbar"><div class="od-pfill" style="width:'+pctR+'%;background:var(--green)"></div></div></div>'
+      +'<div class="od-mt"><div class="od-mt-lbl">Remaining</div><div class="od-mt-val" style="font-size:15px">'+fmtM(f.equityRemaining)+'</div><div class="od-mt-sub"><span class="od-peer-chip n">'+(BV.isNum(f.pctRemaining)?f.pctRemaining.toFixed(0)+'% open':'—')+'</span></div></div>'
+      +'<div class="od-mt"><div class="od-mt-lbl">Raise/Mo</div><div class="od-mt-val" style="font-size:15px">'+(BV.isNum(f.raiseVelocity)?'$'+(f.raiseVelocity/1e3).toFixed(0)+'K':'—')+'</div></div>'
+      +'</div>'+(isMulti?'</div>':'');
+  }).join('')+'</div>';
 
-  // ── Key Metrics Comparison (multi only) ──
-  const keyMetricsComp = isMulti ? renderODKeyMetricsComp(selectedFunds, peer, e, TAG_COLORS, TAG_LABELS) : '';
+  // ── Valuation (single only) ──
+  const valPanel = !isMulti ? (()=>{
+    const f=platformFunds[0];
+    const disc=(BV.isNum(f.purchasePrice)&&BV.isNum(f.appraisedValue)&&f.appraisedValue>0)?((f.appraisedValue-f.purchasePrice)/f.appraisedValue*100):null;
+    return '<div class="od-panel"><div class="od-panel-title">🏷️ Purchase Price & Valuation</div>'+(disc!==null?'<div style="display:flex;align-items:center;gap:10px;margin-bottom:13px;padding:9px 13px;background:'+(disc>0?'var(--green-lt)':'var(--amber-lt)')+';border:1.5px solid '+(disc>0?'#BBF7D0':'#FDE68A')+';border-radius:var(--radius)"><div style="font-size:22px;font-weight:800;color:'+(disc>0?'var(--green)':'var(--amber)')+'">'+( disc>0?'−':'+')+Math.abs(disc).toFixed(1)+'%</div><div style="font-size:12px;color:'+(disc>0?'var(--green)':'var(--amber)')+'">Purchased '+(disc>0?'below appraised value — built-in equity at close':'above appraised value')+'</div></div>':'')+'<div class="od-mg" style="grid-template-columns:1fr 1fr 1fr;gap:9px"><div class="od-mt"><div class="od-mt-lbl">Purchase Price</div><div class="od-mt-val" style="font-size:15px">'+fmtM(f.purchasePrice)+'</div></div><div class="od-mt"><div class="od-mt-lbl">Appraised Value</div><div class="od-mt-val" style="font-size:15px">'+fmtM(f.appraisedValue)+'</div></div><div class="od-mt"><div class="od-mt-lbl">Loaded Price</div><div class="od-mt-val" style="font-size:15px">'+fmtM(f.loadedPrice)+'</div></div></div><div style="display:flex;gap:14px;margin-top:9px;font-size:12px;color:var(--slate)">'+(BV.isNum(f.pricePerSqFt)?'<span>Price/SF: <strong>$'+Math.round(f.pricePerSqFt)+'</strong></span>':'')+(BV.isNum(f.sqft)?'<span>Total SF: <strong>'+(f.sqft/1e3).toFixed(0)+'K</strong></span>':'')+(f.units?'<span>Properties: <strong>'+f.units+'</strong></span>':'')+'</div></div>';
+  })() : '';
 
-  // ── Full Vertical Comparison ──
-  const vcompHtml = BV.renderVerticalCompTable(selectedFunds, STATE.headers || []);
+  // ── Debt/Lease (single only) ──
+  const debtPanel = !isMulti ? (()=>{
+    const f=platformFunds[0];
+    const pLtv=peer?.averages?.ltv, pLease=peer?.averages?.avg_lease_term_remaining, pOcc=peer?.averages?.pct_leased;
+    const chip=(v,pv,higher,fmt)=>BV.isNum(v)&&BV.isNum(pv)?'<span class="od-peer-chip '+(((v>pv)===higher)?'g':'b')+'">'+(v>pv?'↑':'↓')+Math.abs(v-pv).toFixed(1)+(fmt||'')+(higher===false?' vs avg':' vs avg')+'</span>':'';
+    return '<div class="od-panel"><div class="od-panel-title">🏦 Debt & Lease Terms</div><div class="od-mg" style="grid-template-columns:1fr 1fr;gap:9px"><div class="od-mt"><div class="od-mt-lbl">LTV</div><div class="od-mt-val">'+fmtP(f.ltv)+'</div>'+(BV.isNum(f.ltv)&&BV.isNum(pLtv)?'<div class="od-mt-sub">'+chip(f.ltv,pLtv,false,'%')+'</div>':'')+'</div><div class="od-mt"><div class="od-mt-lbl">DSCR</div><div class="od-mt-val">'+(BV.isNum(f.dscr)?f.dscr.toFixed(1)+'x':'—')+'</div></div><div class="od-mt"><div class="od-mt-lbl">Avg Lease Term</div><div class="od-mt-val">'+(BV.isNum(f.avgLeaseTerm)?f.avgLeaseTerm.toFixed(1)+' yr':'—')+'</div>'+(BV.isNum(f.avgLeaseTerm)&&BV.isNum(pLease)?'<div class="od-mt-sub">'+chip(f.avgLeaseTerm,pLease,true,' yr')+'</div>':'')+'</div><div class="od-mt"><div class="od-mt-lbl">Occupancy</div><div class="od-mt-val">'+fmtP(f.occupancy)+'</div>'+(BV.isNum(f.occupancy)&&BV.isNum(pOcc)?'<div class="od-mt-sub">'+chip(f.occupancy,pOcc,true,'%')+'</div>':'')+'</div><div class="od-mt" style="grid-column:1/-1"><div class="od-mt-lbl">Lease Type</div><div style="font-size:13px;font-weight:600;color:var(--navy);margin-top:3px">'+(f.leaseTerms?e(f.leaseTerms):'—')+'</div></div></div></div>';
+  })() : '';
+
+  // ── Portfolio comparison table (multi only) ──
+  const compTable = isMulti ? (()=>{
+    const pLtv=peer?.averages?.ltv, pCoc=peer?.averages?.year1_coc;
+    const rows=[
+      {lbl:'Y1 CoC',vals:platformFunds.map(f=>f.y1coc),fmt:fmtP,higher:true},
+      {lbl:'LTV',vals:platformFunds.map(f=>f.ltv),fmt:fmtP,higher:false},
+      {lbl:'Occupancy',vals:platformFunds.map(f=>f.occupancy),fmt:fmtP,higher:true},
+      {lbl:'DSCR',vals:platformFunds.map(f=>f.dscr),fmt:v=>BV.isNum(v)?v.toFixed(1)+'x':'—',higher:true},
+      {lbl:'Avg Lease',vals:platformFunds.map(f=>f.avgLeaseTerm),fmt:v=>BV.isNum(v)?v.toFixed(1)+' yr':'—',higher:true},
+      {lbl:'Hold Period',vals:platformFunds.map(f=>f.holdPeriod),fmt:v=>BV.isNum(v)?v+' yr':'—',higher:null},
+      {lbl:'Min Invest',vals:platformFunds.map(f=>f.minInvest),fmt:fmtM,higher:null},
+      {lbl:'Status',vals:platformFunds.map(f=>f.status),fmt:v=>v?'<span class="od-peer-chip '+(v==='Open'?'g':'n')+'">'+e(v)+'</span>':'—',higher:null},
+    ].concat(hasClient?[{lbl:'Suitability',vals:suitScores,fmt:v=>BV.isNum(v)?'<span class="od-peer-chip '+(v>=70?'g':v>=45?'n':'b')+'">'+v+'%</span>':'—',higher:null}]:[]);
+    const hdr = platformFunds.map((f,i)=>'<th class="'+['o1','o2','o3'][i]+'">'+TAG_NUMS[i]+' '+e((f.name||'').substring(0,16))+'</th>').join('');
+    const body = rows.map(r=>{
+      const nums=r.vals.filter(BV.isNum);
+      const best=nums.length?(r.higher===true?Math.max(...nums):r.higher===false?Math.min(...nums):null):null;
+      const blend=nums.length?nums.reduce((a,b)=>a+b,0)/nums.length:null;
+      return '<tr><td>'+r.lbl+'</td>'+r.vals.map((v,i)=>'<td'+(BV.isNum(v)&&v===best?' class="best"':'')+'>'+r.fmt(v)+'</td>').join('')+'<td class="blend-col">'+r.fmt(blend)+'</td></tr>';
+    }).join('');
+    return '<div class="od-panel"><div class="od-panel-title">📊 Side-by-Side Comparison</div><div style="overflow-x:auto"><table class="od-comp-table"><thead><tr><th style="text-align:left;width:130px">Metric</th>'+hdr+'<th class="blend">Blended</th></tr></thead><tbody>'+body+'</tbody></table></div></div>';
+  })() : '';
+
+  // ── Key drivers ──
+  const keyDrivers = (() => {
+    const drivers=[];
+    const pLtv=peer?.averages?.ltv, pCoc=peer?.averages?.year1_coc;
+    if(isMulti){
+      const blLtv=platformFunds.map(f=>f.ltv).filter(BV.isNum).reduce((a,b)=>a+b,0)/Math.max(1,platformFunds.filter(f=>BV.isNum(f.ltv)).length);
+      const blCoc=platformFunds.map(f=>f.y1coc).filter(BV.isNum).reduce((a,b)=>a+b,0)/Math.max(1,platformFunds.filter(f=>BV.isNum(f.y1coc)).length);
+      if(BV.isNum(blLtv)&&BV.isNum(pLtv)) drivers.push({c:blLtv<pLtv?'pos':'neg',i:blLtv<pLtv?'✅':'⚠️',t:'Blended LTV of '+blLtv.toFixed(1)+'% is '+(blLtv<pLtv?'below':'above')+' peer average of '+pLtv.toFixed(1)+'%.'});
+      if(BV.isNum(blCoc)&&BV.isNum(pCoc)) drivers.push({c:blCoc>pCoc?'pos':'neg',i:blCoc>pCoc?'✅':'⚠️',t:'Blended Y1 CoC of '+blCoc.toFixed(2)+'% '+(blCoc>pCoc?'exceeds':'trails')+' peer average of '+pCoc.toFixed(2)+'%.'});
+      const types=[...new Set(platformFunds.map(f=>f.propType).filter(Boolean))];
+      drivers.push({c:'neu',i:'ℹ️',t:n+'-offering portfolio spans '+types.join(', ')+(types.length>1?' — sector diversification':'')+' across '+[...new Set(platformFunds.flatMap(f=>BV.extractStates(f.location||'')))].length+' states.'});
+    } else {
+      const f=platformFunds[0];
+      if(BV.isNum(f.ltv)&&BV.isNum(pLtv)) drivers.push({c:f.ltv<pLtv?'pos':'neg',i:f.ltv<pLtv?'✅':'⚠️',t:'LTV of '+f.ltv.toFixed(1)+'% is '+(f.ltv<pLtv?'below':'above')+' peer average of '+pLtv.toFixed(1)+'%.'});
+      if(BV.isNum(f.occupancy)&&f.occupancy>=95) drivers.push({c:'pos',i:'✅',t:'Occupancy of '+f.occupancy.toFixed(1)+'%'+(BV.isNum(f.avgLeaseTerm)?' with '+f.avgLeaseTerm.toFixed(1)+'-yr WALT':'')+' reduces vacancy risk.'});
+      if(BV.isNum(f.y1coc)&&BV.isNum(pCoc)) drivers.push({c:f.y1coc>pCoc?'pos':'neg',i:f.y1coc>pCoc?'✅':'⚠️',t:'Y1 CoC of '+f.y1coc.toFixed(2)+'% '+(f.y1coc>pCoc?'exceeds':'trails')+' peer avg of '+pCoc.toFixed(2)+'%.'});
+      if(BV.isNum(f.dscr)) drivers.push({c:f.dscr>=1.5?'pos':'neg',i:f.dscr>=1.5?'✅':'⚠️',t:'DSCR of '+f.dscr.toFixed(1)+'x — debt service covered '+f.dscr.toFixed(1)+'x by operating income.'});
+      if(BV.isNum(f.purchasePrice)&&BV.isNum(f.appraisedValue)&&f.appraisedValue>0){const d=(f.appraisedValue-f.purchasePrice)/f.appraisedValue*100;drivers.push({c:d>0?'pos':'neu',i:d>0?'✅':'ℹ️',t:'Purchased at '+Math.abs(d).toFixed(1)+'% '+(d>0?'discount':'premium')+' to appraised value of '+fmtM(f.appraisedValue)+'.'});}
+    }
+    while(drivers.length<3) drivers.push({c:'neu',i:'ℹ️',t:'Review offering documents for additional due diligence considerations.'});
+    return '<div class="od-panel"><div class="od-panel-title">⚡ Key Drivers</div><div class="od-kd-grid">'+drivers.slice(0,6).map(d=>'<div class="od-kd '+d.c+'"><div class="od-kd-ico">'+d.i+'</div><div>'+d.t+'</div></div>').join('')+'</div></div>';
+  })();
+
+  // ── Distribution chart ──
+  const distChart = '<div class="od-panel"><div class="od-panel-title">📈 Projected Annual Distributions</div><div class="od-chart-wrap"><canvas id="od-dist-chart"></canvas></div></div>';
+
+  // ── Projection table ──
+  const projTable = (() => {
+    const equity=hasClient&&BV.isNum(c.exchangeAmount)?c.exchangeAmount:null;
+    const getInc=(f,yr)=>f.income&&BV.isNum(f.income[yr-1])?f.income[yr-1]:BV.isNum(f.y1coc)?f.y1coc:null;
+    const blendInc=yr=>{const vs=platformFunds.map(f=>getInc(f,yr)).filter(BV.isNum);return vs.length?vs.reduce((a,b)=>a+b,0)/vs.length:null;};
+    const years=[1,2,3,4,5,6,7];
+    const hdr = isMulti
+      ? platformFunds.map((f,i)=>'<th class="'+['o1','o2','o3'][i]+'">'+TAG_NUMS[i]+' CoC%</th>').join('')+'<th class="hl">Blend</th>'
+      : '<th class="hl">Year 1</th>'+years.slice(1).map(y=>'<th>Year '+y+'</th>').join('');
+    const cocRow = isMulti
+      ? '<tr><td>CoC Return</td>'+platformFunds.map((f,i)=>'<td>'+fmtP(getInc(f,1))+'</td>').join('')+'<td class="hl">'+fmtP(blendInc(1))+'</td></tr>'
+      : '<tr><td>CoC Return</td>'+years.map((y,i)=>'<td'+(i===0?' class="hl"':'')+'>'+fmtP(blendInc(y))+'</td>').join('')+'</tr>';
+    const distRow = equity
+      ? (isMulti
+        ? '<tr><td>Est. Income ('+fmtM(equity)+')</td>'+platformFunds.map((f,i)=>{const v=getInc(f,1);return '<td>'+(BV.isNum(v)?'$'+Math.round(equity*v/100).toLocaleString():'—')+'</td>';}).join('')+'<td class="hl">'+(BV.isNum(blendInc(1))?'$'+Math.round(equity*blendInc(1)/100).toLocaleString():'—')+'</td></tr>'
+        : '<tr><td>Est. Distribution <span style="font-size:10px;color:var(--slate2)">('+fmtM(equity)+' equity)</span></td>'+years.map((y,i)=>{const v=blendInc(y);return '<td'+(i===0?' class="hl"':'')+'>'+( BV.isNum(v)?'$'+Math.round(equity*v/100).toLocaleString():'—')+'</td>';}).join('')+'</tr><tr><td>Cumulative</td>'+years.map((y,i)=>{let cum=0;for(let j=1;j<=y;j++){const v=blendInc(j);if(BV.isNum(v))cum+=equity*v/100;}return '<td'+(i===0?' class="hl"':'')+'>$'+Math.round(cum).toLocaleString()+'</td>';}).join('')+'</tr>')
+      : '<tr><td colspan="'+(isMulti?n+2:8)+'" style="text-align:center;color:var(--slate2);font-size:12px;padding:10px"><a href="#" style="color:var(--blue)" onclick="openProfileModal();return false">Set up a client profile</a> to see estimated dollar distributions.</td></tr>';
+    return '<div class="od-panel"><div class="od-panel-title">📊 Distribution Projections</div><div style="overflow-x:auto"><table class="od-proj-table"><thead><tr><th style="border-radius:8px 0 0 0">Metric</th>'+hdr+'</tr></thead><tbody>'+cocRow+distRow+'</tbody></table></div></div>';
+  })();
+
+  // ── AI narrative (single only) ──
+  const aiNarr = !isMulti ? (()=>{
+    const f=platformFunds[0], pCoc=peer?.averages?.year1_coc;
+    const txt = f.aiNarrative || (e(f.name||'')+' is a '+(f.propType?e(f.propType)+' ':'')+'Delaware Statutory Trust offered by '+e(f.sponsor||'')+'. '+(BV.isNum(f.ltv)?'LTV: '+f.ltv.toFixed(1)+'%. ':'')+( BV.isNum(f.y1coc)?'Year 1 CoC: '+f.y1coc.toFixed(2)+'%'+(BV.isNum(pCoc)?' vs peer avg '+pCoc.toFixed(2)+'%':'')+'. ':'')+( BV.isNum(f.occupancy)?'Occupancy: '+f.occupancy.toFixed(1)+'%. ':''));
+    return '<div class="od-panel"><div class="od-panel-title">🤖 AI Overview</div><div class="od-narr">'+txt+'</div></div>';
+  })() : '';
+
+  // ── Sponsor panel (single only) ──
+  const sponsorPanel = !isMulti ? (()=>{
+    const f=platformFunds[0];
+    const init=(f.sponsor||'?').split(' ').map(w=>w[0]).join('').substring(0,4).toUpperCase();
+    return '<div class="od-panel"><div class="od-panel-title">🏛️ Sponsor — '+e(f.sponsor||'')+'</div><div class="od-sponsor-banner">'+(f.sponsorLogoUrl?'<img src="'+e(f.sponsorLogoUrl)+'" style="width:58px;height:58px;border-radius:9px;object-fit:contain;background:#fff;border:1px solid var(--mist)">':'<div class="od-sponsor-logo-lg">'+e(init)+'</div>')+'<div><div style="font-size:15px;font-weight:700;color:var(--navy)">'+e(f.sponsor||'')+'</div><div style="font-size:12px;color:var(--slate2)">'+(f.sponsorOfferings||'')+(f.sponsorAum?' · $'+f.sponsorAum+' AUM':'')+'</div><div style="display:flex;gap:7px;margin-top:7px">'+(f.sponsorExits?'<span class="od-peer-chip n">'+f.sponsorExits+' exits</span>':'')+(BV.isNum(f.sponsorAvgIrr)?'<span class="od-peer-chip g">'+f.sponsorAvgIrr.toFixed(1)+'% avg IRR</span>':'')+'</div></div></div><div class="od-narr">'+(f.sponsorNarrative||e(f.sponsor||'')+' is the sponsor of this DST offering.')+'</div></div>';
+  })() : '';
 
   // ── Disclosures ──
-  const discHtml = '<div class="od-panel od-body-full"><div class="od-panel-hdr"><div class="od-panel-title">Important Disclosures</div></div><div class="od-panel-body"><div style="font-size:11px;color:var(--slate2);line-height:1.7">' + e(BV.DISCLOSURES) + '</div></div></div>';
+  const disclosures = '<div class="od-panel"><div class="od-panel-title">Important Disclosures</div><div style="font-size:11px;color:var(--slate2);line-height:1.7">'+e(BV.DISCLOSURES)+'</div></div>';
 
   // ── Assemble ──
-  const bodyGrid = '<div class="od-body">' +
-    suitPanel + raisePanel + valPanel + debtLeasePanel +
-    '<div class="od-body-full">' + kdPanel + '</div>' +
-    distPanel + sponsorPanel +
-    '<div class="od-body-full">' + projPanel + '</div>' +
-    '</div>';
+  const hero = '<div class="od-hero"><div class="od-hero-inner"><div class="od-hero-left">'+heroLeft+'</div><div class="od-hero-right"><div class="od-hero-map-panel"><div class="od-hero-panel-label">📍 Property Locations</div><div class="od-hero-panel-content">'+mapSvg+'</div></div><div class="od-hero-video-panel"><div class="od-hero-panel-label">🎬 Sponsor Video</div><div class="od-hero-panel-content"><div style="display:flex;flex-direction:column;align-items:center;gap:8px;color:rgba(255,255,255,.25);padding:16px;text-align:center"><div style="width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="rgba(255,255,255,.4)"><polygon points="5,3 19,12 5,21"/></svg></div><div style="font-size:10px">Sponsor video<br>coming soon</div></div></div></div></div></div>'+kpiStrip+'</div>';
 
-  return navHeader + '<div class="od-wrap">' + offeringTagsHtml + heroHtml + kpiStripHtml + ddRowHtml + actionBarHtml + bodyGrid + (isMulti ? keyMetricsComp : '') + '<div class="bv"><div class="sections">' + vcompHtml + '</div></div>' + discHtml + '</div>';
+  const analyst = '<div class="od-analyst">'
+    +'<div style="display:grid;grid-template-columns:300px 1fr;gap:14px">'+suitPanel+raisePanel+'</div>'
+    +(isMulti?compTable:'<div class="od-two-col">'+valPanel+debtPanel+'</div>')
+    +keyDrivers+distChart+projTable
+    +(isMulti?'':aiNarr+sponsorPanel)
+    +disclosures
+    +'</div>';
+
+  return navHeader + modeBar + hero + ddRow + actionBar + analyst;
 }
-
-// ── Hero ──
-function renderODHero(funds, peer, e, isMulti, TAG_COLORS, TAG_LABELS, MAP_COLORS) {
-  const f0 = funds[0];
-  // Sponsor logo/initials
-  const logoHtml = (f0.sponsor_logo_url)
-    ? '<div class="od-sponsor-logo"><img src="' + e(f0.sponsor_logo_url) + '" alt="' + e(f0.sponsor) + '"></div>'
-    : '<div class="od-sponsor-logo">' + e((f0.sponsor||'?').substring(0,2).toUpperCase()) + '</div>';
-
-  // Badges
-  const statusBadgeClass = { 'Open':'status-open','Closing':'status-closing','Coming Soon':'status-coming','Closed':'status-closed' }[f0.status] || 'status-open';
-  const statusDot = { 'Open':'🟢','Closing':'🟡','Coming Soon':'🔵','Closed':'🔴' }[f0.status] || '🟢';
-
-  let titleHtml, badgesHtml, locationHtml, sponsorMetaHtml;
-
-  if (!isMulti) {
-    titleHtml = '<div class="od-hero-name">' + e(f0.offering_name) + '</div>';
-    badgesHtml = '<div class="od-hero-badges">' +
-      '<span class="od-hero-badge ' + statusBadgeClass + '">' + statusDot + ' ' + e(f0.status) + '</span>' +
-      (f0.asset_class ? '<span class="od-hero-badge">' + e(f0.asset_class) + '</span>' : '') +
-      (f0.sector_focus ? '<span class="od-hero-badge">' + e(f0.sector_focus) + '</span>' : '') +
-      (f0.focus && f0.focus !== f0.sector_focus ? '<span class="od-hero-badge">' + e(f0.focus) + '</span>' : '') +
-      '</div>';
-    locationHtml = f0.property_locations ? '<div class="od-hero-location">📍 ' + e(f0.property_locations) + '</div>' : '';
-    sponsorMetaHtml = '<div class="od-sponsor-meta"><div class="od-sponsor-name">' + e(f0.sponsor) + '</div>' +
-      (f0.sponsor_experience ? '<div class="od-sponsor-exp">Est. ' + e(f0.sponsor_experience) + '</div>' : '') + '</div>';
-  } else {
-    const sponsors = [...new Set(funds.map(f=>f.sponsor))];
-    titleHtml = '<div class="od-hero-name">' + funds.map((f,i) => '<span class="od-offering-tag ' + TAG_COLORS[i] + '" style="font-size:14px;padding:4px 12px;margin-right:6px">' + TAG_LABELS[i] + ' ' + e(f.offering_name) + '</span>').join('') + '</div>';
-    badgesHtml = '<div class="od-hero-badges"><span class="od-blended-badge">⚖️ Portfolio View — Blended Metrics</span></div>';
-    locationHtml = '<div class="od-hero-location">📍 ' + funds.map(f=>e(f.property_locations||'—')).join(' · ') + '</div>';
-    sponsorMetaHtml = '<div class="od-sponsor-meta"><div class="od-sponsor-name">' + e(sponsors.join(', ')) + '</div><div class="od-sponsor-exp">' + funds.length + ' sponsors · blended view</div></div>';
-  }
-
-  // Map in hero right
-  const allStates = isMulti
-    ? funds.flatMap((f,i) => BV.extractStates(f.property_locations).map(s=>({s,i})))
-    : BV.extractStates(f0.property_locations).map(s=>({s,i:0}));
-  const mapHtml = '<div class="od-map-card"><div class="od-map-title">Property Footprint</div><div class="od-map-box" id="od-map"></div>' +
-    (isMulti ? '<div class="od-map-legend">' + funds.map((f,i)=>'<span class="od-map-leg-item"><span class="od-map-leg-dot od-map-leg-dot-' + (i+1) + '"></span>' + e(f.offering_name) + '</span>').join('') + '</div>' : '') +
-    '</div>';
-
-  // Status module (single only)
-  const statusModule = !isMulti ? '<div>' + BV.renderStatusModule(funds[0]) + '</div>' : renderODMultiRaiseStatus(funds, e);
-
-  return '<div class="od-hero"><div class="od-hero-inner"><div class="od-hero-top"><div class="od-hero-left">' +
-    '<div class="od-sponsor-row">' + logoHtml + sponsorMetaHtml + '</div>' +
-    titleHtml + badgesHtml + locationHtml +
-    '</div><div class="od-hero-right">' +
-    statusModule +
-    mapHtml +
-    '</div></div></div></div>';
-}
-
-// Multi-offering raise status (compact)
-function renderODMultiRaiseStatus(funds, e) {
-  return '<div style="display:flex;flex-direction:column;gap:6px">' + funds.map((f,i) => {
-    const m = f.metrics;
-    const pctR = BV.isNum(m.pct_raise_remaining) ? Math.max(0,Math.min(100,m.pct_raise_remaining)) : null;
-    const pctRaised = pctR != null ? (100-pctR).toFixed(0) + '% raised' : '—';
-    return '<div style="background:rgba(255,255,255,0.09);border:1px solid rgba(255,255,255,0.14);border-radius:8px;padding:8px 12px">' +
-      '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px">' +
-      '<span style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.7)">' + e(f.offering_name.length>28?f.offering_name.substring(0,26)+'…':f.offering_name) + '</span>' +
-      '<span style="font-size:11px;font-weight:800;color:rgba(255,255,255,0.9);font-family:monospace">' + pctRaised + '</span>' +
-      '</div>' +
-      (pctR!=null ? '<div style="height:5px;background:rgba(255,255,255,0.12);border-radius:3px;overflow:hidden"><div style="height:100%;width:' + (100-pctR) + '%;background:linear-gradient(90deg,#34D399,#3B82F6);border-radius:3px"></div></div>' : '') +
-      '</div>';
-  }).join('') + '</div>';
-}
-
-// ── KPI Strip ──
-function renderODKpiStrip(funds, peer, kpiKeys, e, isMulti) {
-  return '<div class="od-kpi-strip">' + kpiKeys.map(kpi => {
-    const vals = funds.map(f => f.metrics[kpi.key]).filter(BV.isNum);
-    const val = vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : null;
-    const p = peer.stats[kpi.key];
-    let peerHtml = '';
-    if (BV.isNum(val) && p && BV.isNum(p.avg)) {
-      const d = val - p.avg;
-      const better = kpi.higher === 'higher_better' ? d > 0.05 : d < -0.5;
-      const worse = kpi.higher === 'higher_better' ? d < -0.05 : d > 0.5;
-      const cls = better ? 'up' : worse ? 'down' : 'neutral';
-      const arrow = better ? '↑' : worse ? '↓' : '~';
-      const dStr = kpi.key === 'dscr' ? Math.abs(d).toFixed(2)+'x' : Math.abs(d).toFixed(2)+'%';
-      peerHtml = '<div class="od-kpi-peer">Peer avg: ' + BV.metricFormatter(kpi.key, p.avg) + ' <span class="' + cls + '">' + arrow + ' ' + dStr + '</span></div>';
-    } else {
-      peerHtml = '<div class="od-kpi-peer" style="color:var(--mist)">Peer avg: —</div>';
-    }
-    const dispVal = kpi.fmt ? kpi.fmt(val) : BV.metricFormatter(kpi.key, val);
-    return '<div class="od-kpi-cell"><div class="od-kpi-label">' + kpi.label + '</div><div class="od-kpi-value">' + dispVal + '</div>' + peerHtml + '</div>';
-  }).join('') + '</div>';
-}
-
-// ── DD Icon Row ──
-function renderODDdRow(funds, e, isMulti) {
-  const groups = [
-    { label: 'Offering DD', types: ['brochure','ppm','video','ai_offering_chat'] },
-    { label: 'Sponsor DD', types: ['track_record','sponsor_news','sales_team_map'] },
-    { label: 'Latest Updates', types: ['quarterly_update'] }
-  ];
-  const docLabels = { brochure:'Brochure', ppm:'PPM', video:'Video', ai_offering_chat:'AI Chat', track_record:'Track Record', sponsor_news:'Sponsor News', sales_team_map:'Sales Team', quarterly_update:'Q4 Update' };
-
-  let html = '<div class="od-dd-row">';
-  groups.forEach((group, gi) => {
-    if (gi > 0) html += '<div class="od-dd-divider"></div>';
-    html += '<div class="od-dd-group"><span class="od-dd-group-label">' + group.label + '</span>';
-    group.types.forEach(type => {
-      const available = funds.some(f => f.docs && f.docs[type]);
-      if (!available) {
-        html += '<button class="od-doc-btn unavailable">' + BV.iconSvg(type) + docLabels[type] + '</button>';
-        return;
-      }
-      if (!isMulti) {
-        const url = funds[0].docs[type];
-        html += '<a class="od-doc-btn" href="' + e(url) + '" target="_blank" rel="noopener noreferrer">' + BV.iconSvg(type) + docLabels[type] + '</a>';
-      } else {
-        // Multi: dropdown showing per-offering options
-        const dropId = 'od-doc-drop-' + type;
-        html += '<div class="bv-dropdown-wrap">' +
-          '<button class="od-doc-btn has-dropdown" onclick="document.getElementById(\'' + dropId + '\').classList.toggle(\'open\')">' + BV.iconSvg(type) + docLabels[type] + '</button>' +
-          '<div class="bv-dropdown" id="' + dropId + '" style="min-width:280px">' +
-          funds.map((f,i) => {
-            const url = f.docs[type];
-            return url
-              ? '<a class="bv-select-item" href="' + e(url) + '" target="_blank" rel="noopener noreferrer" style="gap:10px"><span style="font-size:11px;font-weight:700;padding:1px 7px;border-radius:10px;background:' + (i===0?'rgba(59,130,246,0.1)':i===1?'rgba(147,51,234,0.1)':'rgba(217,119,6,0.1)') + '">' + ['①','②','③'][i] + '</span>' + BV.iconSvg(type) + '<span class="bv-select-name">' + e(f.offering_name) + '</span></a>'
-              : '<div class="bv-select-item disabled"><span style="font-size:11px;font-weight:700;padding:1px 7px;border-radius:10px;background:rgba(0,0,0,0.05)">' + ['①','②','③'][i] + '</span><span class="bv-select-name" style="color:var(--fog)">' + e(f.offering_name) + ' — N/A</span></div>';
-          }).join('') +
-          '</div></div>';
-      }
-    });
-    html += '</div>';
-  });
-  html += '</div>';
-  return html;
-}
-
-// ── Suitability Panel ──
-function renderODSuitPanel(funds, suitScores, hasClient, c, e, isMulti) {
-  if (!hasClient) {
-    return '<div class="od-panel"><div class="od-panel-hdr"><div class="od-panel-title">Suitability</div></div><div class="od-panel-body">' +
-      '<div class="empty-state" style="padding:20px"><div class="empty-state-icon">👤</div><h3 style="font-size:14px">No Client Profile</h3><p style="font-size:12px">Set up a client profile to see suitability analysis, income projections, and personalized match scores.</p><button class="btn btn-primary btn-sm" onclick="openProfileModal()">Set Up Client</button></div>' +
-      '</div></div>';
-  }
-  const sc = isMulti ? Math.round(suitScores.filter(x=>x!=null).reduce((a,b)=>a+b,0)/suitScores.filter(x=>x!=null).length) : suitScores[0];
-  const cls = sc == null ? 'none' : sc >= 75 ? 'high' : sc >= 50 ? 'medium' : 'low';
-  const ringHtml = sc != null ? '<div class="od-suit-score-ring ' + cls + '">' + sc + '%</div>' : '';
-
-  const rows = [
-    ['Client', c.name || '—'],
-    ['Risk Tolerance', c.riskTolerance ? c.riskTolerance.charAt(0).toUpperCase()+c.riskTolerance.slice(1) : '—'],
-    ['Horizon', c.horizon ? {short:'Short (3–5 yr)',medium:'Medium (5–10 yr)',long:'Long (10+ yr)'}[c.horizon] : '—'],
-    ['1031 Exchange', c.exchangeAmount ? fmtMoney(c.exchangeAmount) : '—'],
-    ['Filing Status', c.filing ? c.filing.charAt(0).toUpperCase()+c.filing.slice(1) : '—'],
-  ];
-
-  if (isMulti) {
-    // Show per-offering scores
-    const perOfferHtml = funds.map((f,i) => {
-      const s = suitScores[i];
-      const sc2 = s == null ? 'none' : s >= 75 ? 'high' : s >= 50 ? 'medium' : 'low';
-      return '<div class="od-suit-row"><span class="od-suit-key">' + e(f.offering_name.length>22?f.offering_name.substring(0,20)+'…':f.offering_name) + '</span><span class="suit-score ' + sc2 + '">' + (s != null ? s + '%' : '—') + '</span></div>';
-    }).join('');
-    return '<div class="od-panel"><div class="od-panel-hdr"><div class="od-panel-title">Suitability</div><span class="od-blended-badge">Blended</span></div><div class="od-panel-body">' +
-      '<div style="display:flex;align-items:center;margin-bottom:12px">' + ringHtml + '<div><div style="font-size:13px;font-weight:700;color:var(--navy)">' + (c.name || 'Client') + '</div><div style="font-size:11px;color:var(--slate2)">Blended match score</div></div></div>' +
-      perOfferHtml +
-      '<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--surface2)">' +
-      rows.slice(0,3).map(([k,v]) => '<div class="od-suit-row"><span class="od-suit-key">' + k + '</span><span class="od-suit-val">' + v + '</span></div>').join('') +
-      '</div></div></div>';
-  }
-
-  return '<div class="od-panel"><div class="od-panel-hdr"><div class="od-panel-title">Suitability</div></div><div class="od-panel-body">' +
-    '<div style="display:flex;align-items:center;margin-bottom:14px">' + ringHtml +
-    '<div><div style="font-size:15px;font-weight:700;color:var(--navy)">' + (sc != null ? (sc >= 75 ? 'Strong Match' : sc >= 50 ? 'Moderate Match' : 'Low Match') : '—') + '</div><div style="font-size:11px;color:var(--slate2)">' + (sc != null ? sc + '% suitability score' : '') + '</div></div></div>' +
-    rows.map(([k,v]) => '<div class="od-suit-row"><span class="od-suit-key">' + k + '</span><span class="od-suit-val">' + v + '</span></div>').join('') +
-    '</div></div>';
-}
-
-// ── Raise Status Panel ──
-function renderODRaisePanel(funds, e, isMulti) {
-  const renderSingle = (f) => {
-    const m = f.metrics;
-    const pctR = BV.isNum(m.pct_raise_remaining) ? Math.max(0,Math.min(100,m.pct_raise_remaining)) : 0;
-    const pctRaised = 100 - pctR;
-    return (isMulti ? '<div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--surface2)"><div style="font-size:11px;font-weight:700;color:var(--navy);margin-bottom:6px">' + e(f.offering_name) + '</div>' : '') +
-      '<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--slate2);margin-bottom:4px"><span>Raise Progress</span><span style="font-weight:700;color:var(--navy)">' + pctRaised.toFixed(0) + '% raised</span></div>' +
-      '<div class="od-raise-bar"><div class="od-raise-fill" style="width:' + pctRaised + '%"></div></div>' +
-      '<div class="od-raise-stat-row">' +
-      '<div class="od-raise-stat"><div class="od-raise-stat-val">' + BV.fmtMoney(m.filed_raise) + '</div><div class="od-raise-stat-label">Filed</div></div>' +
-      '<div class="od-raise-stat"><div class="od-raise-stat-val">' + BV.fmtMoney(m.remaining_raise) + '</div><div class="od-raise-stat-label">Remaining</div></div>' +
-      '<div class="od-raise-stat"><div class="od-raise-stat-val">' + (BV.isNum(m.raise_velocity) ? fmtMoney(Math.round(m.raise_velocity)) + '/mo' : (BV.isNum(m.months_on_market) ? m.months_on_market + ' mos' : '—')) + '</div><div class="od-raise-stat-label">' + (BV.isNum(m.raise_velocity) ? 'Velocity' : 'On Market') + '</div></div>' +
-      '</div>' +
-      (isMulti ? '</div>' : '');
-  };
-
-  const closeDateInfo = !isMulti && funds[0].metrics.offering_close instanceof Date
-    ? '<div style="margin-top:10px;padding:8px 12px;background:var(--surface);border-radius:6px;font-size:11.5px;color:var(--slate)"><b>Close Date:</b> ' + BV.fmtDate(funds[0].metrics.offering_close) + ' &nbsp;·&nbsp; <b>Open:</b> ' + BV.fmtDate(funds[0].metrics.offering_open) + '</div>'
-    : '';
-
-  return '<div class="od-panel"><div class="od-panel-hdr"><div class="od-panel-title">Raise Status</div>' +
-    (!isMulti && BV.isNum(funds[0].metrics.months_on_market) ? '<div class="od-panel-hint">' + funds[0].metrics.months_on_market + ' months on market</div>' : '') +
-    '</div><div class="od-panel-body">' +
-    funds.map(renderSingle).join('') +
-    closeDateInfo +
-    '</div></div>';
-}
-
-// ── Valuation Panel ──
-function renderODValPanel(funds, e, isMulti) {
-  const renderSingle = (f, showTitle) => {
-    const m = f.metrics;
-    const unloaded = m.purchase_price_unloaded;
-    const appraised = m.appraised_valuation;
-    const loaded = m.loaded_price;
-    const sqft = m.total_sqft;
-    const ppsf = m.price_per_sqft;
-    const delta = (BV.isNum(unloaded) && BV.isNum(appraised) && appraised > 0) ? ((unloaded - appraised) / appraised * 100) : null;
-    const isDisc = BV.isNum(delta) ? delta <= 0 : null;
-    const heroClass = isDisc == null ? 'neutral' : isDisc ? 'discount' : 'premium';
-    const heroLabel = isDisc == null ? 'Valuation Data Unavailable' : isDisc ? 'Discount to Appraisal' : 'Premium to Appraisal';
-    const pctStr = BV.isNum(delta) ? (delta<=0?'−':'+')+Math.abs(delta).toFixed(1)+'%' : '—';
-
-    return (showTitle ? '<div style="font-size:11px;font-weight:700;color:var(--navy);margin-bottom:6px">' + e(f.offering_name) + '</div>' : '') +
-      '<div class="od-val-hero ' + heroClass + '">' +
-      '<div><div class="od-val-pct ' + heroClass + '">' + pctStr + '</div></div>' +
-      '<div><div class="od-val-label">' + heroLabel + '</div><div class="od-val-sub">Purchase vs Appraised</div></div>' +
-      '</div>' +
-      '<div class="od-val-kv">' +
-      '<div class="od-val-kv-item"><div class="od-val-kv-label">Purchase (Unloaded)</div><div class="od-val-kv-value">' + BV.fmtMoney(unloaded) + '</div></div>' +
-      '<div class="od-val-kv-item"><div class="od-val-kv-label">Appraised Value</div><div class="od-val-kv-value">' + BV.fmtMoney(appraised) + '</div></div>' +
-      '<div class="od-val-kv-item"><div class="od-val-kv-label">Loaded Price</div><div class="od-val-kv-value">' + BV.fmtMoney(loaded) + '</div></div>' +
-      '<div class="od-val-kv-item"><div class="od-val-kv-label">Price / SF</div><div class="od-val-kv-value">' + (BV.isNum(ppsf) ? '$'+Math.round(ppsf).toLocaleString()+'/SF' : (BV.isNum(sqft) ? '$—' : 'N/A')) + '</div></div>' +
-      '</div>';
-  };
-
-  return '<div class="od-panel"><div class="od-panel-hdr"><div class="od-panel-title">Valuation</div><div class="od-panel-hint">vs appraisal</div></div><div class="od-panel-body">' +
-    (isMulti
-      ? funds.map((f,i) => '<div style="' + (i>0?'margin-top:14px;padding-top:14px;border-top:1px solid var(--surface2)':'') + '">' + renderSingle(f, true) + '</div>').join('')
-      : renderSingle(funds[0], false)) +
-    '</div></div>';
-}
-
-// ── Debt & Lease Panel ──
-function renderODDebtLeasePanel(funds, e, isMulti) {
-  const renderSingle = (f, showTitle) => {
-    const tenantCredit = f.tenant_credit || '';
-    const propType = f.asset_class || '';
-    let creditDisplay = tenantCredit;
-    if (!tenantCredit || /^n\/?a$/i.test(tenantCredit.trim())) {
-      if (/multifamily/i.test(propType)) creditDisplay = 'N/A — Residential (Multifamily)';
-      else if (/self.?stor/i.test(propType)) creditDisplay = 'N/A — Self Storage';
-      else if (/senior/i.test(propType)) creditDisplay = 'N/A — Senior Living';
-      else creditDisplay = 'N/A';
-    }
-    return (showTitle ? '<div style="font-size:11px;font-weight:700;color:var(--navy);margin-bottom:6px">' + e(f.offering_name) + '</div>' : '') +
-      '<div style="display:grid;gap:8px">' +
-      '<div style="padding:10px 12px;background:var(--surface);border-radius:var(--radius);border:1px solid var(--mist)"><div style="font-size:10px;font-weight:700;color:var(--fog);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px">Debt Terms</div><div style="font-size:12px;color:var(--navy);line-height:1.5">' + e(f.debt_terms || '—') + '</div></div>' +
-      '<div style="padding:10px 12px;background:var(--surface);border-radius:var(--radius);border:1px solid var(--mist)"><div style="font-size:10px;font-weight:700;color:var(--fog);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px">Lease Terms</div><div style="font-size:12px;color:var(--navy);line-height:1.5">' + e(f.lease_terms || '—') + '</div></div>' +
-      '<div style="padding:10px 12px;background:var(--surface);border-radius:var(--radius);border:1px solid var(--mist)"><div style="font-size:10px;font-weight:700;color:var(--fog);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px">Tenant Credit Quality</div><div style="font-size:12px;color:var(--navy);line-height:1.5">' + e(creditDisplay) + '</div></div>' +
-      '</div>';
-  };
-
-  return '<div class="od-panel"><div class="od-panel-hdr"><div class="od-panel-title">Debt & Lease</div></div><div class="od-panel-body">' +
-    (isMulti
-      ? funds.map((f,i) => '<div style="' + (i>0?'margin-top:14px;padding-top:14px;border-top:1px solid var(--surface2)':'') + '">' + renderSingle(f, true) + '</div>').join('')
-      : renderSingle(funds[0], false)) +
-    '</div></div>';
-}
-
-// ── Key Drivers Panel ──
-function renderODKeyDriversPanel(funds, peer, e, isMulti) {
-  const f = funds[0];
-  const m = f.metrics;
-  const p = peer.stats;
-  const drivers = [];
-
-  // LTV
-  if (BV.isNum(m.ltv)) {
-    const avg = p.ltv?.avg;
-    const low = m.ltv < 60;
-    drivers.push({ type: low ? 'positive' : m.ltv > 70 ? 'caution' : 'info', icon: low ? '✅' : m.ltv > 70 ? 'ℹ️' : '✅', text: 'LTV of ' + m.ltv.toFixed(1) + '% — ' + (avg ? (m.ltv < avg ? 'below' : 'above') + ' peer avg of ' + avg.toFixed(1) + '%' : (low ? 'conservative leverage' : 'moderate leverage')) });
-  }
-  // DSCR
-  if (BV.isNum(m.dscr)) {
-    drivers.push({ type: m.dscr >= 1.4 ? 'positive' : m.dscr >= 1.2 ? 'info' : 'caution', icon: m.dscr >= 1.4 ? '✅' : m.dscr >= 1.2 ? 'ℹ️' : '⚠️', text: 'DSCR of ' + m.dscr.toFixed(2) + 'x — ' + (m.dscr >= 1.4 ? 'strong debt service coverage' : m.dscr >= 1.2 ? 'adequate coverage' : 'thin coverage, monitor closely') });
-  }
-  // Occupancy
-  if (BV.isNum(m.pct_leased)) {
-    drivers.push({ type: m.pct_leased >= 95 ? 'positive' : m.pct_leased >= 85 ? 'info' : 'caution', icon: m.pct_leased >= 95 ? '✅' : m.pct_leased >= 85 ? 'ℹ️' : '⚠️', text: m.pct_leased.toFixed(1) + '% occupied' + (p.pct_leased?.avg ? ' vs peer avg ' + p.pct_leased.avg.toFixed(1) + '%' : '') });
-  }
-  // Lease term
-  if (BV.isNum(m.avg_lease_term_remaining)) {
-    drivers.push({ type: m.avg_lease_term_remaining >= 8 ? 'positive' : m.avg_lease_term_remaining >= 4 ? 'info' : 'caution', icon: m.avg_lease_term_remaining >= 8 ? '✅' : m.avg_lease_term_remaining >= 4 ? 'ℹ️' : '⚠️', text: m.avg_lease_term_remaining.toFixed(1) + ' yr avg lease term remaining — ' + (m.avg_lease_term_remaining >= 8 ? 'long-term income stability' : m.avg_lease_term_remaining >= 4 ? 'moderate term visibility' : 'near-term rollover risk') });
-  }
-  // CoC vs peer
-  if (BV.isNum(m.year1_coc) && p.year1_coc?.avg) {
-    const d = m.year1_coc - p.year1_coc.avg;
-    drivers.push({ type: d > 0.3 ? 'positive' : d < -0.3 ? 'caution' : 'info', icon: d > 0.3 ? '✅' : d < -0.3 ? 'ℹ️' : 'ℹ️', text: 'Year 1 CoC of ' + m.year1_coc.toFixed(2) + '%' + (Math.abs(d) > 0.1 ? (d>0?' — above':' — below') + ' peer avg by ' + Math.abs(d).toFixed(2) + ' pts' : ' — in line with peers') });
-  }
-  // 721 UpREIT
-  if (f.upreit_721 && !/^no$/i.test(f.upreit_721) && !/^n\/a$/i.test(f.upreit_721)) {
-    drivers.push({ type: 'positive', icon: '✅', text: '721 UpREIT available — offers potential REIT liquidity pathway' });
-  }
-
-  // Fill to at least 4
-  while (drivers.length < 4 && drivers.length > 0) {
-    drivers.push({ type: 'neutral', icon: 'ℹ️', text: 'Confirm additional underwriting details with sponsor directly.' });
-    break;
-  }
-
-  if (!drivers.length) {
-    return '<div class="od-panel od-body-full"><div class="od-panel-hdr"><div class="od-panel-title">Key Drivers</div></div><div class="od-panel-body"><div style="color:var(--slate2);font-size:12px">Populate offering data to see key driver analysis.</div></div></div>';
-  }
-
-  return '<div class="od-panel od-body-full"><div class="od-panel-hdr"><div class="od-panel-title">Key Drivers</div><div class="od-panel-hint">' + (isMulti ? 'Based on first offering' : 'Underwriting signals') + '</div></div><div class="od-panel-body"><div class="od-kd-grid">' +
-    drivers.slice(0,6).map(d => '<div class="od-kd-item ' + d.type + '"><span class="od-kd-icon">' + d.icon + '</span><span>' + e(d.text) + '</span></div>').join('') +
-    '</div></div></div>';
-}
-
-// ── Distribution Chart Panel ──
-function renderODDistPanel(funds, e) {
-  return '<div class="od-panel"><div class="od-panel-hdr"><div class="od-panel-title">Income Distribution</div><div class="od-panel-hint">Years 1–10</div></div><div class="od-panel-body"><div class="od-chart-box"><canvas id="od-income-chart"></canvas></div></div></div>';
-}
-
-// ── Projection Table Panel ──
-function renderODProjPanel(funds, c, e, isMulti) {
-  const equity = c && c.exchangeAmount ? c.exchangeAmount : null;
-  const f0 = funds[0];
-  const income = f0.metrics;
-  const years = Array.from({length:7},(_,i)=>i+1);
-
-  const blendedIncome = (yr) => {
-    const key = 'income_y' + yr;
-    const vals = funds.map(f=>f.metrics[key]).filter(BV.isNum);
-    return vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : null;
-  };
-
-  return '<div class="od-panel od-body-full"><div class="od-panel-hdr"><div class="od-panel-title">Income Projection</div><div class="od-panel-hint">' + (equity ? 'Based on $' + (equity/1000).toFixed(0) + 'K equity' : 'Set client equity for dollar projections') + '</div></div><div class="od-panel-body"><div style="overflow-x:auto"><table class="od-proj-table"><thead><tr><th>Year</th><th>Cash-on-Cash %</th>' + (equity ? '<th>Est. Annual Income</th><th>Cumulative Income</th>' : '') + '</tr></thead><tbody>' +
-    years.map((yr, i) => {
-      const coc = blendedIncome(yr);
-      const annualIncome = (equity && BV.isNum(coc)) ? equity * (coc/100) : null;
-      const cumulative = equity ? years.slice(0,i+1).reduce((s,y)=>{ const c2=blendedIncome(y); return s+(BV.isNum(c2)?equity*(c2/100):0); }, 0) : null;
-      const isHighlight = yr === 1 || yr === 5;
-      return '<tr' + (isHighlight?' class="highlight-row"':'') + '><td>Year ' + yr + '</td><td>' + (BV.isNum(coc)?coc.toFixed(2)+'%':'—') + '</td>' +
-        (equity ? '<td>' + (annualIncome!=null?'$'+Math.round(annualIncome).toLocaleString():'—') + '</td><td>' + (cumulative?'$'+Math.round(cumulative).toLocaleString():'—') + '</td>' : '') +
-        '</tr>';
-    }).join('') +
-    '</tbody></table></div></div></div>';
-}
-
-// ── Sponsor Panel ──
-function renderODSponsorPanel(funds, e, isMulti) {
-  const renderSponsor = (f, showTitle) => {
-    const pf = STATE.funds.find(x => x.id === f.id);
-    if (!pf) return '';
-    return (showTitle ? '<div style="font-size:11px;font-weight:700;color:var(--navy);margin-bottom:8px">' + e(f.sponsor) + '</div>' : '') +
-      '<div class="od-sponsor-stat-row">' +
-      stat(pf.sponsorAum ? '$' + pf.sponsorAum : '—', 'AUM') +
-      stat(pf.sponsorOfferings || '—', 'Offerings') +
-      stat(pf.sponsorExits || '—', 'Full Exits') +
-      stat(BV.isNum(pf.sponsorAvgIrr) ? pf.sponsorAvgIrr.toFixed(1) + '%' : '—', 'Avg IRR') +
-      '</div>' +
-      (pf.sponsorExperience ? '<div style="padding:8px 12px;background:var(--surface);border-radius:var(--radius);font-size:12px;color:var(--slate);border:1px solid var(--mist)"><b>Experience:</b> ' + e(pf.sponsorExperience) + '</div>' : '');
-  };
-  const stat = (v, l) => '<div class="od-sponsor-stat"><div class="od-sponsor-stat-val">' + v + '</div><div class="od-sponsor-stat-label">' + l + '</div></div>';
-
-  return '<div class="od-panel"><div class="od-panel-hdr"><div class="od-panel-title">Sponsor Track Record</div></div><div class="od-panel-body">' +
-    (isMulti
-      ? funds.map((f,i) => '<div style="' + (i>0?'margin-top:12px;padding-top:12px;border-top:1px solid var(--surface2)':'') + '">' + renderSponsor(f, true) + '</div>').join('')
-      : renderSponsor(funds[0], false)) +
-    '</div></div>';
-}
-
-// ── Key Metrics Comparison (multi mode top table) ──
-function renderODKeyMetricsComp(funds, peer, e, TAG_COLORS, TAG_LABELS) {
-  const rows = [
-    { label:'Year 1 CoC', key:'year1_coc', fmt:v=>BV.fmtPct(v,2), higher:'higher' },
-    { label:'LTV', key:'ltv', fmt:v=>BV.fmtPct(v,2), higher:'lower' },
-    { label:'DSCR', key:'dscr', fmt:v=>BV.isNum(v)?v.toFixed(2)+'x':'—', higher:'higher' },
-    { label:'Occupancy', key:'pct_leased', fmt:v=>BV.fmtPct(v,2), higher:'higher' },
-    { label:'Hold Period', key:'hold_period_years', fmt:v=>BV.isNum(v)?v.toFixed(0)+' yr':'—', higher:'neutral' },
-    { label:'Avg Lease Term', key:'avg_lease_term_remaining', fmt:v=>BV.isNum(v)?v.toFixed(1)+' yr':'—', higher:'higher' },
-    { label:'Min Investment', key:'minimum_investment', fmt:v=>BV.fmtMoney(v), higher:'lower' },
-    { label:'Cap Rate', key:'cap_rate', fmt:v=>BV.fmtPct(v,2), higher:'higher' },
-  ];
-
-  const colWidth = Math.floor(100 / (1 + funds.length));
-  const colStyles = 'grid-template-columns:200px ' + funds.map(()=>colWidth+'px').join(' ');
-
-  const header = '<div class="od-comp-row" style="' + colStyles + ';display:grid;background:var(--surface2);border-bottom:2px solid var(--mist)">' +
-    '<div class="od-comp-cell field" style="font-size:10px;font-weight:700;color:var(--slate2);text-transform:uppercase;letter-spacing:.07em">Metric</div>' +
-    funds.map((f,i) => '<div class="od-comp-cell" style="flex-direction:column;align-items:flex-start;padding:10px 14px"><div style="font-size:11px;font-weight:700;color:var(--navy)">' + TAG_LABELS[i] + ' ' + e(f.offering_name.length>18?f.offering_name.substring(0,16)+'…':f.offering_name) + '</div><div style="font-size:10px;color:var(--slate2)">' + e(f.sponsor) + '</div></div>').join('') +
-    '</div>';
-
-  const dataRows = rows.map(row => {
-    const vals = funds.map(f => f.metrics[row.key]);
-    const numVals = vals.filter(BV.isNum);
-    const bestVal = numVals.length ? (row.higher === 'higher' ? Math.max(...numVals) : row.higher === 'lower' ? Math.min(...numVals) : null) : null;
-    const worstVal = numVals.length >= 2 ? (row.higher === 'higher' ? Math.min(...numVals) : row.higher === 'lower' ? Math.max(...numVals) : null) : null;
-
-    return '<div class="od-comp-row" style="' + colStyles + ';display:grid">' +
-      '<div class="od-comp-cell field">' + e(row.label) + '</div>' +
-      vals.map(v => {
-        const isBest = BV.isNum(v) && v === bestVal && numVals.length >= 2;
-        const isWorst = BV.isNum(v) && v === worstVal && numVals.length >= 2;
-        return '<div class="od-comp-cell' + (isBest?' best':isWorst?' worst':'') + '"><span class="val">' + row.fmt(v) + '</span></div>';
-      }).join('') +
-      '</div>';
-  }).join('');
-
-  return '<div class="od-comp-wrap" style="margin-bottom:16px"><div style="padding:12px 16px;border-bottom:1.5px solid var(--mist);background:linear-gradient(180deg,var(--white),var(--surface));display:flex;align-items:center;justify-content:space-between"><span style="font-size:11px;font-weight:700;color:var(--slate);text-transform:uppercase;letter-spacing:.07em">Key Metrics Comparison</span><span style="font-size:10.5px;color:var(--fog)">Green = best · Red = lowest</span></div>' +
-    header + dataRows + '</div>';
-}
-
 
 
 // ── Basket offering toggle (from dropdown) ──
@@ -2746,19 +2480,31 @@ function bvToggleOffering(id) {
 
 // ── Basket post-render hooks ──
 function basketPostRender() {
-  // Close dropdowns on click outside
+  // Close dropdown on click outside
   document.addEventListener('click', function bvDropClose(e) {
-    document.querySelectorAll('.bv-dropdown.open, [id^="od-doc-drop-"]').forEach(dd => {
-      const wrap = dd.closest('.bv-dropdown-wrap');
-      if (wrap && !wrap.contains(e.target)) dd.classList.remove('open');
-    });
+    const wrap = document.querySelector('.bv-dropdown-wrap');
+    if (wrap && !wrap.contains(e.target)) {
+      const dd = document.getElementById('bv-offering-dropdown');
+      if (dd) dd.classList.remove('open');
+    }
   }, { once: false, capture: true });
 
-  // Draw US map (new view uses id="od-map")
-  odDrawMap();
+  // Wire doc buttons
+  document.querySelectorAll('[data-bv-docbtn]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const type = btn.getAttribute('data-bv-docbtn');
+      const platformFunds = STATE.basket.map(id => STATE.funds.find(f => f.id === id)).filter(Boolean);
+      const selectedFunds = platformFunds.map(BV.adaptFund).filter(Boolean);
+      const modal = document.getElementById('bv-doc-modal');
+      if (modal) modal.innerHTML = BV.renderDocModal(selectedFunds, type);
+    });
+  });
 
-  // Draw income chart (new view uses id="od-income-chart")
-  odDrawIncomeChart();
+  // Draw US map
+  basketDrawMap();
+
+  // Draw income chart
+  basketDrawIncomeChart();
 }
 
 let bvChartsPromise = null;
@@ -2774,110 +2520,6 @@ function loadGoogleCharts() {
     document.head.appendChild(s);
   });
   return bvChartsPromise;
-}
-
-// ── New offering detail view: color-coded map ──
-function odDrawMap() {
-  const el = document.getElementById('od-map');
-  if (!el) return;
-  const platformFunds = STATE.basket.map(id => STATE.funds.find(f => f.id === id)).filter(Boolean);
-  if (!platformFunds.length) return;
-  const isMulti = platformFunds.length > 1;
-  const MAP_COLORS = ['#3B82F6','#9333EA','#D97706'];
-
-  // Build per-offering state sets
-  const offeringStateMap = platformFunds.map(f => ({
-    color: MAP_COLORS[platformFunds.indexOf(f)] || '#3B82F6',
-    states: BV.extractStates(f.location)
-  }));
-
-  // Flatten: state → offering index (first one wins for color in single-color mode)
-  const stateToOffering = {};
-  offeringStateMap.forEach((o, i) => {
-    o.states.forEach(s => { if (!(s in stateToOffering)) stateToOffering[s] = i; });
-  });
-  const allStates = Object.keys(stateToOffering);
-
-  if (!allStates.length) {
-    el.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:rgba(255,255,255,0.4);font-size:11px;font-weight:700">No states detected</div>';
-    return;
-  }
-
-  loadGoogleCharts().then(() => {
-    if (!isMulti) {
-      // Single: uniform navy
-      const dataRows = [['State','Presence']];
-      allStates.forEach(s => dataRows.push(['US-'+s, 1]));
-      const data = google.visualization.arrayToDataTable(dataRows);
-      el.innerHTML = '';
-      const chart = new google.visualization.GeoChart(el);
-      chart.draw(data, { region:'US', resolution:'provinces', legend:'none', backgroundColor:{fill:'transparent'}, datalessRegionColor:'rgba(255,255,255,0.06)', colorAxis:{colors:['#3B82F6','#3B82F6']}, keepAspectRatio:true });
-    } else {
-      // Multi: color-coded by offering (1=blue, 2=purple, 3=gold)
-      const dataRows = [['State','Offering','tooltip']];
-      allStates.forEach(s => {
-        const i = stateToOffering[s];
-        dataRows.push(['US-'+s, i+1, offeringStateMap[i] ? platformFunds[i].name : '']);
-      });
-      const data = google.visualization.arrayToDataTable(dataRows);
-      el.innerHTML = '';
-      const chart = new google.visualization.GeoChart(el);
-      // Use a continuous scale that maps 1→blue, 2→purple, 3→gold
-      chart.draw(data, { region:'US', resolution:'provinces', legend:'none', backgroundColor:{fill:'transparent'}, datalessRegionColor:'rgba(255,255,255,0.06)', colorAxis:{minValue:1, maxValue:3, colors:['#3B82F6','#9333EA','#D97706']}, keepAspectRatio:true });
-    }
-  }).catch(() => {
-    el.innerHTML = '<div style="padding:12px;text-align:center;color:rgba(255,255,255,0.4);font-size:11px">Map unavailable</div>';
-  });
-}
-
-// ── New offering detail view: income chart ──
-function odDrawIncomeChart() {
-  const canvas = document.getElementById('od-income-chart');
-  if (!canvas || !window.Chart) return;
-  if (STATE.incomeChart) { STATE.incomeChart.destroy(); STATE.incomeChart = null; }
-
-  const platformFunds = STATE.basket.map(id => STATE.funds.find(f => f.id === id)).filter(Boolean);
-  const selectedFunds = platformFunds.map(BV.adaptFund).filter(Boolean);
-  if (!selectedFunds.length) return;
-
-  const isMulti = selectedFunds.length > 1;
-  const labels = Array.from({length:10}, (_,i) => 'Y'+(i+1));
-  const CHART_COLORS = ['#3B82F6','#9333EA','#D97706'];
-
-  const datasets = isMulti
-    ? selectedFunds.map((f,i) => ({
-        label: f.offering_name,
-        data: BV.INCOME_KEYS.map(k => BV.isNum(f.metrics[k]) ? f.metrics[k] : null),
-        borderWidth: 2.5,
-        borderRadius: 4,
-        backgroundColor: CHART_COLORS[i] + '55',
-        borderColor: CHART_COLORS[i],
-        type: 'bar'
-      }))
-    : [{
-        label: 'Client Income (%)',
-        data: BV.INCOME_KEYS.map(k => BV.isNum(selectedFunds[0].metrics[k]) ? selectedFunds[0].metrics[k] : null),
-        borderWidth: 0,
-        borderRadius: 8,
-        backgroundColor: 'rgba(59,130,246,0.70)',
-        hoverBackgroundColor: 'rgba(59,130,246,0.9)'
-      }];
-
-  STATE.incomeChart = new Chart(canvas, {
-    type: 'bar',
-    data: { labels, datasets },
-    options: {
-      responsive: true, maintainAspectRatio: false, animation: false,
-      plugins: {
-        legend: { display: isMulti, position: 'top', labels: { font: { family: 'Inter', size: 10, weight: '700' }, boxWidth: 10, padding: 10 } },
-        tooltip: { callbacks: { label: (ctx) => ctx.dataset.label + ': ' + (ctx.raw != null ? ctx.raw.toFixed(2) + '%' : '—') } }
-      },
-      scales: {
-        x: { stacked: false, ticks: { color: 'rgba(9,14,25,0.70)', font: { family: 'Inter', weight: '700', size: 10 } }, grid: { color: 'rgba(15,23,42,0.08)' } },
-        y: { beginAtZero: true, ticks: { color: 'rgba(9,14,25,0.70)', callback: v => v+'%', font: { family: 'Inter', weight: '700', size: 10 } }, grid: { color: 'rgba(15,23,42,0.08)' } }
-      }
-    }
-  });
 }
 
 function basketDrawMap() {
