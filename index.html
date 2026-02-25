@@ -527,6 +527,161 @@ a{color:inherit;text-decoration:none}button{cursor:pointer;font-family:var(--fon
 .bv-select-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .bv-select-x{flex-shrink:0;width:20px;height:20px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:rgba(153,27,27,0.08);color:var(--red);font-size:11px;font-weight:800;cursor:pointer;transition:background .12s}
 .bv-select-x:hover{background:rgba(153,27,27,0.16)}
+/* ═══════════════════════════════════════════
+   OFFERING DETAIL VIEW v2 — Premium Single + Multi
+═══════════════════════════════════════════ */
+.od-wrap{background:var(--surface);min-height:100%}
+.od-mode-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:0;padding:0 0 16px;gap:12px;flex-wrap:wrap}
+.od-mode-toggle{display:flex;background:var(--white);border:1.5px solid var(--mist);border-radius:10px;padding:3px;gap:2px}
+.od-mode-btn{padding:6px 16px;border-radius:8px;border:none;background:transparent;font-size:12px;font-weight:600;color:var(--slate2);cursor:pointer;transition:all var(--transition);white-space:nowrap}
+.od-mode-btn.active{background:var(--navy);color:var(--white)}
+.od-offering-tag{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;border:1.5px solid}
+.od-tag-1{background:rgba(29,78,216,0.08);border-color:rgba(29,78,216,0.25);color:#1D4ED8}
+.od-tag-2{background:rgba(124,58,237,0.08);border-color:rgba(124,58,237,0.25);color:#7C3AED}
+.od-tag-3{background:rgba(180,83,9,0.08);border-color:rgba(180,83,9,0.25);color:#B45309}
+/* Hero */
+.od-hero{background:linear-gradient(160deg,#0B1F3B 0%,#1C3A63 60%,#2A4D7A 100%);border-radius:var(--radius-xl);overflow:hidden;margin-bottom:16px;position:relative}
+.od-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 700px 400px at 85% 50%,rgba(59,130,246,0.15),transparent 60%)}
+.od-hero-inner{padding:24px 28px;position:relative;z-index:1}
+.od-hero-top{display:grid;grid-template-columns:1fr auto;gap:20px;align-items:start}
+@media(max-width:900px){.od-hero-top{grid-template-columns:1fr}}
+.od-hero-left{}
+.od-sponsor-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.od-sponsor-logo{width:38px;height:38px;border-radius:8px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.18);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:rgba(255,255,255,0.9);flex-shrink:0;overflow:hidden}
+.od-sponsor-logo img{width:100%;height:100%;object-fit:contain}
+.od-sponsor-meta{line-height:1.3}
+.od-sponsor-name{font-size:12px;font-weight:700;color:rgba(255,255,255,0.7);letter-spacing:0.02em}
+.od-sponsor-exp{font-size:10.5px;color:rgba(255,255,255,0.45)}
+.od-hero-name{font-size:22px;font-weight:800;color:#fff;letter-spacing:-0.02em;line-height:1.2;margin-bottom:8px}
+.od-hero-badges{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.od-hero-badge{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.88);font-size:11px;font-weight:700;backdrop-filter:blur(4px)}
+.od-hero-badge.status-open{border-color:rgba(52,211,153,0.4);background:rgba(52,211,153,0.12);color:#34D399}
+.od-hero-badge.status-closing{border-color:rgba(251,191,36,0.4);background:rgba(251,191,36,0.12);color:#FBF024}
+.od-hero-badge.status-coming{border-color:rgba(96,165,250,0.4);background:rgba(96,165,250,0.12);color:#60A5FA}
+.od-hero-badge.status-closed{border-color:rgba(248,113,113,0.4);background:rgba(248,113,113,0.1);color:#F87171}
+.od-hero-location{font-size:12px;color:rgba(255,255,255,0.55);display:flex;align-items:center;gap:5px}
+/* KPI Strip */
+.od-kpi-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:0;background:var(--white);border:1.5px solid var(--mist);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:16px;box-shadow:var(--shadow-sm)}
+@media(max-width:700px){.od-kpi-strip{grid-template-columns:repeat(2,1fr)}}
+.od-kpi-cell{padding:14px 18px;border-right:1px solid var(--mist);position:relative}
+.od-kpi-cell:last-child{border-right:none}
+.od-kpi-label{font-size:10px;font-weight:700;color:var(--fog);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px}
+.od-kpi-value{font-size:22px;font-weight:800;color:var(--navy);letter-spacing:-0.03em;line-height:1;font-family:var(--mono)}
+.od-kpi-peer{font-size:10.5px;color:var(--slate2);margin-top:4px}
+.od-kpi-peer .up{color:var(--green);font-weight:700}
+.od-kpi-peer .down{color:var(--red);font-weight:700}
+.od-kpi-peer .neutral{color:var(--fog);font-weight:600}
+/* DD Icons Row */
+.od-dd-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px;padding:12px 16px;background:var(--white);border:1.5px solid var(--mist);border-radius:var(--radius-lg);align-items:center;box-shadow:var(--shadow-sm)}
+.od-dd-group{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.od-dd-group-label{font-size:10px;font-weight:700;color:var(--fog);text-transform:uppercase;letter-spacing:0.08em;white-space:nowrap;margin-right:2px}
+.od-dd-divider{width:1px;height:28px;background:var(--mist);margin:0 6px;flex-shrink:0}
+.od-doc-btn{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:6px;border:1.5px solid var(--mist);background:var(--white);color:var(--navy);font-size:11px;font-weight:700;cursor:pointer;transition:all var(--transition);text-decoration:none;white-space:nowrap;position:relative}
+.od-doc-btn:hover:not(:disabled){border-color:var(--navy2);background:var(--ice);color:var(--navy)}
+.od-doc-btn:disabled,.od-doc-btn.unavailable{opacity:0.38;cursor:not-allowed;pointer-events:none}
+.od-doc-btn.has-dropdown{padding-right:24px}
+.od-doc-btn.has-dropdown::after{content:'▾';position:absolute;right:8px;font-size:9px;opacity:0.6}
+/* Action Bar */
+.od-action-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
+.od-suit-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;margin-left:auto}
+.od-suit-chip.high{background:var(--green-lt);color:var(--green);border:1.5px solid #BBF7D0}
+.od-suit-chip.medium{background:var(--amber-lt);color:var(--amber);border:1.5px solid #FDE68A}
+.od-suit-chip.low{background:var(--red-lt);color:var(--red);border:1.5px solid #FECACA}
+.od-suit-chip.none{background:var(--surface2);color:var(--slate2);border:1.5px solid var(--mist)}
+/* Body Grid */
+.od-body{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+@media(max-width:900px){.od-body{grid-template-columns:1fr}}
+.od-body-full{grid-column:1/-1}
+/* Analyst panels */
+.od-panel{background:var(--white);border:1.5px solid var(--mist);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-sm)}
+.od-panel-hdr{padding:12px 18px;border-bottom:1px solid var(--mist);background:linear-gradient(180deg,var(--white),var(--surface));display:flex;align-items:center;justify-content:space-between;gap:8px}
+.od-panel-title{font-size:11px;font-weight:700;color:var(--slate);text-transform:uppercase;letter-spacing:0.07em}
+.od-panel-hint{font-size:10.5px;color:var(--fog)}
+.od-panel-body{padding:16px 18px}
+/* Suitability panel */
+.od-suit-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--surface2);font-size:12.5px}
+.od-suit-row:last-child{border-bottom:none}
+.od-suit-key{color:var(--slate2);font-weight:500}
+.od-suit-val{font-weight:700;color:var(--navy);text-align:right}
+.od-suit-score-ring{width:68px;height:68px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;flex-shrink:0;margin-right:12px;border:3px solid}
+.od-suit-score-ring.high{background:var(--green-lt);color:var(--green);border-color:#BBF7D0}
+.od-suit-score-ring.medium{background:var(--amber-lt);color:var(--amber);border-color:#FDE68A}
+.od-suit-score-ring.low{background:var(--red-lt);color:var(--red);border-color:#FECACA}
+/* Raise Status */
+.od-raise-bar{height:10px;background:var(--surface2);border-radius:5px;overflow:hidden;margin:8px 0 4px}
+.od-raise-fill{height:100%;background:linear-gradient(90deg,var(--navy2),#3B82F6);border-radius:5px;transition:width 1s cubic-bezier(.4,0,.2,1)}
+.od-raise-stat-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px}
+.od-raise-stat{background:var(--surface);border-radius:var(--radius);padding:10px 12px;text-align:center}
+.od-raise-stat-val{font-size:15px;font-weight:800;color:var(--navy);font-family:var(--mono)}
+.od-raise-stat-label{font-size:10px;font-weight:700;color:var(--fog);text-transform:uppercase;letter-spacing:0.06em;margin-top:2px}
+/* Valuation */
+.od-val-hero{display:flex;align-items:center;gap:12px;padding:14px;border-radius:var(--radius);margin-bottom:12px}
+.od-val-hero.discount{background:var(--green-lt);border:1.5px solid #BBF7D0}
+.od-val-hero.premium{background:var(--amber-lt);border:1.5px solid #FDE68A}
+.od-val-hero.neutral{background:var(--surface2);border:1.5px solid var(--mist)}
+.od-val-pct{font-size:26px;font-weight:800;letter-spacing:-0.03em;line-height:1}
+.od-val-pct.discount{color:var(--green)}
+.od-val-pct.premium{color:var(--amber)}
+.od-val-label{font-size:13px;font-weight:700;color:var(--navy)}
+.od-val-sub{font-size:11px;color:var(--slate2);margin-top:2px}
+.od-val-kv{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.od-val-kv-item{background:var(--surface);border-radius:var(--radius);padding:10px 12px}
+.od-val-kv-label{font-size:10px;font-weight:700;color:var(--fog);text-transform:uppercase;letter-spacing:0.06em}
+.od-val-kv-value{font-size:14px;font-weight:700;color:var(--navy);font-family:var(--mono);margin-top:2px}
+/* Key Drivers */
+.od-kd-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:700px){.od-kd-grid{grid-template-columns:1fr}}
+.od-kd-item{display:flex;align-items:flex-start;gap:8px;padding:10px 12px;border-radius:var(--radius);border:1px solid;font-size:12px;line-height:1.5;color:var(--navy)}
+.od-kd-icon{font-size:13px;flex-shrink:0;margin-top:1px}
+.od-kd-item.positive{background:var(--green-lt);border-color:#BBF7D0}
+.od-kd-item.caution{background:var(--amber-lt);border-color:#FDE68A}
+.od-kd-item.info{background:var(--blue-lt);border-color:#BFDBFE}
+.od-kd-item.neutral{background:var(--surface);border-color:var(--mist)}
+/* Multi-offering comparison table */
+.od-comp-wrap{background:var(--white);border:1.5px solid var(--mist);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:16px;box-shadow:var(--shadow-sm)}
+.od-comp-sticky-header{display:grid;background:var(--surface2);border-bottom:2px solid var(--mist);position:sticky;top:0;z-index:10}
+.od-comp-row{display:grid;border-bottom:1px solid var(--surface2)}
+.od-comp-row:last-child{border-bottom:none}
+.od-comp-row.section-head{background:var(--ice);border-top:1.5px solid var(--mist)}
+.od-comp-cell{padding:9px 14px;font-size:12.5px;display:flex;align-items:center;border-right:1px solid var(--surface2)}
+.od-comp-cell:last-child{border-right:none}
+.od-comp-cell.field{font-weight:600;color:var(--slate);font-size:11.5px;background:var(--surface);flex-shrink:0}
+.od-comp-cell.sec-label{font-weight:700;font-size:11px;color:var(--navy2);text-transform:uppercase;letter-spacing:0.07em;grid-column:1/-1;background:var(--ice)}
+.od-comp-cell.val{font-family:var(--mono);font-weight:600}
+.od-comp-cell.best .val{color:var(--green);font-weight:800}
+.od-comp-cell.worst .val{color:var(--red)}
+/* Map area in hero right */
+.od-hero-right{display:flex;flex-direction:column;gap:10px;min-width:260px;max-width:320px}
+@media(max-width:900px){.od-hero-right{max-width:100%}}
+.od-map-card{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.14);border-radius:12px;padding:12px;backdrop-filter:blur(4px)}
+.od-map-title{font-size:10px;font-weight:700;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px}
+.od-map-box{height:140px;border-radius:8px;overflow:hidden;background:rgba(11,31,59,0.4)}
+.od-map-legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.od-map-leg-item{display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:rgba(255,255,255,0.6)}
+.od-map-leg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.od-map-leg-dot-1{background:#3B82F6}
+.od-map-leg-dot-2{background:#9333EA}
+.od-map-leg-dot-3{background:#D97706}
+/* Sponsor panel */
+.od-sponsor-stat-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.od-sponsor-stat{background:var(--surface);border-radius:var(--radius);padding:10px 14px;flex:1;min-width:90px;text-align:center}
+.od-sponsor-stat-val{font-size:16px;font-weight:800;color:var(--navy);font-family:var(--mono);letter-spacing:-0.02em}
+.od-sponsor-stat-label{font-size:10px;font-weight:700;color:var(--fog);text-transform:uppercase;letter-spacing:0.06em;margin-top:2px}
+/* Distribution chart */
+.od-chart-box{height:200px;position:relative;margin-top:8px}
+/* Projection table */
+.od-proj-table{width:100%;border-collapse:collapse;font-size:12px}
+.od-proj-table th{background:var(--surface2);padding:7px 10px;text-align:center;font-size:10px;font-weight:700;color:var(--slate2);text-transform:uppercase;letter-spacing:0.06em;border-bottom:1px solid var(--mist)}
+.od-proj-table th:first-child{text-align:left}
+.od-proj-table td{padding:7px 10px;text-align:center;border-bottom:1px solid var(--surface2);font-family:var(--mono);color:var(--navy);font-weight:500}
+.od-proj-table td:first-child{text-align:left;font-family:var(--font);font-weight:600;color:var(--slate);font-size:11.5px}
+.od-proj-table tr:last-child td{border-bottom:none}
+.od-proj-table .highlight-row td{background:var(--ice);font-weight:700}
+/* Offering tags in multi mode */
+.od-offering-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+/* Blended badge */
+.od-blended-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:10.5px;font-weight:700;background:rgba(124,58,237,0.1);color:#7C3AED;border:1px solid rgba(124,58,237,0.25)}
+
 /* ── DST Calculator ── */
 .dst-offerings-bar{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
 .dst-offering-pill{display:inline-flex;align-items:center;padding:4px 12px;border-radius:999px;background:var(--ice);border:1px solid var(--mist);font-size:11px;font-weight:600;color:var(--navy)}
@@ -695,7 +850,7 @@ function fetchSheetData() {
         let monthsOnMarket = null;
         if (oOpen) { monthsOnMarket = Math.round((now - oOpen) / (30.44 * 86400000)); if (monthsOnMarket < 0) monthsOnMarket = null; }
 
-        return {
+        const obj = {
           id: idx,
           name: g('Offering Name') || 'Unnamed',
           sponsor: g('Sponsor') || '',
@@ -714,7 +869,7 @@ function fetchSheetData() {
           pctRaised: pctRaised,
           pctRemaining: pctRemaining,
           ltv: parsePct(g('Loan to Value')),
-          dscr: null,
+          dscr: parsePct(g('DSCR')),
           dscrStress: null,
           holdPeriod: parseInt(g('Hold Period')) || null,
           occupancy: parsePct(g('% Leased')),
@@ -722,12 +877,14 @@ function fetchSheetData() {
           appraisedValue: parseMoneyM(g('Appraised Valuation')),
           loadedPrice: parseMoneyM(g('Loaded Price')),
           units: parseInt(g('# Assets')) || null,
-          sqft: null,
+          sqft: parseFloat(String(g('Total Square Footage') || '').replace(/[,\s]/g, '')) || null,
           pricePerUnit: null,
-          pricePerSqFt: null,
+          pricePerSqFt: null, // computed below
           acqCapRate: parsePct(g('Acquisition Cap Rate')),
           avgLeaseTerm: parseFloat(g('Average Lease Term Remaining')) || null,
-          tenantCredit: '',
+          tenantCredit: g('Tenant Credit Quality') || '',
+          sponsorLogoUrl: g('Sponsor Logo URL') || '',
+          quarterlyUpdateUrl: g('Quarterly Update URL') || '',
           leaseTerms: g('Lease Terms') || '',
           debtTerms: g('Debt Terms') || '',
           rentEscalations: g('Rent Escalations') || '',
@@ -760,8 +917,17 @@ function fetchSheetData() {
           closeDate: oClose,
           monthsOnMarket: monthsOnMarket,
           income: income,
+          raiseVelocity: null,
           _raw: row.c
         };
+        // Computed: Price per SF
+        if (obj.purchasePrice && obj.sqft && obj.sqft > 0) obj.pricePerSqFt = obj.purchasePrice / obj.sqft;
+        // Computed: Raise velocity per month
+        if (obj.filedRaise && obj.equityRemaining != null && obj.monthsOnMarket && obj.monthsOnMarket > 0) {
+          const raised = obj.filedRaise - obj.equityRemaining;
+          if (raised > 0) obj.raiseVelocity = raised / obj.monthsOnMarket;
+        }
+        return obj;
       }).filter(f => f.name !== 'Unnamed');
       computePeerStats();
       dot.className = 'pulse-dot'; txt.textContent = STATE.funds.length + ' offerings live';
@@ -1753,7 +1919,7 @@ BV.summarizeStates = (states, max) => { max = max || 6; const arr = BV.uniqSorte
 BV.pctDelta = (a, b) => { if (!BV.isNum(a) || !BV.isNum(b) || b === 0) return null; return (a - b) / b * 100; };
 BV.moneyDelta = (a, b) => { if (!BV.isNum(a) || !BV.isNum(b)) return null; return a - b; };
 
-BV.iconSvg = (type) => { const common = 'width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"'; const wrap = (inner) => '<span class="ico"><svg ' + common + '>' + inner + '</svg></span>'; const icons = { brochure: wrap('<path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"/><path d="M14 2v5h5"/><path d="M9 13h6"/><path d="M9 17h6"/>'), ppm: wrap('<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 6h8"/><path d="M8 10h8"/>'), video: wrap('<path d="M15 10l4.5-2.5v9L15 14"/><rect x="3" y="7" width="12" height="10" rx="2" ry="2"/>'), ai_offering_chat: wrap('<path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/><path d="M8 9h8"/><path d="M8 13h6"/>'), track_record: wrap('<path d="M3 3v18h18"/><path d="M7 14l3-3 3 2 5-6"/>'), sponsor_news: wrap('<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10"/><path d="M7 12h6"/><path d="M7 16h8"/>'), sales_team_map: wrap('<path d="M21 10c0 6-9 12-9 12S3 16 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>') }; return icons[type] || wrap('<circle cx="12" cy="12" r="9"/>'); };
+BV.iconSvg = (type) => { const common = 'width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"'; const wrap = (inner) => '<span class="ico"><svg ' + common + '>' + inner + '</svg></span>'; const icons = { brochure: wrap('<path d="M14 2H7a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7z"/><path d="M14 2v5h5"/><path d="M9 13h6"/><path d="M9 17h6"/>'), ppm: wrap('<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M8 6h8"/><path d="M8 10h8"/>'), video: wrap('<path d="M15 10l4.5-2.5v9L15 14"/><rect x="3" y="7" width="12" height="10" rx="2" ry="2"/>'), ai_offering_chat: wrap('<path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/><path d="M8 9h8"/><path d="M8 13h6"/>'), track_record: wrap('<path d="M3 3v18h18"/><path d="M7 14l3-3 3 2 5-6"/>'), sponsor_news: wrap('<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10"/><path d="M7 12h6"/><path d="M7 16h8"/>'), sales_team_map: wrap('<path d="M21 10c0 6-9 12-9 12S3 16 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>'), quarterly_update: wrap('<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/><path d="M8 14h8"/><path d="M8 18h5"/>') }; return icons[type] || wrap('<circle cx="12" cy="12" r="9"/>'); };
 
 // ── Percentile rank ──
 BV.lowerBound = (arr, x) => { let lo = 0, hi = arr.length; while (lo < hi) { const mid = (lo + hi) >> 1; if (arr[mid] < x) lo = mid + 1; else hi = mid; } return lo; };
@@ -1773,11 +1939,14 @@ BV.adaptFund = (f) => {
   const m = {};
   m.year1_coc = f.y1coc;
   m.ltv = f.ltv;
+  m.dscr = f.dscr;
   m.cap_rate = f.acqCapRate;
   m.hold_period_years = f.holdPeriod;
   m.minimum_investment = f.minInvest;
   m.pct_leased = f.occupancy;
   m.num_assets = f.units;
+  m.total_sqft = f.sqft;
+  m.price_per_sqft = f.pricePerSqFt;
   m.rent_escalations = BV.parseNumberLoose(f.rentEscalations);
   m.avg_lease_term_remaining = f.avgLeaseTerm;
   m.purchase_price_unloaded = f.purchasePrice;
@@ -1787,6 +1956,8 @@ BV.adaptFund = (f) => {
   m.current_raise = f.currentRaise;
   m.remaining_raise = f.equityRemaining;
   m.pct_raise_remaining = f.pctRemaining;
+  m.raise_velocity = f.raiseVelocity;
+  m.months_on_market = f.monthsOnMarket;
   m.offering_open = f.openDate;
   m.offering_close = f.closeDate;
   m.states = BV.extractStates(f.location);
@@ -1799,16 +1970,23 @@ BV.adaptFund = (f) => {
     displayLabel: f.sponsor + ' — ' + f.name,
     asset_class: f.propType,
     sector_focus: f.sector || f.focus || '',
+    focus: f.focus || '',
     offering_structure: f.propType,
     distribution_frequency: f.distFrequency,
     debt_terms: f.debtTerms,
     lease_terms: f.leaseTerms,
+    tenant_credit: f.tenantCredit || '',
+    sponsor_experience: f.sponsorExperience || '',
+    sponsor_logo_url: f.sponsorLogoUrl || '',
+    quarterly_update_url: f.quarterlyUpdateUrl || '',
     preferred: f.preferred,
     promote: f.promote,
     upreit_721: f.upReit,
     gp_commit: f.gpCommit,
     property_locations: f.location,
     year_built_avg: f.buildingAge,
+    status: f.status,
+    months_on_market: f.monthsOnMarket,
     metrics: m,
     docs: {
       brochure: BV.normalizeDocUrl(f.brochureUrl),
@@ -1817,15 +1995,16 @@ BV.adaptFund = (f) => {
       ai_offering_chat: BV.normalizeDocUrl(f.aiChatUrl),
       track_record: BV.normalizeDocUrl(f.trackRecordUrl),
       sponsor_news: BV.normalizeDocUrl(f.sponsorNewsUrl),
-      sales_team_map: BV.normalizeDocUrl(f.salesTeamUrl)
+      sales_team_map: BV.normalizeDocUrl(f.salesTeamUrl),
+      quarterly_update: BV.normalizeDocUrl(f.quarterlyUpdateUrl)
     },
     __rawRow: rawRow
   };
 };
 
 // ── Peer stats for basket ──
-BV.PEER_KEYS = ['year1_coc','ltv','hold_period_years','minimum_investment','pct_leased','rent_escalations','avg_lease_term_remaining','num_assets','purchase_price_unloaded','appraised_valuation','loaded_price','cap_rate'];
-BV.SNAPSHOT_KEYS = ['year1_coc','ltv','hold_period_years','minimum_investment','pct_leased','rent_escalations','avg_lease_term_remaining','num_assets'];
+BV.PEER_KEYS = ['year1_coc','ltv','dscr','hold_period_years','minimum_investment','pct_leased','rent_escalations','avg_lease_term_remaining','num_assets','purchase_price_unloaded','appraised_valuation','loaded_price','cap_rate','price_per_sqft'];
+BV.SNAPSHOT_KEYS = ['year1_coc','ltv','dscr','hold_period_years','minimum_investment','pct_leased','rent_escalations','avg_lease_term_remaining','num_assets'];
 BV.INCOME_KEYS = Array.from({length:10}, (_,i) => 'income_y' + (i+1));
 BV.DISCLOSURES = 'For informational purposes only. This material does not constitute investment advice, an offer to sell, or a solicitation of an offer to buy any security or interest. Figures are shown as provided in the underlying data source and may be incomplete, unaudited, or subject to change. Verify all information with official offering documents and your firm\'s compliance requirements. Peer averages shown are simple averages of the currently listed offerings in the data set (excluding blanks/NA). For Broker Dealer and Investment Advisor home office due diligence use only. Always validate data with official offering documents and compliance requirements. Alts Fund LINK, LLC is not responsible for data errors or omissions.';
 
@@ -1841,17 +2020,19 @@ BV.computePeerStats = (allFunds) => {
 };
 
 BV.metricLabel = (key) => {
-  const labels = { year1_coc:'Year 1 Cash-on-Cash', ltv:'Loan-to-Value (LTV)', hold_period_years:'Hold Period', minimum_investment:'Minimum Investment (Sum)', pct_leased:'Occupancy (% Leased)', rent_escalations:'Rent Escalations', avg_lease_term_remaining:'Avg Lease Term Remaining', num_assets:'# Assets', purchase_price_unloaded:'Purchase Price (Unloaded)', appraised_valuation:'Appraised Valuation', loaded_price:'Loaded Price', cap_rate:'Acquisition Cap Rate' };
+  const labels = { year1_coc:'Year 1 Cash-on-Cash', ltv:'Loan-to-Value (LTV)', dscr:'DSCR', hold_period_years:'Hold Period', minimum_investment:'Minimum Investment (Sum)', pct_leased:'Occupancy (% Leased)', rent_escalations:'Rent Escalations', avg_lease_term_remaining:'Avg Lease Term Remaining', num_assets:'# Assets', purchase_price_unloaded:'Purchase Price (Unloaded)', appraised_valuation:'Appraised Valuation', loaded_price:'Loaded Price', cap_rate:'Acquisition Cap Rate', price_per_sqft:'Price Per SF' };
   if (/^income_y\d+$/.test(key)) return 'Client Income (%) — Year ' + key.match(/\d+/)[0];
   return labels[key] || key;
 };
 
 BV.metricFormatter = (key, val) => {
   if (!BV.isNum(val)) return '—';
+  if (key === 'dscr') return val.toFixed(2) + 'x';
   if (key === 'minimum_investment') return BV.fmtMoney(val);
   if (key === 'hold_period_years' || key === 'avg_lease_term_remaining') return val.toFixed(1) + ' yrs';
   if (key === 'num_assets') return Math.round(val) + '';
   if (key === 'purchase_price_unloaded' || key === 'appraised_valuation' || key === 'loaded_price') return BV.fmtMoney(val);
+  if (key === 'price_per_sqft') return '$' + Math.round(val).toLocaleString() + '/SF';
   return BV.fmtPct(val, 2);
 };
 
@@ -1961,7 +2142,7 @@ BV.renderPurchaseValuation = (agg) => {
 };
 
 // ── Render: Doc buttons ──
-BV.DOC_TYPES = ['brochure','ppm','video','ai_offering_chat','track_record','sponsor_news','sales_team_map'];
+BV.DOC_TYPES = ['brochure','ppm','video','ai_offering_chat','track_record','sponsor_news','sales_team_map','quarterly_update'];
 BV.docAvailability = (funds) => { const avail = {}; for (const t of BV.DOC_TYPES) avail[t] = funds.some(f => f.docs && f.docs[t]); return avail; };
 
 BV.renderDocButtons = (selectedFunds) => {
@@ -2028,80 +2209,519 @@ BV.renderVerticalCompTable = (selectedFunds, headers) => {
   return '<div class="sec"><div class="secHdr"><div class="h">Vertical Side-by-Side Comparison</div><div class="hint">All columns except Year 1–10 and doc URLs • Sticky headers</div></div><div class="secBody"><div class="vcompWrap"><div class="vcompTop"><div class="t">Comparison Table</div><div class="s">Scroll down — headers stay pinned</div></div><div class="vcompScroller"><table class="vcompTable">' + thead + '<tbody>' + bodyRows + '</tbody></table></div></div></div></div>';
 };
 
-// ── Main renderBasket() ──
+// ── Main renderBasket() — Premium Single + Multi Offering View ──
 function renderBasket() {
   const basketIds = STATE.basket;
   const platformFunds = basketIds.map(id => STATE.funds.find(f => f.id === id)).filter(Boolean);
-  if (!platformFunds.length) return '<div class="page-header"><div><div class="page-title">Basket & Comparison</div><div class="page-subtitle">Add offerings from Browse to compare side-by-side</div></div></div><div class="empty-state"><div class="empty-state-icon">🛒</div><h3>Basket is Empty</h3><p>Add up to 3 offerings from Browse to unlock full tear sheet comparison with peer benchmarking, valuation analysis, income charts, and vertical comparison tables.</p><button class="btn btn-primary" onclick="navigateTo(\'browse\')">Browse Offerings</button></div>';
+  if (!platformFunds.length) {
+    return '<div class="page-header"><div><div class="page-title">Offering Detail</div><div class="page-subtitle">Add offerings from Browse to view full tear sheet analysis</div></div></div><div class="empty-state"><div class="empty-state-icon">📋</div><h3>No Offering Selected</h3><p>Add up to 3 offerings from Browse to unlock the full tear sheet — KPI strip, raise status, valuation analysis, income projections, and side-by-side comparison.</p><button class="btn btn-primary" onclick="navigateTo(\'browse\')">Browse Offerings</button></div>';
+  }
 
-  // Adapt platform funds to basket format
   const selectedFunds = platformFunds.map(BV.adaptFund).filter(Boolean);
   const allAdapted = STATE.funds.map(BV.adaptFund).filter(Boolean);
   const peer = BV.computePeerStats(allAdapted);
-  const agg = BV.aggregate(selectedFunds);
-  const isMulti = agg.__isAggregate;
-  const insights = BV.buildInsights(agg, selectedFunds, peer);
-  const st = agg.property_states || [];
-  const e = BV.escapeHTML;
   const n = selectedFunds.length;
+  const isMulti = n > 1;
+  const e = BV.escapeHTML;
+  const c = STATE.client;
+  const hasClient = !!(c && c.name && (c.riskTolerance || c.exchangeAmount));
 
-  // ── Platform nav header with multi-select dropdown ──
+  // Offering color tags
+  const TAG_COLORS = ['od-tag-1','od-tag-2','od-tag-3'];
+  const TAG_LABELS = ['①','②','③'];
+  const MAP_COLORS = ['#3B82F6','#9333EA','#D97706'];
+
+  // ── Nav Header ──
   const offeringOpts = STATE.funds.map(f => {
     const checked = STATE.basket.includes(f.id);
     const disabled = !checked && STATE.basket.length >= 3;
-    return '<label class="bv-select-item' + (checked ? ' checked' : '') + (disabled ? ' disabled' : '') + '" onclick="event.stopPropagation()"><input type="checkbox" value="' + f.id + '"' + (checked ? ' checked' : '') + (disabled ? ' disabled' : '') + ' onchange="bvToggleOffering(' + f.id + ')"><span class="bv-select-name">' + BV.escapeHTML(f.sponsor + ' — ' + f.name) + '</span>' + (checked ? '<span class="bv-select-x" onclick="event.preventDefault();bvToggleOffering(' + f.id + ')">✕</span>' : '') + '</label>';
+    return '<label class="bv-select-item' + (checked?' checked':'') + (disabled?' disabled':'') + '" onclick="event.stopPropagation()"><input type="checkbox" value="' + f.id + '"' + (checked?' checked':'') + (disabled?' disabled':'') + ' onchange="bvToggleOffering(' + f.id + ')"><span class="bv-select-name">' + e(f.sponsor + ' — ' + f.name) + '</span>' + (checked ? '<span class="bv-select-x" onclick="event.preventDefault();bvToggleOffering(' + f.id + ')">✕</span>' : '') + '</label>';
   }).join('');
-  const navHeader = '<div class="page-header"><div><div class="page-title">Basket</div><div class="page-subtitle">' + n + ' offering' + (n>1?'s':'') + ' selected' + (n > 1 ? ' — comparison mode' : '') + '</div></div><div style="display:flex;gap:8px;align-items:center"><div class="bv-dropdown-wrap"><button class="btn btn-secondary" onclick="document.getElementById(\'bv-offering-dropdown\').classList.toggle(\'open\')">Offerings (' + n + '/3) ▾</button><div class="bv-dropdown" id="bv-offering-dropdown">' + offeringOpts + '</div></div><button class="btn btn-secondary" onclick="navigateTo(\'browse\')">← Browse</button><button class="btn btn-ghost" onclick="STATE.basket=[];saveBasket();renderApp();toast(\'Basket cleared\')">Clear All</button></div></div>';
+
+  const navHeader = '<div class="page-header"><div><div class="page-title">Offering Detail</div><div class="page-subtitle">' + n + ' offering' + (n>1?'s':'') + ' selected' + (isMulti ? ' — portfolio view' : '') + '</div></div><div style="display:flex;gap:8px;align-items:center"><div class="bv-dropdown-wrap"><button class="btn btn-secondary" onclick="document.getElementById(\'bv-offering-dropdown\').classList.toggle(\'open\')">Offerings (' + n + '/3) ▾</button><div class="bv-dropdown" id="bv-offering-dropdown">' + offeringOpts + '</div></div><button class="btn btn-secondary" onclick="navigateTo(\'browse\')">← Browse</button><button class="btn btn-ghost" onclick="STATE.basket=[];saveBasket();renderApp();toast(\'Basket cleared\')">Clear All</button></div></div>';
+
+  // ── Build suitability scores ──
+  const suitScores = selectedFunds.map(sf => {
+    const pf = platformFunds.find(x => x.id === sf.id);
+    return pf ? computeSuitScore(pf) : null;
+  });
+  const blendedSuit = suitScores.filter(x => x != null).length ? Math.round(suitScores.filter(x=>x!=null).reduce((a,b)=>a+b,0)/suitScores.filter(x=>x!=null).length) : null;
+  const suitClass = (sc) => sc == null ? 'none' : sc >= 75 ? 'high' : sc >= 50 ? 'medium' : 'low';
+  const suitLabel = (sc) => sc == null ? (hasClient ? 'Calculating...' : 'Set up client') : sc + '% match';
+
+  // ── Offering tags (multi mode) ──
+  const offeringTagsHtml = isMulti ? '<div class="od-offering-tags">' + selectedFunds.map((sf,i) => '<span class="od-offering-tag ' + TAG_COLORS[i] + '">' + TAG_LABELS[i] + ' ' + e(sf.offering_name) + '</span>').join('') + '</div>' : '';
 
   // ── Hero ──
-  const heroTitle = isMulti ? 'Selected Offerings (' + n + ')' : selectedFunds[0].displayLabel;
-  const heroSub = isMulti ? 'As of: ' + new Date().toLocaleDateString() + ' • Combined metrics are averages (except Min Investment = sum)' : 'As of: ' + new Date().toLocaleDateString();
-  const metaBadges = (() => {
-    if (isMulti) {
-      const sponsors = BV.uniqSorted(selectedFunds.map(f=>f.sponsor).filter(Boolean));
-      const asset = BV.uniqSorted(selectedFunds.map(f=>f.asset_class).filter(Boolean));
-      return (sponsors.length ? '<span class="r-badge"><strong>Sponsors:</strong> '+e(sponsors.slice(0,3).join(', ')+(sponsors.length>3?'…':''))+'</span>' : '') + (asset.length ? '<span class="r-badge">'+e(asset.slice(0,3).join(', ')+(asset.length>3?'…':''))+'</span>' : '');
-    }
-    const f = selectedFunds[0];
-    return (f.asset_class ? '<span class="r-badge">'+e(f.asset_class)+'</span>' : '') + (f.sector_focus ? '<span class="r-badge">'+e(f.sector_focus)+'</span>' : '') + (f.offering_structure ? '<span class="r-badge">'+e(f.offering_structure)+'</span>' : '');
-  })();
-  const statusHtml = !isMulti ? BV.renderStatusModule(selectedFunds[0]) : '';
-  const hero = '<div class="r-hero"><div class="topline"><div class="r-title"><h2>'+e(heroTitle)+'</h2><div class="subline">'+e(heroSub)+'</div><div class="metaRow">'+metaBadges+'</div></div>'+statusHtml+'<div class="docsBox">'+BV.renderDocButtons(selectedFunds)+'</div></div></div>';
+  const heroHtml = renderODHero(selectedFunds, peer, e, isMulti, TAG_COLORS, TAG_LABELS, MAP_COLORS);
 
-  // ── Key Takeaways + Map ──
-  const insightsHtml = '<div class="kv-grid"><div class="callouts"><div class="callout"><h3>Key Takeaways</h3><ul>'+(insights.takeaways.length ? insights.takeaways : ['No standout signals from current data.']).map(x=>'<li>'+e(x)+'</li>').join('')+'</ul></div><div class="callout"><h3>Potential Considerations</h3><ul>'+(insights.considerations.length ? insights.considerations : ['No specific considerations flagged.']).map(x=>'<li>'+e(x)+'</li>').join('')+'</ul></div></div><div class="mapWrap"><div class="mapHdr"><div class="t">Footprint (Contiguous US)</div><div class="s">'+(st.length ? st.length+' state'+(st.length===1?'':'s') : 'No states parsed')+'</div></div><div class="mapBox" id="bv-map"></div><div class="legend"><span class="swatch"></span><span>States in <b>Property Location(s)</b></span></div><div class="textBlock" style="margin-top:10px"><b>Locations:</b> '+e(agg.property_locations_summary||'—')+'</div></div></div>';
+  // ── KPI Strip ──
+  const kpiKeys = [
+    { key:'ltv', label:'Loan-to-Value', higher:'lower_better' },
+    { key:'year1_coc', label:'Yr 1 Cash-on-Cash', higher:'higher_better' },
+    { key:'pct_leased', label:'Occupancy', higher:'higher_better' },
+    { key:'dscr', label:'DSCR', higher:'higher_better', fmt:(v)=>BV.isNum(v)?v.toFixed(2)+'x':'—' }
+  ];
+  const kpiStripHtml = renderODKpiStrip(selectedFunds, peer, kpiKeys, e, isMulti);
 
-  // ── Snapshot Metrics ──
-  const snapshotHtml = '<div class="sec"><div class="secHdr"><div class="h">Snapshot Metrics</div><div class="hint">Peer averages + rank percentile • data coverage per tile</div></div><div class="secBody"><div class="metricsGrid">' + BV.SNAPSHOT_KEYS.map(k => {
-    const cov = agg.coverage[k]; const v = agg.metrics[k];
-    return '<div class="mBox">'+BV.covBadgeHtml(cov)+'<div class="k">'+e(BV.metricLabel(k))+'</div><div class="v">'+e(BV.metricFormatter(k, v))+'</div><div class="vs">'+BV.peerVsLine(k, v, peer, cov)+'</div></div>';
-  }).join('') + '</div></div></div>';
+  // ── DD Icon Row ──
+  const ddRowHtml = renderODDdRow(selectedFunds, e, isMulti);
 
-  // ── Income Chart ──
-  const incomeKeys = BV.INCOME_KEYS;
-  const covAny = incomeKeys.some(k => (agg.coverage?.[k]?.present || 0) > 0);
-  const covSummary = incomeKeys.map(k => agg.coverage?.[k]).filter(Boolean);
-  const avgCov = covSummary.length ? Math.round(covSummary.reduce((a,c)=>a+(c.present/c.total),0)/covSummary.length*100) : 0;
-  const incomeHtml = '<div class="sec"><div class="secHdr"><div class="h">Client Income (%), Years 1–10</div><div class="hint">'+(isMulti ? 'Bars are averaged across selected offerings' : 'Bars reflect selected offering')+'</div></div><div class="secBody"><div class="chartWrap"><div class="chartHdr"><div class="t">Client Income (%) by Year</div><div class="s">'+(covAny ? 'Avg data coverage ~'+avgCov+'%' : 'No income data found')+'</div></div><div class="chartBox"><canvas id="bv-income-chart"></canvas></div></div></div></div>';
+  // ── Action Bar ──
+  const suitDisplay = isMulti ? blendedSuit : suitScores[0];
+  const actionBarHtml = '<div class="od-action-bar">' +
+    '<button class="btn btn-primary" onclick="toast(\'Added to basket\')">+ Add to Basket</button>' +
+    '<button class="btn btn-secondary" onclick="navigateTo(\'portfolio_builder\')">📐 Build Portfolio</button>' +
+    '<button class="btn btn-secondary" onclick="toast(\'Share link copied\')">🔗 Share Tear Sheet</button>' +
+    '<button class="btn btn-secondary" onclick="navigateTo(\'model\')">🧮 Model for Client</button>' +
+    '<span class="od-suit-chip ' + suitClass(suitDisplay) + '">' +
+    (hasClient ? '🎯 ' + suitLabel(suitDisplay) : '👤 ' + (c.name ? suitLabel(suitDisplay) : 'Set up client profile')) +
+    '</span>' +
+    '</div>';
 
-  // ── Debt & Lease ──
-  let debtHtml = '<div class="sec"><div class="secHdr"><div class="h">Debt & Lease</div><div class="hint">'+(isMulti ? 'Separate per offering' : 'As entered')+'</div></div><div class="secBody">';
-  if (isMulti) { debtHtml += agg.debt_lease_list.map(x => '<div class="mBox" style="margin-bottom:10px"><div class="k">'+e(x.label)+'</div><div class="textBlock" style="margin-top:8px"><b>Debt Terms</b><br>'+(x.debt_terms ? e(x.debt_terms) : '—')+'<br><br><b>Lease Terms</b><br>'+(x.lease_terms ? e(x.lease_terms) : '—')+'</div></div>').join(''); }
-  else { debtHtml += '<div class="textBlock"><b>Debt Terms</b><br>'+(selectedFunds[0].debt_terms ? e(selectedFunds[0].debt_terms) : '—')+'<br><br><b>Lease Terms</b><br>'+(selectedFunds[0].lease_terms ? e(selectedFunds[0].lease_terms) : '—')+'</div>'; }
-  debtHtml += '</div></div>';
+  // ── Body Panels ──
+  const suitPanel = renderODSuitPanel(selectedFunds, suitScores, hasClient, c, e, isMulti);
+  const raisePanel = renderODRaisePanel(selectedFunds, e, isMulti);
+  const valPanel = renderODValPanel(selectedFunds, e, isMulti);
+  const debtLeasePanel = renderODDebtLeasePanel(selectedFunds, e, isMulti);
+  const kdPanel = renderODKeyDriversPanel(selectedFunds, peer, e, isMulti);
+  const distPanel = renderODDistPanel(selectedFunds, e);
+  const projPanel = renderODProjPanel(selectedFunds, c, e, isMulti);
+  const sponsorPanel = renderODSponsorPanel(selectedFunds, e, isMulti);
 
-  // ── Vertical Comparison ──
+  // ── Key Metrics Comparison (multi only) ──
+  const keyMetricsComp = isMulti ? renderODKeyMetricsComp(selectedFunds, peer, e, TAG_COLORS, TAG_LABELS) : '';
+
+  // ── Full Vertical Comparison ──
   const vcompHtml = BV.renderVerticalCompTable(selectedFunds, STATE.headers || []);
 
   // ── Disclosures ──
-  const disclosuresHtml = '<div class="sec"><div class="secHdr"><div class="h">Important Disclosures</div><div class="hint">Compliance footer</div></div><div class="secBody"><div class="textBlock">'+e(BV.DISCLOSURES)+'</div></div></div>';
+  const discHtml = '<div class="od-panel od-body-full"><div class="od-panel-hdr"><div class="od-panel-title">Important Disclosures</div></div><div class="od-panel-body"><div style="font-size:11px;color:var(--slate2);line-height:1.7">' + e(BV.DISCLOSURES) + '</div></div></div>';
 
-  // ── Footer ──
-  const ftrHtml = '<div class="ftr"><div>Data loaded: ' + new Date().toLocaleDateString() + '</div><div>Alts Fund LINK Platform</div></div>';
+  // ── Assemble ──
+  const bodyGrid = '<div class="od-body">' +
+    suitPanel + raisePanel + valPanel + debtLeasePanel +
+    '<div class="od-body-full">' + kdPanel + '</div>' +
+    distPanel + sponsorPanel +
+    '<div class="od-body-full">' + projPanel + '</div>' +
+    '</div>';
 
-  const report = '<div class="bv"><div class="report">' + hero + insightsHtml + '<div class="sections">' + snapshotHtml + incomeHtml + BV.renderPurchaseValuation(agg) + debtHtml + vcompHtml + disclosuresHtml + '</div>' + ftrHtml + '</div></div>';
-  return navHeader + report;
+  return navHeader + '<div class="od-wrap">' + offeringTagsHtml + heroHtml + kpiStripHtml + ddRowHtml + actionBarHtml + bodyGrid + (isMulti ? keyMetricsComp : '') + '<div class="bv"><div class="sections">' + vcompHtml + '</div></div>' + discHtml + '</div>';
 }
+
+// ── Hero ──
+function renderODHero(funds, peer, e, isMulti, TAG_COLORS, TAG_LABELS, MAP_COLORS) {
+  const f0 = funds[0];
+  // Sponsor logo/initials
+  const logoHtml = (f0.sponsor_logo_url)
+    ? '<div class="od-sponsor-logo"><img src="' + e(f0.sponsor_logo_url) + '" alt="' + e(f0.sponsor) + '"></div>'
+    : '<div class="od-sponsor-logo">' + e((f0.sponsor||'?').substring(0,2).toUpperCase()) + '</div>';
+
+  // Badges
+  const statusBadgeClass = { 'Open':'status-open','Closing':'status-closing','Coming Soon':'status-coming','Closed':'status-closed' }[f0.status] || 'status-open';
+  const statusDot = { 'Open':'🟢','Closing':'🟡','Coming Soon':'🔵','Closed':'🔴' }[f0.status] || '🟢';
+
+  let titleHtml, badgesHtml, locationHtml, sponsorMetaHtml;
+
+  if (!isMulti) {
+    titleHtml = '<div class="od-hero-name">' + e(f0.offering_name) + '</div>';
+    badgesHtml = '<div class="od-hero-badges">' +
+      '<span class="od-hero-badge ' + statusBadgeClass + '">' + statusDot + ' ' + e(f0.status) + '</span>' +
+      (f0.asset_class ? '<span class="od-hero-badge">' + e(f0.asset_class) + '</span>' : '') +
+      (f0.sector_focus ? '<span class="od-hero-badge">' + e(f0.sector_focus) + '</span>' : '') +
+      (f0.focus && f0.focus !== f0.sector_focus ? '<span class="od-hero-badge">' + e(f0.focus) + '</span>' : '') +
+      '</div>';
+    locationHtml = f0.property_locations ? '<div class="od-hero-location">📍 ' + e(f0.property_locations) + '</div>' : '';
+    sponsorMetaHtml = '<div class="od-sponsor-meta"><div class="od-sponsor-name">' + e(f0.sponsor) + '</div>' +
+      (f0.sponsor_experience ? '<div class="od-sponsor-exp">Est. ' + e(f0.sponsor_experience) + '</div>' : '') + '</div>';
+  } else {
+    const sponsors = [...new Set(funds.map(f=>f.sponsor))];
+    titleHtml = '<div class="od-hero-name">' + funds.map((f,i) => '<span class="od-offering-tag ' + TAG_COLORS[i] + '" style="font-size:14px;padding:4px 12px;margin-right:6px">' + TAG_LABELS[i] + ' ' + e(f.offering_name) + '</span>').join('') + '</div>';
+    badgesHtml = '<div class="od-hero-badges"><span class="od-blended-badge">⚖️ Portfolio View — Blended Metrics</span></div>';
+    locationHtml = '<div class="od-hero-location">📍 ' + funds.map(f=>e(f.property_locations||'—')).join(' · ') + '</div>';
+    sponsorMetaHtml = '<div class="od-sponsor-meta"><div class="od-sponsor-name">' + e(sponsors.join(', ')) + '</div><div class="od-sponsor-exp">' + funds.length + ' sponsors · blended view</div></div>';
+  }
+
+  // Map in hero right
+  const allStates = isMulti
+    ? funds.flatMap((f,i) => BV.extractStates(f.property_locations).map(s=>({s,i})))
+    : BV.extractStates(f0.property_locations).map(s=>({s,i:0}));
+  const mapHtml = '<div class="od-map-card"><div class="od-map-title">Property Footprint</div><div class="od-map-box" id="od-map"></div>' +
+    (isMulti ? '<div class="od-map-legend">' + funds.map((f,i)=>'<span class="od-map-leg-item"><span class="od-map-leg-dot od-map-leg-dot-' + (i+1) + '"></span>' + e(f.offering_name) + '</span>').join('') + '</div>' : '') +
+    '</div>';
+
+  // Status module (single only)
+  const statusModule = !isMulti ? '<div>' + BV.renderStatusModule(funds[0]) + '</div>' : renderODMultiRaiseStatus(funds, e);
+
+  return '<div class="od-hero"><div class="od-hero-inner"><div class="od-hero-top"><div class="od-hero-left">' +
+    '<div class="od-sponsor-row">' + logoHtml + sponsorMetaHtml + '</div>' +
+    titleHtml + badgesHtml + locationHtml +
+    '</div><div class="od-hero-right">' +
+    statusModule +
+    mapHtml +
+    '</div></div></div></div>';
+}
+
+// Multi-offering raise status (compact)
+function renderODMultiRaiseStatus(funds, e) {
+  return '<div style="display:flex;flex-direction:column;gap:6px">' + funds.map((f,i) => {
+    const m = f.metrics;
+    const pctR = BV.isNum(m.pct_raise_remaining) ? Math.max(0,Math.min(100,m.pct_raise_remaining)) : null;
+    const pctRaised = pctR != null ? (100-pctR).toFixed(0) + '% raised' : '—';
+    return '<div style="background:rgba(255,255,255,0.09);border:1px solid rgba(255,255,255,0.14);border-radius:8px;padding:8px 12px">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px">' +
+      '<span style="font-size:10px;font-weight:700;color:rgba(255,255,255,0.7)">' + e(f.offering_name.length>28?f.offering_name.substring(0,26)+'…':f.offering_name) + '</span>' +
+      '<span style="font-size:11px;font-weight:800;color:rgba(255,255,255,0.9);font-family:monospace">' + pctRaised + '</span>' +
+      '</div>' +
+      (pctR!=null ? '<div style="height:5px;background:rgba(255,255,255,0.12);border-radius:3px;overflow:hidden"><div style="height:100%;width:' + (100-pctR) + '%;background:linear-gradient(90deg,#34D399,#3B82F6);border-radius:3px"></div></div>' : '') +
+      '</div>';
+  }).join('') + '</div>';
+}
+
+// ── KPI Strip ──
+function renderODKpiStrip(funds, peer, kpiKeys, e, isMulti) {
+  return '<div class="od-kpi-strip">' + kpiKeys.map(kpi => {
+    const vals = funds.map(f => f.metrics[kpi.key]).filter(BV.isNum);
+    const val = vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : null;
+    const p = peer.stats[kpi.key];
+    let peerHtml = '';
+    if (BV.isNum(val) && p && BV.isNum(p.avg)) {
+      const d = val - p.avg;
+      const better = kpi.higher === 'higher_better' ? d > 0.05 : d < -0.5;
+      const worse = kpi.higher === 'higher_better' ? d < -0.05 : d > 0.5;
+      const cls = better ? 'up' : worse ? 'down' : 'neutral';
+      const arrow = better ? '↑' : worse ? '↓' : '~';
+      const dStr = kpi.key === 'dscr' ? Math.abs(d).toFixed(2)+'x' : Math.abs(d).toFixed(2)+'%';
+      peerHtml = '<div class="od-kpi-peer">Peer avg: ' + BV.metricFormatter(kpi.key, p.avg) + ' <span class="' + cls + '">' + arrow + ' ' + dStr + '</span></div>';
+    } else {
+      peerHtml = '<div class="od-kpi-peer" style="color:var(--mist)">Peer avg: —</div>';
+    }
+    const dispVal = kpi.fmt ? kpi.fmt(val) : BV.metricFormatter(kpi.key, val);
+    return '<div class="od-kpi-cell"><div class="od-kpi-label">' + kpi.label + '</div><div class="od-kpi-value">' + dispVal + '</div>' + peerHtml + '</div>';
+  }).join('') + '</div>';
+}
+
+// ── DD Icon Row ──
+function renderODDdRow(funds, e, isMulti) {
+  const groups = [
+    { label: 'Offering DD', types: ['brochure','ppm','video','ai_offering_chat'] },
+    { label: 'Sponsor DD', types: ['track_record','sponsor_news','sales_team_map'] },
+    { label: 'Latest Updates', types: ['quarterly_update'] }
+  ];
+  const docLabels = { brochure:'Brochure', ppm:'PPM', video:'Video', ai_offering_chat:'AI Chat', track_record:'Track Record', sponsor_news:'Sponsor News', sales_team_map:'Sales Team', quarterly_update:'Q4 Update' };
+
+  let html = '<div class="od-dd-row">';
+  groups.forEach((group, gi) => {
+    if (gi > 0) html += '<div class="od-dd-divider"></div>';
+    html += '<div class="od-dd-group"><span class="od-dd-group-label">' + group.label + '</span>';
+    group.types.forEach(type => {
+      const available = funds.some(f => f.docs && f.docs[type]);
+      if (!available) {
+        html += '<button class="od-doc-btn unavailable">' + BV.iconSvg(type) + docLabels[type] + '</button>';
+        return;
+      }
+      if (!isMulti) {
+        const url = funds[0].docs[type];
+        html += '<a class="od-doc-btn" href="' + e(url) + '" target="_blank" rel="noopener noreferrer">' + BV.iconSvg(type) + docLabels[type] + '</a>';
+      } else {
+        // Multi: dropdown showing per-offering options
+        const dropId = 'od-doc-drop-' + type;
+        html += '<div class="bv-dropdown-wrap">' +
+          '<button class="od-doc-btn has-dropdown" onclick="document.getElementById(\'' + dropId + '\').classList.toggle(\'open\')">' + BV.iconSvg(type) + docLabels[type] + '</button>' +
+          '<div class="bv-dropdown" id="' + dropId + '" style="min-width:280px">' +
+          funds.map((f,i) => {
+            const url = f.docs[type];
+            return url
+              ? '<a class="bv-select-item" href="' + e(url) + '" target="_blank" rel="noopener noreferrer" style="gap:10px"><span style="font-size:11px;font-weight:700;padding:1px 7px;border-radius:10px;background:' + (i===0?'rgba(59,130,246,0.1)':i===1?'rgba(147,51,234,0.1)':'rgba(217,119,6,0.1)') + '">' + ['①','②','③'][i] + '</span>' + BV.iconSvg(type) + '<span class="bv-select-name">' + e(f.offering_name) + '</span></a>'
+              : '<div class="bv-select-item disabled"><span style="font-size:11px;font-weight:700;padding:1px 7px;border-radius:10px;background:rgba(0,0,0,0.05)">' + ['①','②','③'][i] + '</span><span class="bv-select-name" style="color:var(--fog)">' + e(f.offering_name) + ' — N/A</span></div>';
+          }).join('') +
+          '</div></div>';
+      }
+    });
+    html += '</div>';
+  });
+  html += '</div>';
+  return html;
+}
+
+// ── Suitability Panel ──
+function renderODSuitPanel(funds, suitScores, hasClient, c, e, isMulti) {
+  if (!hasClient) {
+    return '<div class="od-panel"><div class="od-panel-hdr"><div class="od-panel-title">Suitability</div></div><div class="od-panel-body">' +
+      '<div class="empty-state" style="padding:20px"><div class="empty-state-icon">👤</div><h3 style="font-size:14px">No Client Profile</h3><p style="font-size:12px">Set up a client profile to see suitability analysis, income projections, and personalized match scores.</p><button class="btn btn-primary btn-sm" onclick="openProfileModal()">Set Up Client</button></div>' +
+      '</div></div>';
+  }
+  const sc = isMulti ? Math.round(suitScores.filter(x=>x!=null).reduce((a,b)=>a+b,0)/suitScores.filter(x=>x!=null).length) : suitScores[0];
+  const cls = sc == null ? 'none' : sc >= 75 ? 'high' : sc >= 50 ? 'medium' : 'low';
+  const ringHtml = sc != null ? '<div class="od-suit-score-ring ' + cls + '">' + sc + '%</div>' : '';
+
+  const rows = [
+    ['Client', c.name || '—'],
+    ['Risk Tolerance', c.riskTolerance ? c.riskTolerance.charAt(0).toUpperCase()+c.riskTolerance.slice(1) : '—'],
+    ['Horizon', c.horizon ? {short:'Short (3–5 yr)',medium:'Medium (5–10 yr)',long:'Long (10+ yr)'}[c.horizon] : '—'],
+    ['1031 Exchange', c.exchangeAmount ? fmtMoney(c.exchangeAmount) : '—'],
+    ['Filing Status', c.filing ? c.filing.charAt(0).toUpperCase()+c.filing.slice(1) : '—'],
+  ];
+
+  if (isMulti) {
+    // Show per-offering scores
+    const perOfferHtml = funds.map((f,i) => {
+      const s = suitScores[i];
+      const sc2 = s == null ? 'none' : s >= 75 ? 'high' : s >= 50 ? 'medium' : 'low';
+      return '<div class="od-suit-row"><span class="od-suit-key">' + e(f.offering_name.length>22?f.offering_name.substring(0,20)+'…':f.offering_name) + '</span><span class="suit-score ' + sc2 + '">' + (s != null ? s + '%' : '—') + '</span></div>';
+    }).join('');
+    return '<div class="od-panel"><div class="od-panel-hdr"><div class="od-panel-title">Suitability</div><span class="od-blended-badge">Blended</span></div><div class="od-panel-body">' +
+      '<div style="display:flex;align-items:center;margin-bottom:12px">' + ringHtml + '<div><div style="font-size:13px;font-weight:700;color:var(--navy)">' + (c.name || 'Client') + '</div><div style="font-size:11px;color:var(--slate2)">Blended match score</div></div></div>' +
+      perOfferHtml +
+      '<div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--surface2)">' +
+      rows.slice(0,3).map(([k,v]) => '<div class="od-suit-row"><span class="od-suit-key">' + k + '</span><span class="od-suit-val">' + v + '</span></div>').join('') +
+      '</div></div></div>';
+  }
+
+  return '<div class="od-panel"><div class="od-panel-hdr"><div class="od-panel-title">Suitability</div></div><div class="od-panel-body">' +
+    '<div style="display:flex;align-items:center;margin-bottom:14px">' + ringHtml +
+    '<div><div style="font-size:15px;font-weight:700;color:var(--navy)">' + (sc != null ? (sc >= 75 ? 'Strong Match' : sc >= 50 ? 'Moderate Match' : 'Low Match') : '—') + '</div><div style="font-size:11px;color:var(--slate2)">' + (sc != null ? sc + '% suitability score' : '') + '</div></div></div>' +
+    rows.map(([k,v]) => '<div class="od-suit-row"><span class="od-suit-key">' + k + '</span><span class="od-suit-val">' + v + '</span></div>').join('') +
+    '</div></div>';
+}
+
+// ── Raise Status Panel ──
+function renderODRaisePanel(funds, e, isMulti) {
+  const renderSingle = (f) => {
+    const m = f.metrics;
+    const pctR = BV.isNum(m.pct_raise_remaining) ? Math.max(0,Math.min(100,m.pct_raise_remaining)) : 0;
+    const pctRaised = 100 - pctR;
+    return (isMulti ? '<div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--surface2)"><div style="font-size:11px;font-weight:700;color:var(--navy);margin-bottom:6px">' + e(f.offering_name) + '</div>' : '') +
+      '<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--slate2);margin-bottom:4px"><span>Raise Progress</span><span style="font-weight:700;color:var(--navy)">' + pctRaised.toFixed(0) + '% raised</span></div>' +
+      '<div class="od-raise-bar"><div class="od-raise-fill" style="width:' + pctRaised + '%"></div></div>' +
+      '<div class="od-raise-stat-row">' +
+      '<div class="od-raise-stat"><div class="od-raise-stat-val">' + BV.fmtMoney(m.filed_raise) + '</div><div class="od-raise-stat-label">Filed</div></div>' +
+      '<div class="od-raise-stat"><div class="od-raise-stat-val">' + BV.fmtMoney(m.remaining_raise) + '</div><div class="od-raise-stat-label">Remaining</div></div>' +
+      '<div class="od-raise-stat"><div class="od-raise-stat-val">' + (BV.isNum(m.raise_velocity) ? fmtMoney(Math.round(m.raise_velocity)) + '/mo' : (BV.isNum(m.months_on_market) ? m.months_on_market + ' mos' : '—')) + '</div><div class="od-raise-stat-label">' + (BV.isNum(m.raise_velocity) ? 'Velocity' : 'On Market') + '</div></div>' +
+      '</div>' +
+      (isMulti ? '</div>' : '');
+  };
+
+  const closeDateInfo = !isMulti && funds[0].metrics.offering_close instanceof Date
+    ? '<div style="margin-top:10px;padding:8px 12px;background:var(--surface);border-radius:6px;font-size:11.5px;color:var(--slate)"><b>Close Date:</b> ' + BV.fmtDate(funds[0].metrics.offering_close) + ' &nbsp;·&nbsp; <b>Open:</b> ' + BV.fmtDate(funds[0].metrics.offering_open) + '</div>'
+    : '';
+
+  return '<div class="od-panel"><div class="od-panel-hdr"><div class="od-panel-title">Raise Status</div>' +
+    (!isMulti && BV.isNum(funds[0].metrics.months_on_market) ? '<div class="od-panel-hint">' + funds[0].metrics.months_on_market + ' months on market</div>' : '') +
+    '</div><div class="od-panel-body">' +
+    funds.map(renderSingle).join('') +
+    closeDateInfo +
+    '</div></div>';
+}
+
+// ── Valuation Panel ──
+function renderODValPanel(funds, e, isMulti) {
+  const renderSingle = (f, showTitle) => {
+    const m = f.metrics;
+    const unloaded = m.purchase_price_unloaded;
+    const appraised = m.appraised_valuation;
+    const loaded = m.loaded_price;
+    const sqft = m.total_sqft;
+    const ppsf = m.price_per_sqft;
+    const delta = (BV.isNum(unloaded) && BV.isNum(appraised) && appraised > 0) ? ((unloaded - appraised) / appraised * 100) : null;
+    const isDisc = BV.isNum(delta) ? delta <= 0 : null;
+    const heroClass = isDisc == null ? 'neutral' : isDisc ? 'discount' : 'premium';
+    const heroLabel = isDisc == null ? 'Valuation Data Unavailable' : isDisc ? 'Discount to Appraisal' : 'Premium to Appraisal';
+    const pctStr = BV.isNum(delta) ? (delta<=0?'−':'+')+Math.abs(delta).toFixed(1)+'%' : '—';
+
+    return (showTitle ? '<div style="font-size:11px;font-weight:700;color:var(--navy);margin-bottom:6px">' + e(f.offering_name) + '</div>' : '') +
+      '<div class="od-val-hero ' + heroClass + '">' +
+      '<div><div class="od-val-pct ' + heroClass + '">' + pctStr + '</div></div>' +
+      '<div><div class="od-val-label">' + heroLabel + '</div><div class="od-val-sub">Purchase vs Appraised</div></div>' +
+      '</div>' +
+      '<div class="od-val-kv">' +
+      '<div class="od-val-kv-item"><div class="od-val-kv-label">Purchase (Unloaded)</div><div class="od-val-kv-value">' + BV.fmtMoney(unloaded) + '</div></div>' +
+      '<div class="od-val-kv-item"><div class="od-val-kv-label">Appraised Value</div><div class="od-val-kv-value">' + BV.fmtMoney(appraised) + '</div></div>' +
+      '<div class="od-val-kv-item"><div class="od-val-kv-label">Loaded Price</div><div class="od-val-kv-value">' + BV.fmtMoney(loaded) + '</div></div>' +
+      '<div class="od-val-kv-item"><div class="od-val-kv-label">Price / SF</div><div class="od-val-kv-value">' + (BV.isNum(ppsf) ? '$'+Math.round(ppsf).toLocaleString()+'/SF' : (BV.isNum(sqft) ? '$—' : 'N/A')) + '</div></div>' +
+      '</div>';
+  };
+
+  return '<div class="od-panel"><div class="od-panel-hdr"><div class="od-panel-title">Valuation</div><div class="od-panel-hint">vs appraisal</div></div><div class="od-panel-body">' +
+    (isMulti
+      ? funds.map((f,i) => '<div style="' + (i>0?'margin-top:14px;padding-top:14px;border-top:1px solid var(--surface2)':'') + '">' + renderSingle(f, true) + '</div>').join('')
+      : renderSingle(funds[0], false)) +
+    '</div></div>';
+}
+
+// ── Debt & Lease Panel ──
+function renderODDebtLeasePanel(funds, e, isMulti) {
+  const renderSingle = (f, showTitle) => {
+    const tenantCredit = f.tenant_credit || '';
+    const propType = f.asset_class || '';
+    let creditDisplay = tenantCredit;
+    if (!tenantCredit || /^n\/?a$/i.test(tenantCredit.trim())) {
+      if (/multifamily/i.test(propType)) creditDisplay = 'N/A — Residential (Multifamily)';
+      else if (/self.?stor/i.test(propType)) creditDisplay = 'N/A — Self Storage';
+      else if (/senior/i.test(propType)) creditDisplay = 'N/A — Senior Living';
+      else creditDisplay = 'N/A';
+    }
+    return (showTitle ? '<div style="font-size:11px;font-weight:700;color:var(--navy);margin-bottom:6px">' + e(f.offering_name) + '</div>' : '') +
+      '<div style="display:grid;gap:8px">' +
+      '<div style="padding:10px 12px;background:var(--surface);border-radius:var(--radius);border:1px solid var(--mist)"><div style="font-size:10px;font-weight:700;color:var(--fog);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px">Debt Terms</div><div style="font-size:12px;color:var(--navy);line-height:1.5">' + e(f.debt_terms || '—') + '</div></div>' +
+      '<div style="padding:10px 12px;background:var(--surface);border-radius:var(--radius);border:1px solid var(--mist)"><div style="font-size:10px;font-weight:700;color:var(--fog);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px">Lease Terms</div><div style="font-size:12px;color:var(--navy);line-height:1.5">' + e(f.lease_terms || '—') + '</div></div>' +
+      '<div style="padding:10px 12px;background:var(--surface);border-radius:var(--radius);border:1px solid var(--mist)"><div style="font-size:10px;font-weight:700;color:var(--fog);text-transform:uppercase;letter-spacing:.07em;margin-bottom:4px">Tenant Credit Quality</div><div style="font-size:12px;color:var(--navy);line-height:1.5">' + e(creditDisplay) + '</div></div>' +
+      '</div>';
+  };
+
+  return '<div class="od-panel"><div class="od-panel-hdr"><div class="od-panel-title">Debt & Lease</div></div><div class="od-panel-body">' +
+    (isMulti
+      ? funds.map((f,i) => '<div style="' + (i>0?'margin-top:14px;padding-top:14px;border-top:1px solid var(--surface2)':'') + '">' + renderSingle(f, true) + '</div>').join('')
+      : renderSingle(funds[0], false)) +
+    '</div></div>';
+}
+
+// ── Key Drivers Panel ──
+function renderODKeyDriversPanel(funds, peer, e, isMulti) {
+  const f = funds[0];
+  const m = f.metrics;
+  const p = peer.stats;
+  const drivers = [];
+
+  // LTV
+  if (BV.isNum(m.ltv)) {
+    const avg = p.ltv?.avg;
+    const low = m.ltv < 60;
+    drivers.push({ type: low ? 'positive' : m.ltv > 70 ? 'caution' : 'info', icon: low ? '✅' : m.ltv > 70 ? 'ℹ️' : '✅', text: 'LTV of ' + m.ltv.toFixed(1) + '% — ' + (avg ? (m.ltv < avg ? 'below' : 'above') + ' peer avg of ' + avg.toFixed(1) + '%' : (low ? 'conservative leverage' : 'moderate leverage')) });
+  }
+  // DSCR
+  if (BV.isNum(m.dscr)) {
+    drivers.push({ type: m.dscr >= 1.4 ? 'positive' : m.dscr >= 1.2 ? 'info' : 'caution', icon: m.dscr >= 1.4 ? '✅' : m.dscr >= 1.2 ? 'ℹ️' : '⚠️', text: 'DSCR of ' + m.dscr.toFixed(2) + 'x — ' + (m.dscr >= 1.4 ? 'strong debt service coverage' : m.dscr >= 1.2 ? 'adequate coverage' : 'thin coverage, monitor closely') });
+  }
+  // Occupancy
+  if (BV.isNum(m.pct_leased)) {
+    drivers.push({ type: m.pct_leased >= 95 ? 'positive' : m.pct_leased >= 85 ? 'info' : 'caution', icon: m.pct_leased >= 95 ? '✅' : m.pct_leased >= 85 ? 'ℹ️' : '⚠️', text: m.pct_leased.toFixed(1) + '% occupied' + (p.pct_leased?.avg ? ' vs peer avg ' + p.pct_leased.avg.toFixed(1) + '%' : '') });
+  }
+  // Lease term
+  if (BV.isNum(m.avg_lease_term_remaining)) {
+    drivers.push({ type: m.avg_lease_term_remaining >= 8 ? 'positive' : m.avg_lease_term_remaining >= 4 ? 'info' : 'caution', icon: m.avg_lease_term_remaining >= 8 ? '✅' : m.avg_lease_term_remaining >= 4 ? 'ℹ️' : '⚠️', text: m.avg_lease_term_remaining.toFixed(1) + ' yr avg lease term remaining — ' + (m.avg_lease_term_remaining >= 8 ? 'long-term income stability' : m.avg_lease_term_remaining >= 4 ? 'moderate term visibility' : 'near-term rollover risk') });
+  }
+  // CoC vs peer
+  if (BV.isNum(m.year1_coc) && p.year1_coc?.avg) {
+    const d = m.year1_coc - p.year1_coc.avg;
+    drivers.push({ type: d > 0.3 ? 'positive' : d < -0.3 ? 'caution' : 'info', icon: d > 0.3 ? '✅' : d < -0.3 ? 'ℹ️' : 'ℹ️', text: 'Year 1 CoC of ' + m.year1_coc.toFixed(2) + '%' + (Math.abs(d) > 0.1 ? (d>0?' — above':' — below') + ' peer avg by ' + Math.abs(d).toFixed(2) + ' pts' : ' — in line with peers') });
+  }
+  // 721 UpREIT
+  if (f.upreit_721 && !/^no$/i.test(f.upreit_721) && !/^n\/a$/i.test(f.upreit_721)) {
+    drivers.push({ type: 'positive', icon: '✅', text: '721 UpREIT available — offers potential REIT liquidity pathway' });
+  }
+
+  // Fill to at least 4
+  while (drivers.length < 4 && drivers.length > 0) {
+    drivers.push({ type: 'neutral', icon: 'ℹ️', text: 'Confirm additional underwriting details with sponsor directly.' });
+    break;
+  }
+
+  if (!drivers.length) {
+    return '<div class="od-panel od-body-full"><div class="od-panel-hdr"><div class="od-panel-title">Key Drivers</div></div><div class="od-panel-body"><div style="color:var(--slate2);font-size:12px">Populate offering data to see key driver analysis.</div></div></div>';
+  }
+
+  return '<div class="od-panel od-body-full"><div class="od-panel-hdr"><div class="od-panel-title">Key Drivers</div><div class="od-panel-hint">' + (isMulti ? 'Based on first offering' : 'Underwriting signals') + '</div></div><div class="od-panel-body"><div class="od-kd-grid">' +
+    drivers.slice(0,6).map(d => '<div class="od-kd-item ' + d.type + '"><span class="od-kd-icon">' + d.icon + '</span><span>' + e(d.text) + '</span></div>').join('') +
+    '</div></div></div>';
+}
+
+// ── Distribution Chart Panel ──
+function renderODDistPanel(funds, e) {
+  return '<div class="od-panel"><div class="od-panel-hdr"><div class="od-panel-title">Income Distribution</div><div class="od-panel-hint">Years 1–10</div></div><div class="od-panel-body"><div class="od-chart-box"><canvas id="od-income-chart"></canvas></div></div></div>';
+}
+
+// ── Projection Table Panel ──
+function renderODProjPanel(funds, c, e, isMulti) {
+  const equity = c && c.exchangeAmount ? c.exchangeAmount : null;
+  const f0 = funds[0];
+  const income = f0.metrics;
+  const years = Array.from({length:7},(_,i)=>i+1);
+
+  const blendedIncome = (yr) => {
+    const key = 'income_y' + yr;
+    const vals = funds.map(f=>f.metrics[key]).filter(BV.isNum);
+    return vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : null;
+  };
+
+  return '<div class="od-panel od-body-full"><div class="od-panel-hdr"><div class="od-panel-title">Income Projection</div><div class="od-panel-hint">' + (equity ? 'Based on $' + (equity/1000).toFixed(0) + 'K equity' : 'Set client equity for dollar projections') + '</div></div><div class="od-panel-body"><div style="overflow-x:auto"><table class="od-proj-table"><thead><tr><th>Year</th><th>Cash-on-Cash %</th>' + (equity ? '<th>Est. Annual Income</th><th>Cumulative Income</th>' : '') + '</tr></thead><tbody>' +
+    years.map((yr, i) => {
+      const coc = blendedIncome(yr);
+      const annualIncome = (equity && BV.isNum(coc)) ? equity * (coc/100) : null;
+      const cumulative = equity ? years.slice(0,i+1).reduce((s,y)=>{ const c2=blendedIncome(y); return s+(BV.isNum(c2)?equity*(c2/100):0); }, 0) : null;
+      const isHighlight = yr === 1 || yr === 5;
+      return '<tr' + (isHighlight?' class="highlight-row"':'') + '><td>Year ' + yr + '</td><td>' + (BV.isNum(coc)?coc.toFixed(2)+'%':'—') + '</td>' +
+        (equity ? '<td>' + (annualIncome!=null?'$'+Math.round(annualIncome).toLocaleString():'—') + '</td><td>' + (cumulative?'$'+Math.round(cumulative).toLocaleString():'—') + '</td>' : '') +
+        '</tr>';
+    }).join('') +
+    '</tbody></table></div></div></div>';
+}
+
+// ── Sponsor Panel ──
+function renderODSponsorPanel(funds, e, isMulti) {
+  const renderSponsor = (f, showTitle) => {
+    const pf = STATE.funds.find(x => x.id === f.id);
+    if (!pf) return '';
+    return (showTitle ? '<div style="font-size:11px;font-weight:700;color:var(--navy);margin-bottom:8px">' + e(f.sponsor) + '</div>' : '') +
+      '<div class="od-sponsor-stat-row">' +
+      stat(pf.sponsorAum ? '$' + pf.sponsorAum : '—', 'AUM') +
+      stat(pf.sponsorOfferings || '—', 'Offerings') +
+      stat(pf.sponsorExits || '—', 'Full Exits') +
+      stat(BV.isNum(pf.sponsorAvgIrr) ? pf.sponsorAvgIrr.toFixed(1) + '%' : '—', 'Avg IRR') +
+      '</div>' +
+      (pf.sponsorExperience ? '<div style="padding:8px 12px;background:var(--surface);border-radius:var(--radius);font-size:12px;color:var(--slate);border:1px solid var(--mist)"><b>Experience:</b> ' + e(pf.sponsorExperience) + '</div>' : '');
+  };
+  const stat = (v, l) => '<div class="od-sponsor-stat"><div class="od-sponsor-stat-val">' + v + '</div><div class="od-sponsor-stat-label">' + l + '</div></div>';
+
+  return '<div class="od-panel"><div class="od-panel-hdr"><div class="od-panel-title">Sponsor Track Record</div></div><div class="od-panel-body">' +
+    (isMulti
+      ? funds.map((f,i) => '<div style="' + (i>0?'margin-top:12px;padding-top:12px;border-top:1px solid var(--surface2)':'') + '">' + renderSponsor(f, true) + '</div>').join('')
+      : renderSponsor(funds[0], false)) +
+    '</div></div>';
+}
+
+// ── Key Metrics Comparison (multi mode top table) ──
+function renderODKeyMetricsComp(funds, peer, e, TAG_COLORS, TAG_LABELS) {
+  const rows = [
+    { label:'Year 1 CoC', key:'year1_coc', fmt:v=>BV.fmtPct(v,2), higher:'higher' },
+    { label:'LTV', key:'ltv', fmt:v=>BV.fmtPct(v,2), higher:'lower' },
+    { label:'DSCR', key:'dscr', fmt:v=>BV.isNum(v)?v.toFixed(2)+'x':'—', higher:'higher' },
+    { label:'Occupancy', key:'pct_leased', fmt:v=>BV.fmtPct(v,2), higher:'higher' },
+    { label:'Hold Period', key:'hold_period_years', fmt:v=>BV.isNum(v)?v.toFixed(0)+' yr':'—', higher:'neutral' },
+    { label:'Avg Lease Term', key:'avg_lease_term_remaining', fmt:v=>BV.isNum(v)?v.toFixed(1)+' yr':'—', higher:'higher' },
+    { label:'Min Investment', key:'minimum_investment', fmt:v=>BV.fmtMoney(v), higher:'lower' },
+    { label:'Cap Rate', key:'cap_rate', fmt:v=>BV.fmtPct(v,2), higher:'higher' },
+  ];
+
+  const colWidth = Math.floor(100 / (1 + funds.length));
+  const colStyles = 'grid-template-columns:200px ' + funds.map(()=>colWidth+'px').join(' ');
+
+  const header = '<div class="od-comp-row" style="' + colStyles + ';display:grid;background:var(--surface2);border-bottom:2px solid var(--mist)">' +
+    '<div class="od-comp-cell field" style="font-size:10px;font-weight:700;color:var(--slate2);text-transform:uppercase;letter-spacing:.07em">Metric</div>' +
+    funds.map((f,i) => '<div class="od-comp-cell" style="flex-direction:column;align-items:flex-start;padding:10px 14px"><div style="font-size:11px;font-weight:700;color:var(--navy)">' + TAG_LABELS[i] + ' ' + e(f.offering_name.length>18?f.offering_name.substring(0,16)+'…':f.offering_name) + '</div><div style="font-size:10px;color:var(--slate2)">' + e(f.sponsor) + '</div></div>').join('') +
+    '</div>';
+
+  const dataRows = rows.map(row => {
+    const vals = funds.map(f => f.metrics[row.key]);
+    const numVals = vals.filter(BV.isNum);
+    const bestVal = numVals.length ? (row.higher === 'higher' ? Math.max(...numVals) : row.higher === 'lower' ? Math.min(...numVals) : null) : null;
+    const worstVal = numVals.length >= 2 ? (row.higher === 'higher' ? Math.min(...numVals) : row.higher === 'lower' ? Math.max(...numVals) : null) : null;
+
+    return '<div class="od-comp-row" style="' + colStyles + ';display:grid">' +
+      '<div class="od-comp-cell field">' + e(row.label) + '</div>' +
+      vals.map(v => {
+        const isBest = BV.isNum(v) && v === bestVal && numVals.length >= 2;
+        const isWorst = BV.isNum(v) && v === worstVal && numVals.length >= 2;
+        return '<div class="od-comp-cell' + (isBest?' best':isWorst?' worst':'') + '"><span class="val">' + row.fmt(v) + '</span></div>';
+      }).join('') +
+      '</div>';
+  }).join('');
+
+  return '<div class="od-comp-wrap" style="margin-bottom:16px"><div style="padding:12px 16px;border-bottom:1.5px solid var(--mist);background:linear-gradient(180deg,var(--white),var(--surface));display:flex;align-items:center;justify-content:space-between"><span style="font-size:11px;font-weight:700;color:var(--slate);text-transform:uppercase;letter-spacing:.07em">Key Metrics Comparison</span><span style="font-size:10.5px;color:var(--fog)">Green = best · Red = lowest</span></div>' +
+    header + dataRows + '</div>';
+}
+
+
 
 // ── Basket offering toggle (from dropdown) ──
 function bvToggleOffering(id) {
@@ -2118,31 +2738,19 @@ function bvToggleOffering(id) {
 
 // ── Basket post-render hooks ──
 function basketPostRender() {
-  // Close dropdown on click outside
+  // Close dropdowns on click outside
   document.addEventListener('click', function bvDropClose(e) {
-    const wrap = document.querySelector('.bv-dropdown-wrap');
-    if (wrap && !wrap.contains(e.target)) {
-      const dd = document.getElementById('bv-offering-dropdown');
-      if (dd) dd.classList.remove('open');
-    }
+    document.querySelectorAll('.bv-dropdown.open, [id^="od-doc-drop-"]').forEach(dd => {
+      const wrap = dd.closest('.bv-dropdown-wrap');
+      if (wrap && !wrap.contains(e.target)) dd.classList.remove('open');
+    });
   }, { once: false, capture: true });
 
-  // Wire doc buttons
-  document.querySelectorAll('[data-bv-docbtn]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const type = btn.getAttribute('data-bv-docbtn');
-      const platformFunds = STATE.basket.map(id => STATE.funds.find(f => f.id === id)).filter(Boolean);
-      const selectedFunds = platformFunds.map(BV.adaptFund).filter(Boolean);
-      const modal = document.getElementById('bv-doc-modal');
-      if (modal) modal.innerHTML = BV.renderDocModal(selectedFunds, type);
-    });
-  });
+  // Draw US map (new view uses id="od-map")
+  odDrawMap();
 
-  // Draw US map
-  basketDrawMap();
-
-  // Draw income chart
-  basketDrawIncomeChart();
+  // Draw income chart (new view uses id="od-income-chart")
+  odDrawIncomeChart();
 }
 
 let bvChartsPromise = null;
@@ -2158,6 +2766,110 @@ function loadGoogleCharts() {
     document.head.appendChild(s);
   });
   return bvChartsPromise;
+}
+
+// ── New offering detail view: color-coded map ──
+function odDrawMap() {
+  const el = document.getElementById('od-map');
+  if (!el) return;
+  const platformFunds = STATE.basket.map(id => STATE.funds.find(f => f.id === id)).filter(Boolean);
+  if (!platformFunds.length) return;
+  const isMulti = platformFunds.length > 1;
+  const MAP_COLORS = ['#3B82F6','#9333EA','#D97706'];
+
+  // Build per-offering state sets
+  const offeringStateMap = platformFunds.map(f => ({
+    color: MAP_COLORS[platformFunds.indexOf(f)] || '#3B82F6',
+    states: BV.extractStates(f.location)
+  }));
+
+  // Flatten: state → offering index (first one wins for color in single-color mode)
+  const stateToOffering = {};
+  offeringStateMap.forEach((o, i) => {
+    o.states.forEach(s => { if (!(s in stateToOffering)) stateToOffering[s] = i; });
+  });
+  const allStates = Object.keys(stateToOffering);
+
+  if (!allStates.length) {
+    el.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:rgba(255,255,255,0.4);font-size:11px;font-weight:700">No states detected</div>';
+    return;
+  }
+
+  loadGoogleCharts().then(() => {
+    if (!isMulti) {
+      // Single: uniform navy
+      const dataRows = [['State','Presence']];
+      allStates.forEach(s => dataRows.push(['US-'+s, 1]));
+      const data = google.visualization.arrayToDataTable(dataRows);
+      el.innerHTML = '';
+      const chart = new google.visualization.GeoChart(el);
+      chart.draw(data, { region:'US', resolution:'provinces', legend:'none', backgroundColor:{fill:'transparent'}, datalessRegionColor:'rgba(255,255,255,0.06)', colorAxis:{colors:['#3B82F6','#3B82F6']}, keepAspectRatio:true });
+    } else {
+      // Multi: color-coded by offering (1=blue, 2=purple, 3=gold)
+      const dataRows = [['State','Offering','tooltip']];
+      allStates.forEach(s => {
+        const i = stateToOffering[s];
+        dataRows.push(['US-'+s, i+1, offeringStateMap[i] ? platformFunds[i].name : '']);
+      });
+      const data = google.visualization.arrayToDataTable(dataRows);
+      el.innerHTML = '';
+      const chart = new google.visualization.GeoChart(el);
+      // Use a continuous scale that maps 1→blue, 2→purple, 3→gold
+      chart.draw(data, { region:'US', resolution:'provinces', legend:'none', backgroundColor:{fill:'transparent'}, datalessRegionColor:'rgba(255,255,255,0.06)', colorAxis:{minValue:1, maxValue:3, colors:['#3B82F6','#9333EA','#D97706']}, keepAspectRatio:true });
+    }
+  }).catch(() => {
+    el.innerHTML = '<div style="padding:12px;text-align:center;color:rgba(255,255,255,0.4);font-size:11px">Map unavailable</div>';
+  });
+}
+
+// ── New offering detail view: income chart ──
+function odDrawIncomeChart() {
+  const canvas = document.getElementById('od-income-chart');
+  if (!canvas || !window.Chart) return;
+  if (STATE.incomeChart) { STATE.incomeChart.destroy(); STATE.incomeChart = null; }
+
+  const platformFunds = STATE.basket.map(id => STATE.funds.find(f => f.id === id)).filter(Boolean);
+  const selectedFunds = platformFunds.map(BV.adaptFund).filter(Boolean);
+  if (!selectedFunds.length) return;
+
+  const isMulti = selectedFunds.length > 1;
+  const labels = Array.from({length:10}, (_,i) => 'Y'+(i+1));
+  const CHART_COLORS = ['#3B82F6','#9333EA','#D97706'];
+
+  const datasets = isMulti
+    ? selectedFunds.map((f,i) => ({
+        label: f.offering_name,
+        data: BV.INCOME_KEYS.map(k => BV.isNum(f.metrics[k]) ? f.metrics[k] : null),
+        borderWidth: 2.5,
+        borderRadius: 4,
+        backgroundColor: CHART_COLORS[i] + '55',
+        borderColor: CHART_COLORS[i],
+        type: 'bar'
+      }))
+    : [{
+        label: 'Client Income (%)',
+        data: BV.INCOME_KEYS.map(k => BV.isNum(selectedFunds[0].metrics[k]) ? selectedFunds[0].metrics[k] : null),
+        borderWidth: 0,
+        borderRadius: 8,
+        backgroundColor: 'rgba(59,130,246,0.70)',
+        hoverBackgroundColor: 'rgba(59,130,246,0.9)'
+      }];
+
+  STATE.incomeChart = new Chart(canvas, {
+    type: 'bar',
+    data: { labels, datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false, animation: false,
+      plugins: {
+        legend: { display: isMulti, position: 'top', labels: { font: { family: 'Inter', size: 10, weight: '700' }, boxWidth: 10, padding: 10 } },
+        tooltip: { callbacks: { label: (ctx) => ctx.dataset.label + ': ' + (ctx.raw != null ? ctx.raw.toFixed(2) + '%' : '—') } }
+      },
+      scales: {
+        x: { stacked: false, ticks: { color: 'rgba(9,14,25,0.70)', font: { family: 'Inter', weight: '700', size: 10 } }, grid: { color: 'rgba(15,23,42,0.08)' } },
+        y: { beginAtZero: true, ticks: { color: 'rgba(9,14,25,0.70)', callback: v => v+'%', font: { family: 'Inter', weight: '700', size: 10 } }, grid: { color: 'rgba(15,23,42,0.08)' } }
+      }
+    }
+  });
 }
 
 function basketDrawMap() {
