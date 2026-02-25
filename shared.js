@@ -1,90 +1,572 @@
 /**
- * AFL Platform — shared.js
- * Shared library exposing window.AFL to all modules.
- * Version: 1.0 | Built per AFL_PLATFORM_SPEC.md
+ * shared.js — AFL Platform Shared Library
+ * Alts Fund Link | Alternative Asset Diligence Intelligence
+ *
+ * Exposes window.AFL — used by every module.
+ * Load this in index.html (shell) before any module is injected.
+ *
+ * API surface:
+ *   AFL.state            — live state (reads/writes localStorage)
+ *   AFL.loadFunds()      — fetch + parse Google Sheets → AFL.state.funds
+ *   AFL.basket.*         — basket CRUD (max 3)
+ *   AFL.suitScore()      — suitability algorithm (0–100)
+ *   AFL.peerStats()      — averages across all funds
+ *   AFL.navigate()       — SPA router (triggers shell)
+ *   AFL.updateHeader()   — signals shell to re-render header
+ *   AFL.fmt.*            — formatting helpers
+ *   AFL.isNum()          — type guard
+ *   AFL.escapeHTML()     — XSS safety
+ *   AFL.extractStates()  — parse location strings → state array
  */
 
-(function () {
+(function (global) {
   'use strict';
 
-  // ─────────────────────────────────────────────
-  // Constants
-  // ─────────────────────────────────────────────
+  // ─────────────────────────────────────────────────────────────
+  //  CONSTANTS
+  // ─────────────────────────────────────────────────────────────
   const SHEET_ID   = '1xVFw8pFrJzcxD8CH7ainimPKD6GW9tn1bb8ggHYUfRs';
   const SHEET_NAME = 'Sheet1';
-  const SHEETS_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME}`;
+  const SHEETS_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(SHEET_NAME)}`;
 
   const LS_KEYS = {
     basket : 'afl_basket',
     client : 'afl_client',
     nav    : 'afl_nav',
-    funds  : 'afl_funds',
+    funds  : 'afl_funds',          // session cache (sessionStorage)
+    viewMode: 'afl_view_mode',
   };
 
-  // ─────────────────────────────────────────────
-  // localStorage helpers
-  // ─────────────────────────────────────────────
-  function lsGet(key, fallback) {
-    try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
-    catch { return fallback; }
+  const BASKET_MAX = 3;
+
+  // ─────────────────────────────────────────────────────────────
+  //  LOCAL STORAGE HELPERS
+  // ─────────────────────────────────────────────────────────────
+  function lsGet(key, fallback = null) {
+    try {
+      const raw = localStorage.getItem(key);
+      return raw !== null ? JSON.parse(raw) : fallback;
+    } catch (e) { return fallback; }
   }
   function lsSet(key, val) {
-    try { localStorage.setItem(key, JSON.stringify(val)); } catch {}
+    try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {}
+  }
+  function ssGet(key, fallback = null) {
+    try {
+      const raw = sessionStorage.getItem(key);
+      return raw !== null ? JSON.parse(raw) : fallback;
+    } catch (e) { return fallback; }
+  }
+  function ssSet(key, val) {
+    try { sessionStorage.setItem(key, JSON.stringify(val)); } catch (e) {}
   }
 
-  // ─────────────────────────────────────────────
-  // State
-  // ─────────────────────────────────────────────
-  const state = {
-    get funds()   { return lsGet(LS_KEYS.funds,  []); },
-    set funds(v)  { lsSet(LS_KEYS.funds, v); },
-    get basket()  { return lsGet(LS_KEYS.basket, []); },
-    set basket(v) { lsSet(LS_KEYS.basket, v); },
-    get client()  { return lsGet(LS_KEYS.client, defaultClient()); },
-    set client(v) { lsSet(LS_KEYS.client, v); },
-    get nav()     { return lsGet(LS_KEYS.nav, 'browse'); },
-    set nav(v)    { lsSet(LS_KEYS.nav, v); },
-    viewMode: 'advisor', // 'advisor' | 'client' | 'compliance' — in-memory only
+  // ─────────────────────────────────────────────────────────────
+  //  STATE  (live object — writes through to localStorage)
+  // ─────────────────────────────────────────────────────────────
+  const _state = {
+    funds    : [],          // array of parsed fund objects (in-memory)
+    basket   : lsGet(LS_KEYS.basket, []),
+    client   : lsGet(LS_KEYS.client, {
+      name           : '',
+      exchangeAmount : null,
+      riskTolerance  : '',
+      propTypes      : [],
+      horizon        : null,
+      age            : null,
+      accredited     : true,
+      notes          : ''
+    }),
+    nav      : lsGet(LS_KEYS.nav, 'browse'),
+    viewMode : lsGet(LS_KEYS.viewMode, 'advisor'), // 'advisor' | 'client' | 'compliance'
   };
 
-  function defaultClient() {
+  // Proxy so assignments auto-persist
+  const state = new Proxy(_state, {
+    set(target, key, value) {
+      target[key] = value;
+      if (key === 'basket')   lsSet(LS_KEYS.basket, value);
+      if (key === 'client')   lsSet(LS_KEYS.client, value);
+      if (key === 'nav')      lsSet(LS_KEYS.nav, value);
+      if (key === 'viewMode') lsSet(LS_KEYS.viewMode, value);
+      return true;
+    }
+  });
+
+  // ─────────────────────────────────────────────────────────────
+  //  COLUMN → FIELD MAP
+  //  Handles the confirmed Sheet column names (including "ear 3" typo)
+  // ─────────────────────────────────────────────────────────────
+  const COL_MAP = {
+    'Sponsor'                         : 'sponsor',
+    'Offering Name'                   : 'name',
+    'Asset Class'                     : 'assetClass',
+    'Sector'                          : 'sector',
+    'Focus'                           : 'focus',
+    'Filed Raise'                     : 'filedRaise',
+    'Current Raise'                   : 'currentRaise',
+    'Remaining Raise'                 : 'equityRemaining',
+    'Offering Open'                   : 'offeringOpen',
+    'Offering Close'                  : 'offeringClose',
+    'Offering Structure'              : 'offeringStructure',
+    'Year 1 Cash on Cash Distribution': 'y1coc',  // fallback
+    'Year 1 Cash on Cash': 'y1coc',
+    'Frequency'                       : 'distFrequency',
+    'Loan to Value'                   : 'ltv',
+    'Preferred'                       : 'preferred',
+    'Promote'                         : 'promote',
+    '721 UpREIT'                      : 'upReit',
+    'Exemption'                       : 'exemption',
+    'Tax Reporting'                   : 'taxReporting',
+    'Hold Period'                     : 'holdPeriod',
+    'Minimum - DST'                   : 'minInvest',
+    '# Assets'                        : 'numAssets',
+    'Property Location(s)'            : 'location',
+    'Building Age'                    : 'buildingAge',
+    '(Avg)% Leased'                   : 'occupancy',  // fallback
+    '% Leased'                        : 'occupancy',
+    'Debt Terms'                      : 'debtTerms',
+    'DSCR'                            : 'dscr',
+    'Lease Terms'                     : 'leaseTerms',
+    'Total Square Footage'            : 'sqft',
+    'Tenant Credit Quality'           : 'tenantCredit',
+    'Rent Escalations'                : 'rentEscalations',
+    'Average Lease Term Remaining'    : 'avgLeaseTerm',
+    'GP Commit'                       : 'gpCommit',
+    'Purchase Price (Unloaded)'       : 'purchasePrice',
+    'Appraised Valuation'             : 'appraisedValue',
+    'Loaded Price'                    : 'loadedPrice',
+    'Acquisition Cap Rate'            : 'capRate',
+    'Rep Comp'                        : 'repComp',
+    'Sales Load'                      : 'salesLoad',
+    'Reserve'                         : 'reserve',
+    // Income projections (Year 1–10; note "ear 3" typo variant)
+    'Year 1'  : 'income_0',
+    'Year 2'  : 'income_1',
+    'Year 3'  : 'income_2',
+    'ear 3'   : 'income_2',   // ← confirmed typo in sheet
+    'Year 4'  : 'income_3',
+    'Year 5'  : 'income_4',
+    'Year 6'  : 'income_5',
+    'Year 7'  : 'income_6',
+    'Year 8'  : 'income_7',
+    'Year 9'  : 'income_8',
+    'Year 10' : 'income_9',
+    // Sponsor stats
+    'Sponsor AUM'                     : 'sponsorAum',
+    'Number of Sponsor Offerings'     : 'sponsorOfferings',
+    'Sponsor Full Cycle Exits'        : 'sponsorExits',
+    'Sponsor Average IRR'             : 'sponsorAvgIrr',
+    'Sponsor Best IRR'                : 'sponsorBestIrr',
+    'Sponsor Worst IRR'               : 'sponsorWorstIrr',
+    'Sponsor Experience'              : 'sponsorExperience',
+    // Document / media URLs
+    'Brochure'                        : 'brochureUrl',
+    'PPM'                             : 'ppmUrl',
+    'Track Record'                    : 'trackRecordUrl',
+    'Sales Team Map'                  : 'salesTeamUrl',
+    'Video'                           : 'videoUrl',
+    'Sponsor News'                    : 'sponsorNewsUrl',
+    'AI Offering Chat'                : 'aiChatUrl',
+    'Quarterly Update URL'            : 'quarterlyUpdateUrl',
+    'Sponsor Logo URL'                : 'sponsorLogoUrl',
+  };
+
+  // Numeric fields (will be coerced to Number)
+  const NUM_FIELDS = new Set([
+    'filedRaise','currentRaise','equityRemaining','y1coc','ltv','preferred',
+    'holdPeriod','minInvest','numAssets','occupancy','dscr','sqft','avgLeaseTerm',
+    'purchasePrice','appraisedValue','loadedPrice','capRate','repComp','salesLoad',
+    'sponsorOfferings','sponsorExits','sponsorAvgIrr','sponsorBestIrr','sponsorWorstIrr',
+    'income_0','income_1','income_2','income_3','income_4',
+    'income_5','income_6','income_7','income_8','income_9',
+  ]);
+
+  // ─────────────────────────────────────────────────────────────
+  //  GOOGLE SHEETS PARSER
+  // ─────────────────────────────────────────────────────────────
+
+  /**
+   * Parse the gviz JSON response into clean fund objects.
+   * Handles both numeric and string cell types.
+   */
+  function parseSheetResponse(rawText) {
+    // Strip the JSONP wrapper: google.visualization.Query.setResponse({...});
+    const jsonStr = rawText.replace(/^[^(]+\(/, '').replace(/\);?\s*$/, '');
+    const json = JSON.parse(jsonStr);
+
+    const cols = json.table.cols.map(c => (c.label || '').trim());
+    const rows = json.table.rows || [];
+
+    return rows
+      .map((row, rowIdx) => {
+        // Skip completely empty rows
+        if (!row.c || row.c.every(cell => !cell || cell.v === null)) return null;
+
+        const fund = { id: rowIdx + 1, income: [] };
+
+        cols.forEach((colLabel, ci) => {
+          const cell  = row.c[ci];
+          const field = COL_MAP[colLabel];
+          if (!field) return; // unmapped column — skip
+
+          let val = null;
+          if (cell) {
+            // Prefer formatted string for dates, raw value for numbers/strings
+            val = cell.v !== undefined && cell.v !== null ? cell.v : null;
+            if (val === null && cell.f) val = cell.f;
+          }
+
+          // Coerce numerics
+          if (NUM_FIELDS.has(field) && val !== null && val !== '') {
+            const n = parseFloat(String(val).replace(/[,$%\s]/g, ''));
+            val = isFinite(n) ? n : null;
+          }
+
+          // Income array fields
+          if (field.startsWith('income_')) {
+            const idx = parseInt(field.split('_')[1]);
+            fund.income[idx] = val;
+          } else {
+            fund[field] = val;
+          }
+        });
+
+        // Derived fields
+        fund.status       = deriveStatus(fund);
+        fund.pctRemaining = derivePctRemaining(fund);
+        fund.raiseVelocity= deriveRaiseVelocity(fund);
+        fund.propType     = fund.sector;  // alias
+        fund.displayLabel = fund.name
+          ? (fund.name.length > 40 ? fund.name.slice(0,38)+'…' : fund.name)
+          : 'Offering #' + fund.id;
+
+        return fund;
+      })
+      .filter(Boolean); // remove null (empty) rows
+  }
+
+  // ── Derived field calculators ──────────────────────────────
+
+  function deriveStatus(fund) {
+    if (!fund.offeringClose) return 'Open';
+    // gviz date comes as a Date object or "Date(year,month,day)" string
+    const close = parseGvizDate(fund.offeringClose);
+    if (!close) return 'Open';
+    const now = new Date();
+    const msLeft = close - now;
+    if (msLeft < 0)                    return 'Closed';
+    if (msLeft < 30 * 24*60*60*1000)  return 'Closing Soon';
+    return 'Open';
+  }
+
+  function derivePctRemaining(fund) {
+    if (!fund.filedRaise || !fund.equityRemaining) return null;
+    const pct = (fund.equityRemaining / fund.filedRaise) * 100;
+    return Math.min(100, Math.max(0, pct));
+  }
+
+  function deriveRaiseVelocity(fund) {
+    if (!fund.currentRaise || !fund.offeringOpen) return null;
+    const open = parseGvizDate(fund.offeringOpen);
+    if (!open) return null;
+    const months = (new Date() - open) / (1000*60*60*24*30.44);
+    if (months < 0.1) return null;
+    return fund.currentRaise / months; // $/month
+  }
+
+  /**
+   * gviz returns dates as JS Date objects in the v field,
+   * or sometimes as "Date(2025,0,15)" strings.
+   */
+  function parseGvizDate(val) {
+    if (!val) return null;
+    if (val instanceof Date) return val;
+    if (typeof val === 'string') {
+      // "Date(2025,0,15)" → month is 0-indexed
+      const m = val.match(/Date\((\d+),(\d+),(\d+)\)/);
+      if (m) return new Date(+m[1], +m[2], +m[3]);
+      const d = new Date(val);
+      return isNaN(d) ? null : d;
+    }
+    return null;
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  //  loadFunds()  — public API
+  // ─────────────────────────────────────────────────────────────
+
+  let _loadPromise = null; // deduplicate concurrent calls
+
+  async function loadFunds(forceRefresh = false) {
+    // Return cached in-memory funds if available
+    if (!forceRefresh && state.funds && state.funds.length > 0) {
+      return state.funds;
+    }
+    // Check session storage cache (survives module re-injections)
+    if (!forceRefresh) {
+      const cached = ssGet(LS_KEYS.funds);
+      if (cached && Array.isArray(cached) && cached.length > 0) {
+        state.funds = cached;
+        return state.funds;
+      }
+    }
+    // Deduplicate in-flight requests
+    if (_loadPromise) return _loadPromise;
+
+    _loadPromise = (async () => {
+      try {
+        const res = await fetch(SHEETS_URL);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const text = await res.text();
+        const funds = parseSheetResponse(text);
+        state.funds = funds;
+        ssSet(LS_KEYS.funds, funds); // cache for session
+        return funds;
+      } finally {
+        _loadPromise = null;
+      }
+    })();
+
+    return _loadPromise;
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  //  BASKET  API
+  // ─────────────────────────────────────────────────────────────
+  const basket = {
+    /** Current basket as array of IDs */
+    _ids() { return Array.isArray(state.basket) ? state.basket : []; },
+
+    has(id) { return this._ids().includes(Number(id)); },
+
+    add(id) {
+      id = Number(id);
+      const ids = this._ids();
+      if (ids.includes(id)) return false;
+      if (ids.length >= BASKET_MAX) return false; // full
+      state.basket = [...ids, id];
+      return true;
+    },
+
+    remove(id) {
+      id = Number(id);
+      state.basket = this._ids().filter(x => x !== id);
+    },
+
+    /** Return full fund objects for ids in basket */
+    get() {
+      const ids = this._ids();
+      return ids.map(id => state.funds.find(f => f.id === id)).filter(Boolean);
+    },
+
+    /** Persist to localStorage (already auto-persisted via state proxy, but exposed for explicitness) */
+    save() { lsSet(LS_KEYS.basket, this._ids()); },
+
+    clear() { state.basket = []; },
+
+    count() { return this._ids().length; },
+  };
+
+  // ─────────────────────────────────────────────────────────────
+  //  SUITABILITY SCORING  (spec §7)
+  // ─────────────────────────────────────────────────────────────
+
+  /**
+   * Returns integer 0–100, or null if no client loaded.
+   *
+   * Base: 50
+   * +20  ltv <= 60 (or no LTV data: +0)
+   * +15  minInvest <= client.exchangeAmount
+   * +15  y1coc >= 4.0
+   * +10  client.propTypes includes fund.sector
+   * +10  occupancy >= 90
+   * -10  ltv > 65
+   * -15  minInvest > client.exchangeAmount
+   * -20  ltv > 75
+   */
+  function suitScore(fund, client) {
+    if (!client || !client.exchangeAmount) return null;
+
+    let score = 50;
+
+    // LTV adjustments
+    const ltv = fund.ltv;
+    if (ltv != null && isFinite(ltv)) {
+      if (ltv <= 60)      score += 20;
+      else if (ltv <= 65) score += 0;
+      else if (ltv <= 75) score -= 10;
+      else                score -= 20; // also catches -10 + -20 = -20 (spec says -20 if >75)
+    }
+
+    // Minimum investment
+    const min = fund.minInvest;
+    if (min != null && isFinite(min) && client.exchangeAmount != null) {
+      if (min <= client.exchangeAmount) score += 15;
+      else                              score -= 15;
+    }
+
+    // Y1 CoC
+    if (fund.y1coc != null && isFinite(fund.y1coc) && fund.y1coc >= 4.0) score += 15;
+
+    // Property type preference
+    if (Array.isArray(client.propTypes) && client.propTypes.length > 0) {
+      if (client.propTypes.includes(fund.sector) || client.propTypes.includes(fund.propType)) {
+        score += 10;
+      }
+    }
+
+    // Occupancy
+    if (fund.occupancy != null && isFinite(fund.occupancy) && fund.occupancy >= 90) score += 10;
+
+    return Math.min(100, Math.max(0, Math.round(score)));
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  //  PEER STATS
+  // ─────────────────────────────────────────────────────────────
+
+  /**
+   * Returns averages / min / max across all (or provided) funds.
+   * Useful for rendering peer comparison bars.
+   */
+  function peerStats(funds) {
+    const arr = funds || state.funds || [];
+    if (!arr.length) return {};
+
+    function avg(field) {
+      const vals = arr.map(f => f[field]).filter(v => v != null && isFinite(v));
+      if (!vals.length) return null;
+      return vals.reduce((a,b)=>a+b,0) / vals.length;
+    }
+    function mn(field) {
+      const vals = arr.map(f => f[field]).filter(v => v != null && isFinite(v));
+      return vals.length ? Math.min(...vals) : null;
+    }
+    function mx(field) {
+      const vals = arr.map(f => f[field]).filter(v => v != null && isFinite(v));
+      return vals.length ? Math.max(...vals) : null;
+    }
+
     return {
-      name: '', exchangeAmount: null, riskTolerance: '',
-      propTypes: [], horizon: null, age: null,
-      accredited: true, notes: ''
+      y1coc    : { avg: avg('y1coc'),     min: mn('y1coc'),     max: mx('y1coc')     },
+      ltv      : { avg: avg('ltv'),       min: mn('ltv'),       max: mx('ltv')       },
+      occupancy: { avg: avg('occupancy'), min: mn('occupancy'), max: mx('occupancy') },
+      minInvest: { avg: avg('minInvest'), min: mn('minInvest'), max: mx('minInvest') },
+      holdPeriod:{ avg: avg('holdPeriod'),min: mn('holdPeriod'),max: mx('holdPeriod')},
+      capRate  : { avg: avg('capRate'),   min: mn('capRate'),   max: mx('capRate')   },
+      count    : arr.length,
     };
   }
 
-  // ─────────────────────────────────────────────
-  // Utilities
-  // ─────────────────────────────────────────────
-  function isNum(v) { return v !== null && v !== undefined && v !== '' && isFinite(Number(v)); }
+  // ─────────────────────────────────────────────────────────────
+  //  NAVIGATION
+  // ─────────────────────────────────────────────────────────────
+
+  /**
+   * Navigate to a module. The shell listens for the 'afl:navigate' event.
+   * Params are passed as event detail and also stored in sessionStorage
+   * so the module can read them on init.
+   *
+   * Usage: AFL.navigate('offering', { ids: [1,2,3] })
+   */
+  function navigate(module, params = {}) {
+    state.nav = module;
+    // Store params for the module to read on init
+    try {
+      sessionStorage.setItem('afl_nav_params', JSON.stringify({ module, params }));
+    } catch(e) {}
+
+    // Dispatch event for the shell router
+    const evt = new CustomEvent('afl:navigate', { detail: { module, params } });
+    window.dispatchEvent(evt);
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  //  HEADER UPDATE
+  // ─────────────────────────────────────────────────────────────
+
+  /**
+   * Tell the shell to refresh its header UI (basket count, client name, etc).
+   * Shell listens for 'afl:header-update'.
+   */
+  function updateHeader(data = {}) {
+    const payload = {
+      basketCount : basket.count(),
+      clientName  : state.client ? state.client.name || '' : '',
+      viewMode    : state.viewMode,
+      fundCount   : state.funds.length,
+      ...data,
+    };
+    const evt = new CustomEvent('afl:header-update', { detail: payload });
+    window.dispatchEvent(evt);
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  //  FORMATTING UTILITIES
+  // ─────────────────────────────────────────────────────────────
 
   const fmt = {
+    /**
+     * Format a percentage. Returns "—" for null/NaN.
+     * @param {number} v  — e.g. 5.25 → "5.25%"
+     * @param {number} d  — decimal places (default 2)
+     */
     pct(v, d = 2) {
-      if (!isNum(v)) return '—';
+      if (v == null || !isFinite(Number(v))) return '—';
       return Number(v).toFixed(d) + '%';
     },
+
+    /**
+     * Format money. Abbreviates large numbers.
+     * 2400000 → "$2.4M"  |  380000 → "$380K"  |  500 → "$500"
+     */
     money(v) {
-      if (!isNum(v)) return '—';
+      if (v == null || !isFinite(Number(v))) return '—';
       const n = Number(v);
-      if (Math.abs(n) >= 1e9) return '$' + (n / 1e9).toFixed(2) + 'B';
-      if (Math.abs(n) >= 1e6) return '$' + (n / 1e6).toFixed(1) + 'M';
-      if (Math.abs(n) >= 1e3) return '$' + (n / 1e3).toFixed(0) + 'K';
+      if (n >= 1e9) return '$' + (n/1e9).toFixed(2).replace(/\.?0+$/,'') + 'B';
+      if (n >= 1e6) return '$' + (n/1e6).toFixed(2).replace(/\.?0+$/,'') + 'M';
+      if (n >= 1e3) return '$' + (n/1e3).toFixed(1).replace(/\.?0+$/,'') + 'K';
       return '$' + n.toFixed(0);
     },
+
+    /**
+     * Format a date value (Date object, gviz Date string, or ISO string).
+     */
     date(s) {
       if (!s) return '—';
-      const d = new Date(s);
-      if (isNaN(d)) return s;
-      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      let d;
+      if (s instanceof Date) { d = s; }
+      else {
+        const m = String(s).match(/Date\((\d+),(\d+),(\d+)\)/);
+        d = m ? new Date(+m[1], +m[2], +m[3]) : new Date(s);
+      }
+      if (isNaN(d)) return String(s);
+      return d.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
     },
-    num(v, d = 0) {
-      if (!isNum(v)) return '—';
-      return Number(v).toFixed(d);
-    }
+
+    /**
+     * Format a number with commas.
+     */
+    num(v, decimals = 0) {
+      if (v == null || !isFinite(Number(v))) return '—';
+      return Number(v).toLocaleString('en-US', {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals,
+      });
+    },
   };
 
+  // ─────────────────────────────────────────────────────────────
+  //  UTILITY FUNCTIONS
+  // ─────────────────────────────────────────────────────────────
+
+  /** True if v is a finite number (not null, not NaN, not ±Infinity) */
+  function isNum(v) {
+    return v !== null && v !== undefined && isFinite(Number(v));
+  }
+
+  /** XSS-safe HTML escaping */
   function escapeHTML(s) {
     if (s == null) return '';
     return String(s)
@@ -95,399 +577,140 @@
       .replace(/'/g, '&#39;');
   }
 
+  /**
+   * Parse a location string like "TX, OH, IN, GA" into ['TX','OH','IN','GA'].
+   * Also handles multi-word state names if they appear.
+   */
   function extractStates(locationStr) {
     if (!locationStr) return [];
-    return locationStr.split(/[,/|;]+/).map(s => s.trim()).filter(Boolean);
+    // Split on commas and/or spaces, filter for 2-letter state codes
+    return locationStr
+      .split(/[\s,]+/)
+      .map(s => s.trim().toUpperCase())
+      .filter(s => /^[A-Z]{2}$/.test(s));
   }
 
-  // ─────────────────────────────────────────────
-  // Google Sheets Parser
-  // ─────────────────────────────────────────────
-
-  // Maps column label → fund field. Handles known typo 'ear 3' → income[2]
-  const COL_MAP = {
-    'Sponsor':                       { field: 'sponsor',            type: 'str' },
-    'Offering Name':                 { field: 'name',               type: 'str' },
-    'Asset Class':                   { field: 'assetClass',         type: 'str' },
-    'Sector':                        { field: 'sector',             type: 'str' },
-    'Focus':                         { field: 'focus',              type: 'str' },
-    'Filed Raise':                   { field: 'filedRaise',         type: 'num' },
-    'Current Raise':                 { field: 'currentRaise',       type: 'num' },
-    'Remaining Raise':               { field: 'equityRemaining',    type: 'num' },
-    'Offering Open':                 { field: 'offeringOpen',       type: 'str' },
-    'Offering Close':                { field: 'offeringClose',      type: 'str' },
-    'Offering Structure':            { field: 'offeringStructure',  type: 'str' },
-    'Year 1 Cash on Cash Distribution': { field: 'y1coc',          type: 'num' },
-    'Frequency':                     { field: 'distFrequency',      type: 'str' },
-    'Loan to Value':                 { field: 'ltv',                type: 'num' },
-    'Preferred':                     { field: 'preferred',          type: 'num' },
-    'Promote':                       { field: 'promote',            type: 'str' },
-    '721 UpREIT':                    { field: 'upReit',             type: 'str' },
-    'Exemption':                     { field: 'exemption',          type: 'str' },
-    'Tax Reporting':                 { field: 'taxReporting',       type: 'str' },
-    'Hold Period':                   { field: 'holdPeriod',         type: 'num' },
-    'Minimum - DST':                 { field: 'minInvest',          type: 'num' },
-    '# Assets':                      { field: 'numAssets',          type: 'num' },
-    'Property Location(s)':          { field: 'location',           type: 'str' },
-    'Building Age':                  { field: 'buildingAge',        type: 'str' },
-    '(Avg)% Leased':                 { field: 'occupancy',          type: 'num' },
-    'Debt Terms':                    { field: 'debtTerms',          type: 'str' },
-    'DSCR':                          { field: 'dscr',               type: 'num' },
-    'Lease Terms':                   { field: 'leaseTerms',         type: 'str' },
-    'Total Square Footage':          { field: 'sqft',               type: 'num' },
-    'Tenant Credit Quality':         { field: 'tenantCredit',       type: 'str' },
-    'Rent Escalations':              { field: 'rentEscalations',    type: 'str' },
-    'Average Lease Term Remaining':  { field: 'avgLeaseTerm',       type: 'num' },
-    'GP Commit':                     { field: 'gpCommit',           type: 'str' },
-    'Purchase Price (Unloaded)':     { field: 'purchasePrice',      type: 'num' },
-    'Appraised Valuation':           { field: 'appraisedValue',     type: 'num' },
-    'Loaded Price':                  { field: 'loadedPrice',        type: 'num' },
-    'Acquisition Cap Rate':          { field: 'capRate',            type: 'num' },
-    'Rep Comp':                      { field: 'repComp',            type: 'num' },
-    'Sales Load':                    { field: 'salesLoad',          type: 'num' },
-    'Reserve':                       { field: 'reserve',            type: 'str' },
-    'Year 1':                        { field: 'income.0',           type: 'num' },
-    'Year 2':                        { field: 'income.1',           type: 'num' },
-    'Year 3':                        { field: 'income.2',           type: 'num' },
-    'ear 3':                         { field: 'income.2',           type: 'num' }, // known typo
-    'Year 4':                        { field: 'income.3',           type: 'num' },
-    'Year 5':                        { field: 'income.4',           type: 'num' },
-    'Year 6':                        { field: 'income.5',           type: 'num' },
-    'Year 7':                        { field: 'income.6',           type: 'num' },
-    'Year 8':                        { field: 'income.7',           type: 'num' },
-    'Year 9':                        { field: 'income.8',           type: 'num' },
-    'Year 10':                       { field: 'income.9',           type: 'num' },
-    'Sponsor AUM':                   { field: 'sponsorAum',         type: 'str' },
-    'Number of Sponsor Offerings':   { field: 'sponsorOfferings',   type: 'num' },
-    'Sponsor Full Cycle Exits':      { field: 'sponsorExits',       type: 'num' },
-    'Sponsor Average IRR':           { field: 'sponsorAvgIrr',      type: 'num' },
-    'Sponsor Best IRR':              { field: 'sponsorBestIrr',     type: 'num' },
-    'Sponsor Worst IRR':             { field: 'sponsorWorstIrr',    type: 'num' },
-    'Sponsor Experience':            { field: 'sponsorExperience',  type: 'str' },
-    'Brochure':                      { field: 'brochureUrl',        type: 'str' },
-    'PPM':                           { field: 'ppmUrl',             type: 'str' },
-    'Track Record':                  { field: 'trackRecordUrl',     type: 'str' },
-    'Sales Team Map':                { field: 'salesTeamUrl',       type: 'str' },
-    'Video':                         { field: 'videoUrl',           type: 'str' },
-    'Sponsor News':                  { field: 'sponsorNewsUrl',     type: 'str' },
-    'AI Offering Chat':              { field: 'aiChatUrl',          type: 'str' },
-    'Quarterly Update URL':          { field: 'quarterlyUpdateUrl', type: 'str' },
-    'Sponsor Logo URL':              { field: 'sponsorLogoUrl',     type: 'str' },
-  };
-
-  function parseGvizResponse(raw) {
-    // Strip google's callback wrapper
-    const json = raw.replace(/^[^(]*\(/, '').replace(/\);?\s*$/, '');
-    const data = JSON.parse(json);
-    const cols = data.table.cols.map(c => c.label || c.id);
-    const rows = data.table.rows || [];
-
-    return rows.map((row, rowIdx) => {
-      const fund = { id: rowIdx + 1, income: Array(10).fill(null) };
-      const cells = row.c || [];
-
-      cols.forEach((label, ci) => {
-        const cell = cells[ci];
-        const val = cell ? (cell.v !== undefined ? cell.v : null) : null;
-        const mapped = COL_MAP[label];
-        if (!mapped) return;
-
-        if (mapped.field.startsWith('income.')) {
-          const idx = parseInt(mapped.field.split('.')[1]);
-          fund.income[idx] = isNum(val) ? Number(val) : null;
-        } else if (mapped.type === 'num') {
-          fund[mapped.field] = isNum(val) ? Number(val) : null;
-        } else {
-          fund[mapped.field] = val !== null ? String(val) : '';
-        }
-      });
-
-      // Computed fields
-      fund.propType = fund.sector || '';
-      fund.displayLabel = fund.name || `Offering ${fund.id}`;
-      fund.status = computeStatus(fund.offeringClose);
-      fund.pctRemaining = (isNum(fund.equityRemaining) && isNum(fund.filedRaise) && fund.filedRaise > 0)
-        ? (fund.equityRemaining / fund.filedRaise) * 100 : null;
-
-      // Raise velocity: currentRaise / months since open
-      if (isNum(fund.currentRaise) && fund.offeringOpen) {
-        const open = new Date(fund.offeringOpen);
-        const now  = new Date();
-        const months = (now - open) / (1000 * 60 * 60 * 24 * 30.44);
-        fund.raiseVelocity = months > 0 ? fund.currentRaise / months : null;
-      } else {
-        fund.raiseVelocity = null;
-      }
-
-      return fund;
-    }).filter(f => f.name); // drop blank rows
-  }
-
-  function computeStatus(closeDateStr) {
-    if (!closeDateStr) return 'Open';
-    const close = new Date(closeDateStr);
-    const now   = new Date();
-    if (isNaN(close)) return 'Open';
-    const daysLeft = (close - now) / (1000 * 60 * 60 * 24);
-    if (daysLeft < 0)  return 'Closed';
-    if (daysLeft < 30) return 'Closing Soon';
-    return 'Open';
-  }
-
-  // ─────────────────────────────────────────────
-  // Data Loading
-  // ─────────────────────────────────────────────
-  let _loadPromise = null;
-
-  async function loadFunds(forceRefresh = false) {
-    // Return cached if available and not forcing refresh
-    const cached = state.funds;
-    if (!forceRefresh && cached && cached.length > 0) return cached;
-
-    // Dedupe concurrent calls
-    if (_loadPromise) return _loadPromise;
-
-    _loadPromise = (async () => {
-      try {
-        const res  = await fetch(SHEETS_URL);
-        const text = await res.text();
-        const funds = parseGvizResponse(text);
-        state.funds = funds;
-        return funds;
-      } finally {
-        _loadPromise = null;
-      }
-    })();
-
-    return _loadPromise;
-  }
-
-  // ─────────────────────────────────────────────
-  // Basket
-  // ─────────────────────────────────────────────
-  const basket = {
-    add(id) {
-      let b = state.basket;
-      if (b.includes(id)) return false;
-      if (b.length >= 3) return false; // max 3
-      b = [...b, id];
-      state.basket = b;
-      basket._notify();
-      return true;
-    },
-    remove(id) {
-      state.basket = state.basket.filter(x => x !== id);
-      basket._notify();
-    },
-    has(id)  { return state.basket.includes(id); },
-    get()    {
-      const funds = state.funds;
-      return state.basket.map(id => funds.find(f => f.id === id)).filter(Boolean);
-    },
-    save()   { /* state.basket setter already persists */ },
-    count()  { return state.basket.length; },
-    _notify() {
-      // Dispatch event for shell header to update
-      window.dispatchEvent(new CustomEvent('afl:basketchange', { detail: { count: state.basket.length } }));
-    }
-  };
-
-  // ─────────────────────────────────────────────
-  // Suitability Scoring
-  // ─────────────────────────────────────────────
-  function suitScore(fund, client) {
-    if (!client || !client.name) return null;
-
-    let score = 50;
-
-    // LTV scoring
-    if (isNum(fund.ltv)) {
-      if (fund.ltv <= 60)      score += 20;
-      else if (fund.ltv <= 65) score += 0;
-      else if (fund.ltv <= 75) score -= 10;
-      else                     score -= 20;
-    }
-
-    // Minimum investment vs exchange amount
-    if (isNum(fund.minInvest) && isNum(client.exchangeAmount)) {
-      if (fund.minInvest <= client.exchangeAmount) score += 15;
-      else                                          score -= 15;
-    }
-
-    // Y1 CoC
-    if (isNum(fund.y1coc) && fund.y1coc >= 4.0) score += 15;
-
-    // Property type match
-    if (Array.isArray(client.propTypes) && client.propTypes.length > 0 && fund.sector) {
-      if (client.propTypes.includes(fund.sector)) score += 10;
-    }
-
-    // Occupancy
-    if (isNum(fund.occupancy) && fund.occupancy >= 90) score += 10;
-
-    return Math.max(0, Math.min(100, Math.round(score)));
-  }
-
-  function suitLabel(score) {
-    if (score === null) return null;
-    if (score >= 75) return { label: 'Strong Match', color: 'green' };
-    if (score >= 55) return { label: 'Good Match',   color: 'blue'  };
-    if (score >= 40) return { label: 'Fair Match',   color: 'amber' };
-    return               { label: 'Poor Match',    color: 'red'   };
-  }
-
-  // ─────────────────────────────────────────────
-  // Peer Stats
-  // ─────────────────────────────────────────────
-  function peerStats(funds) {
-    if (!funds || funds.length === 0) return {};
-    const nums = (field) => funds.map(f => f[field]).filter(v => isNum(v)).map(Number);
-    const avg  = arr => arr.length ? arr.reduce((a,b) => a+b, 0) / arr.length : null;
-    const max  = arr => arr.length ? Math.max(...arr) : null;
-    const min  = arr => arr.length ? Math.min(...arr) : null;
-
-    const fields = ['y1coc', 'ltv', 'occupancy', 'holdPeriod', 'minInvest', 'capRate', 'dscr'];
-    const stats = {};
-    fields.forEach(f => {
-      const arr = nums(f);
-      stats[f] = { avg: avg(arr), max: max(arr), min: min(arr), count: arr.length };
-    });
-    return stats;
-  }
-
-  // ─────────────────────────────────────────────
-  // Navigation
-  // ─────────────────────────────────────────────
-  function navigate(module, params = {}) {
-    state.nav = module;
-    window.dispatchEvent(new CustomEvent('afl:navigate', { detail: { module, params } }));
-  }
-
-  // ─────────────────────────────────────────────
-  // Header update (called by modules)
-  // ─────────────────────────────────────────────
-  function updateHeader(opts = {}) {
-    window.dispatchEvent(new CustomEvent('afl:headerupdate', { detail: opts }));
-  }
-
-  // ─────────────────────────────────────────────
-  // Suitability chip HTML helper
-  // ─────────────────────────────────────────────
-  function suitChipHTML(fund, client) {
-    const score = suitScore(fund, client);
-    if (score === null) return '';
-    const { label, color } = suitLabel(score);
-    return `<span class="suit-chip suit-chip--${color}">${score} — ${label}</span>`;
-  }
-
-  // ─────────────────────────────────────────────
-  // Status badge HTML helper
-  // ─────────────────────────────────────────────
-  function statusBadgeHTML(status) {
-    const map = {
-      'Open':         'badge--green',
-      'Closing Soon': 'badge--amber',
-      'Closed':       'badge--red',
-    };
-    const cls = map[status] || 'badge--fog';
-    return `<span class="badge ${cls}">${escapeHTML(status)}</span>`;
-  }
-
-  // ─────────────────────────────────────────────
-  // Module loader (used by shell)
-  // ─────────────────────────────────────────────
-  async function loadModule(module, params = {}) {
-    const appContent = document.getElementById('app-content');
-    if (!appContent) return;
-
-    appContent.innerHTML = `
-      <div class="module-loading">
-        <div class="loading-spinner"></div>
-        <p>Loading…</p>
-      </div>`;
-
+  /**
+   * Get current nav params (set by navigate()).
+   */
+  function getNavParams() {
     try {
-      const res  = await fetch(`${module}.html?v=${Date.now()}`);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const html = await res.text();
-
-      // Parse the fetched HTML
-      const parser = new DOMParser();
-      const doc    = parser.parseFromString(html, 'text/html');
-
-      // Inject <style> blocks
-      doc.querySelectorAll('style').forEach(s => {
-        const existing = document.querySelector(`style[data-module="${module}"]`);
-        if (existing) existing.remove();
-        const el = document.createElement('style');
-        el.setAttribute('data-module', module);
-        el.textContent = s.textContent;
-        document.head.appendChild(el);
-      });
-
-      // Inject body content
-      const body = doc.body ? doc.body.innerHTML : html;
-      appContent.innerHTML = body;
-
-      // Execute scripts in module
-      appContent.querySelectorAll('script').forEach(oldScript => {
-        const newScript = document.createElement('script');
-        if (oldScript.src) {
-          newScript.src = oldScript.src;
-        } else {
-          newScript.textContent = oldScript.textContent;
-        }
-        oldScript.replaceWith(newScript);
-      });
-
-      // Call module init if defined
-      if (window.currentModule && typeof window.currentModule.init === 'function') {
-        await window.currentModule.init({ client: state.client, basket: state.basket, params });
-      }
-
-      state.nav = module;
-      updateSidebarActive(module);
-
-    } catch (err) {
-      appContent.innerHTML = `
-        <div class="module-error">
-          <div class="module-error__icon">⚠️</div>
-          <h3>Could not load module</h3>
-          <p>${escapeHTML(err.message)}</p>
-          <button onclick="AFL.loadModule('${module}')">Retry</button>
-        </div>`;
-      console.error('[AFL] loadModule error:', err);
-    }
+      const raw = sessionStorage.getItem('afl_nav_params');
+      return raw ? JSON.parse(raw) : null;
+    } catch(e) { return null; }
   }
 
-  function updateSidebarActive(module) {
-    document.querySelectorAll('.sidebar-nav__item').forEach(el => {
-      el.classList.toggle('sidebar-nav__item--active', el.dataset.module === module);
-    });
+  /**
+   * Get a fund by ID from state.funds.
+   */
+  function getFund(id) {
+    return state.funds.find(f => f.id === Number(id)) || null;
   }
 
-  // ─────────────────────────────────────────────
-  // Expose window.AFL
-  // ─────────────────────────────────────────────
-  window.AFL = {
+  /**
+   * Get all funds for a given sponsor name.
+   */
+  function getSponsorFunds(sponsorName) {
+    return state.funds.filter(f =>
+      (f.sponsor || '').toLowerCase() === (sponsorName || '').toLowerCase()
+    );
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  //  CLIENT HELPERS
+  // ─────────────────────────────────────────────────────────────
+
+  const client = {
+    get()     { return state.client; },
+    set(data) {
+      state.client = { ...state.client, ...data };
+      updateHeader();
+    },
+    clear() {
+      state.client = {
+        name:'', exchangeAmount:null, riskTolerance:'',
+        propTypes:[], horizon:null, age:null, accredited:true, notes:''
+      };
+      updateHeader();
+    },
+    isSet() {
+      const c = state.client;
+      return !!(c && (c.name || c.exchangeAmount));
+    },
+  };
+
+  // ─────────────────────────────────────────────────────────────
+  //  VIEW MODE HELPER
+  // ─────────────────────────────────────────────────────────────
+
+  const view = {
+    get()  { return state.viewMode; },
+    set(m) { state.viewMode = m; updateHeader(); },
+    is(m)  { return state.viewMode === m; },
+  };
+
+  // ─────────────────────────────────────────────────────────────
+  //  AFL NAMESPACE — PUBLIC API
+  // ─────────────────────────────────────────────────────────────
+
+  const AFL = {
+    // Core state
     state,
+
+    // Data
     loadFunds,
-    loadModule,
+    getFund,
+    getSponsorFunds,
+    getNavParams,
+
+    // Basket
+    basket,
+
+    // Client
+    client,
+
+    // View mode
+    view,
+
+    // Scoring
+    suitScore,
+    peerStats,
+
+    // Navigation
     navigate,
     updateHeader,
-    isNum,
+
+    // Formatting
     fmt,
+
+    // Utils
+    isNum,
     escapeHTML,
     extractStates,
-    basket,
-    suitScore,
-    suitLabel,
-    suitChipHTML,
-    statusBadgeHTML,
-    peerStats,
-    // Constants exposed for modules that need them
-    SHEET_ID,
-    SHEET_NAME,
+
+    // Expose parseGvizDate for modules that handle raw dates
+    parseGvizDate,
+
+    // Version
+    version: '1.0.0',
   };
 
-})();
+  // Expose globally
+  global.AFL = AFL;
+
+  // Auto-signal header update when basket changes
+  // (useful after direct localStorage manipulation)
+  window.addEventListener('storage', e => {
+    if (e.key === LS_KEYS.basket) {
+      try { state.basket = JSON.parse(e.newValue || '[]'); } catch(err) {}
+      updateHeader();
+    }
+    if (e.key === LS_KEYS.client) {
+      try { state.client = JSON.parse(e.newValue || 'null') || state.client; } catch(err) {}
+      updateHeader();
+    }
+  });
+
+  console.log(`[AFL] shared.js v${AFL.version} loaded`);
+
+})(window);
