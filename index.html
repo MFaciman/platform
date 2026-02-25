@@ -2211,6 +2211,14 @@ BV.renderVerticalCompTable = (selectedFunds, headers) => {
 
 // ── Main renderBasket() — Premium Single + Multi Offering View ──
 function renderBasket() {
+  try {
+  return _renderBasketInner();
+  } catch(err) {
+    console.error('renderBasket crash:', err);
+    return '<div class="page-header"><div><div class="page-title">Offering Detail</div></div></div><div class="empty-state"><div class="empty-state-icon">⚠️</div><h3>View Error</h3><p style="font-family:monospace;font-size:11px;color:red">' + String(err) + '</p><p style="font-size:11px;color:var(--slate2)">Check browser console for full stack trace.</p></div>';
+  }
+}
+function _renderBasketInner() {
   const basketIds = STATE.basket;
   const platformFunds = basketIds.map(id => STATE.funds.find(f => f.id === id)).filter(Boolean);
   if (!platformFunds.length) {
