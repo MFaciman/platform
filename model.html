@@ -1,0 +1,1481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>1031 Exchange Modeler — AFL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+/* ── Design tokens (mirror index.html) ── */
+:root {
+  --navy:       #0B1F3B;
+  --navy2:      #1C3A63;
+  --navy3:      #2A4D7A;
+  --slate:      #3A5270;
+  --slate2:     #5C7A99;
+  --fog:        #8FA3BA;
+  --mist:       #C8D8E8;
+  --ice:        #E8F0F8;
+  --white:      #FFFFFF;
+  --surface:    #F4F7FB;
+  --surface2:   #EEF3FA;
+  --green:      #1A7A4A;
+  --green-lt:   #E8F7EF;
+  --amber:      #B45309;
+  --amber-lt:   #FEF3C7;
+  --red:        #991B1B;
+  --red-lt:     #FEE2E2;
+  --gold:       #C9A84C;
+  --gold-lt:    #FBF6EC;
+  --radius:     8px;
+  --radius-lg:  14px;
+  --shadow-sm:  0 1px 3px rgba(11,31,59,0.08);
+  --shadow:     0 4px 12px rgba(11,31,59,0.10);
+  --font: 'DM Sans', sans-serif;
+  --mono: 'DM Mono', monospace;
+  --transition: 0.18s cubic-bezier(0.4,0,0.2,1);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--font);
+  font-size: 14px;
+  background: var(--surface);
+  color: var(--navy);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+/* ── Page layout ── */
+.mod-page { display: flex; flex-direction: column; min-height: 100vh; }
+
+/* ── Page header ── */
+.mod-header {
+  background: var(--white);
+  border-bottom: 1px solid var(--mist);
+  padding: 18px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.mod-header-left h1 {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--navy);
+  letter-spacing: -0.02em;
+}
+.mod-header-left p {
+  font-size: 12.5px;
+  color: var(--slate2);
+  margin-top: 2px;
+}
+.mod-header-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.client-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--ice);
+  border: 1px solid var(--mist);
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--navy2);
+}
+.client-chip span { color: var(--slate2); font-weight: 400; }
+
+/* ── Basket bar ── */
+#basket-bar {
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy2) 100%);
+  padding: 12px 32px;
+  display: none; /* shown when basket populated */
+}
+#basket-bar.visible { display: block; }
+.basket-bar-inner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.basket-bar-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: rgba(255,255,255,0.55);
+  flex-shrink: 0;
+}
+.basket-offering-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 20px;
+  padding: 4px 12px 4px 10px;
+  font-size: 12px;
+  color: #fff;
+  cursor: default;
+}
+.basket-pill-name { font-weight: 600; max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.basket-pill-coc {
+  font-size: 11px;
+  color: rgba(255,255,255,0.65);
+  font-family: var(--mono);
+}
+.basket-empty-note {
+  font-size: 12.5px;
+  color: rgba(255,255,255,0.5);
+  font-style: italic;
+}
+.basket-bar-link {
+  margin-left: auto;
+  font-size: 12px;
+  color: rgba(255,255,255,0.6);
+  text-decoration: underline;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.basket-bar-link:hover { color: #fff; }
+
+/* ── Two-col body ── */
+.mod-body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 380px 1fr;
+  gap: 0;
+  align-items: start;
+}
+.mod-inputs {
+  background: var(--white);
+  border-right: 1px solid var(--mist);
+  padding: 24px;
+  overflow-y: auto;
+  position: sticky;
+  top: 0;
+  max-height: calc(100vh - 130px);
+}
+.mod-outputs {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Input sections ── */
+.input-section {
+  margin-bottom: 24px;
+}
+.input-section-title {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--fog);
+  border-bottom: 1px solid var(--mist);
+  padding-bottom: 7px;
+  margin-bottom: 14px;
+}
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.form-row.full { grid-template-columns: 1fr; }
+.form-group { display: flex; flex-direction: column; gap: 4px; }
+.form-label {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--slate);
+}
+.form-label .opt { color: var(--fog); font-weight: 400; font-size: 10.5px; }
+.form-input, .form-select {
+  height: 36px;
+  padding: 0 10px;
+  border: 1.5px solid var(--mist);
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-family: var(--font);
+  color: var(--navy);
+  background: var(--white);
+  outline: none;
+  transition: border-color var(--transition);
+  width: 100%;
+}
+.form-input:focus, .form-select:focus {
+  border-color: var(--navy2);
+  box-shadow: 0 0 0 3px rgba(28,58,99,0.08);
+}
+.form-input.mono { font-family: var(--mono); }
+.form-input::placeholder { color: var(--fog); }
+.form-select {
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%235C7A99' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 28px;
+  cursor: pointer;
+}
+
+/* Computed row */
+.computed-row {
+  background: var(--surface);
+  border: 1px solid var(--mist);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  margin-bottom: 10px;
+}
+.computed-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3px 0;
+}
+.computed-line:not(:last-child) { border-bottom: 1px solid var(--mist); padding-bottom: 5px; margin-bottom: 5px; }
+.computed-key { font-size: 12px; color: var(--slate2); }
+.computed-val {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--navy);
+  font-family: var(--mono);
+}
+.computed-val.highlight { color: var(--navy2); font-size: 14px; }
+
+/* Deadline row */
+.deadline-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.deadline-chip {
+  background: var(--ice);
+  border: 1px solid var(--mist);
+  border-radius: var(--radius);
+  padding: 8px 12px;
+}
+.deadline-chip .label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--fog); }
+.deadline-chip .date { font-size: 13px; font-weight: 700; color: var(--navy); margin-top: 2px; font-family: var(--mono); }
+.deadline-chip.warning .date { color: var(--amber); }
+
+/* Fee row */
+.fee-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+
+/* ── Output panels ── */
+.output-panel {
+  background: var(--white);
+  border: 1.5px solid var(--mist);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--mist);
+  cursor: pointer;
+  background: var(--surface);
+  gap: 12px;
+}
+.panel-header:hover { background: var(--ice); }
+.panel-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+.panel-icon { font-size: 16px; }
+.panel-title {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--navy);
+}
+.panel-subtitle { font-size: 11.5px; color: var(--slate2); margin-top: 1px; }
+.panel-status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11.5px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.status-clean { background: var(--green-lt); color: var(--green); }
+.status-review { background: var(--amber-lt); color: var(--amber); }
+.status-boot { background: var(--red-lt); color: var(--red); }
+.status-na { background: var(--surface2); color: var(--slate2); }
+.panel-chevron { font-size: 12px; color: var(--fog); transition: transform var(--transition); }
+.panel-chevron.open { transform: rotate(180deg); }
+.panel-body { padding: 20px; }
+.panel-body.hidden { display: none; }
+
+/* ── Boot analysis table ── */
+.boot-table { width: 100%; border-collapse: collapse; }
+.boot-table tr { border-bottom: 1px solid var(--surface2); }
+.boot-table tr:last-child { border-bottom: none; }
+.boot-table td {
+  padding: 8px 0;
+  font-size: 13px;
+}
+.boot-table .bt-label { color: var(--slate2); }
+.boot-table .bt-val {
+  text-align: right;
+  font-weight: 600;
+  color: var(--navy);
+  font-family: var(--mono);
+}
+.boot-table .bt-val.neg { color: var(--red); }
+.boot-table .bt-val.pos { color: var(--green); }
+.boot-table tr.section-gap td { padding-top: 14px; }
+.boot-table tr.subtotal td { background: var(--surface); }
+.boot-table tr.total td {
+  font-weight: 700;
+  font-size: 14px;
+  border-top: 2px solid var(--mist);
+  padding-top: 10px;
+}
+.boot-note {
+  margin-top: 14px;
+  padding: 10px 14px;
+  background: var(--amber-lt);
+  border-left: 3px solid var(--amber);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  font-size: 12px;
+  color: var(--amber);
+  line-height: 1.5;
+}
+.boot-note.green {
+  background: var(--green-lt);
+  border-left-color: var(--green);
+  color: var(--green);
+}
+
+/* ── Debt tracker ── */
+.progress-bar-wrap { margin-bottom: 6px; }
+.progress-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+}
+.progress-label { font-size: 12px; font-weight: 600; color: var(--slate); }
+.progress-pct { font-size: 12px; font-weight: 700; font-family: var(--mono); }
+.progress-track {
+  height: 10px;
+  background: var(--surface2);
+  border-radius: 5px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 5px;
+  transition: width 0.5s ease;
+}
+.progress-fill.green { background: linear-gradient(90deg, #1A7A4A, #22C55E); }
+.progress-fill.amber { background: linear-gradient(90deg, #B45309, #F59E0B); }
+.progress-fill.red   { background: linear-gradient(90deg, #991B1B, #EF4444); }
+.progress-caption { font-size: 11.5px; color: var(--slate2); margin-top: 4px; }
+.debt-breakdown {
+  margin-top: 14px;
+  border: 1px solid var(--mist);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.debt-breakdown-header {
+  background: var(--surface);
+  padding: 7px 14px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--fog);
+}
+.debt-breakdown-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  gap: 8px;
+  padding: 8px 14px;
+  border-top: 1px solid var(--mist);
+  align-items: center;
+  font-size: 12.5px;
+}
+.debt-breakdown-row .name { color: var(--navy); font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.debt-breakdown-row .sub { font-size: 11px; color: var(--slate2); }
+.debt-col { font-family: var(--mono); font-size: 12px; color: var(--slate); text-align: right; }
+.debt-col.highlight { color: var(--navy2); font-weight: 700; }
+
+/* ── Projected metrics ── */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.metric-tile {
+  background: var(--surface);
+  border: 1px solid var(--mist);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+}
+.metric-tile.accent {
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy2) 100%);
+  border-color: transparent;
+}
+.mt-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--fog);
+  margin-bottom: 4px;
+}
+.metric-tile.accent .mt-label { color: rgba(255,255,255,0.5); }
+.mt-val {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--navy);
+  letter-spacing: -0.02em;
+  font-family: var(--mono);
+}
+.metric-tile.accent .mt-val { color: #fff; }
+.mt-sub { font-size: 11px; color: var(--slate2); margin-top: 2px; }
+.metric-tile.accent .mt-sub { color: rgba(255,255,255,0.5); }
+
+.metrics-table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+.metrics-table tr { border-bottom: 1px solid var(--surface2); }
+.metrics-table tr:last-child { border-bottom: none; }
+.metrics-table td { padding: 7px 0; font-size: 12.5px; }
+.metrics-table .ml { color: var(--slate2); }
+.metrics-table .mv { text-align: right; font-weight: 600; font-family: var(--mono); color: var(--navy); }
+.metrics-table .mv.green { color: var(--green); }
+.metrics-table tr.divider-row td { border-top: 2px solid var(--mist); padding-top: 10px; font-weight: 700; }
+
+.income-chart-wrap {
+  border: 1px solid var(--mist);
+  border-radius: var(--radius);
+  padding: 14px;
+  background: var(--surface);
+}
+.income-chart-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--fog);
+  margin-bottom: 10px;
+}
+
+/* ── Stress test ── */
+.stress-table { width: 100%; border-collapse: collapse; }
+.stress-table th {
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--fog);
+  background: var(--surface);
+  text-align: right;
+  border-bottom: 1px solid var(--mist);
+}
+.stress-table th:first-child { text-align: left; }
+.stress-table td {
+  padding: 9px 12px;
+  font-size: 12.5px;
+  text-align: right;
+  border-bottom: 1px solid var(--surface2);
+}
+.stress-table td:first-child { text-align: left; color: var(--slate2); }
+.stress-table .col-base { color: var(--green); font-weight: 700; font-family: var(--mono); }
+.stress-table .col-mild { color: var(--amber); font-weight: 700; font-family: var(--mono); }
+.stress-table .col-severe { color: var(--red); font-weight: 700; font-family: var(--mono); }
+.stress-table .col-assumption { color: var(--slate); font-family: var(--mono); font-size: 12px; }
+.stress-header-base { background: var(--green-lt) !important; color: var(--green) !important; }
+.stress-header-mild { background: var(--amber-lt) !important; color: var(--amber) !important; }
+.stress-header-severe { background: var(--red-lt) !important; color: var(--red) !important; }
+
+.locked-state {
+  text-align: center;
+  padding: 32px 20px;
+  color: var(--slate2);
+}
+.locked-icon { font-size: 32px; margin-bottom: 8px; }
+.locked-text { font-size: 13px; line-height: 1.6; max-width: 280px; margin: 0 auto 14px; }
+
+/* ── Footer handoff bar ── */
+.mod-footer {
+  background: var(--navy);
+  padding: 16px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  position: sticky;
+  bottom: 0;
+}
+.footer-summary {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.footer-stat { text-align: center; }
+.footer-stat .fs-val { font-size: 18px; font-weight: 700; color: #fff; font-family: var(--mono); }
+.footer-stat .fs-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.08em; color: rgba(255,255,255,0.45); margin-top: 1px; }
+.footer-divider { width: 1px; height: 36px; background: rgba(255,255,255,0.12); }
+.footer-actions { display: flex; gap: 10px; align-items: center; }
+.btn-handoff {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: var(--gold);
+  color: var(--navy);
+  border: none;
+  border-radius: var(--radius);
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all var(--transition);
+  font-family: var(--font);
+}
+.btn-handoff:hover { background: #D4B460; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(201,168,76,0.35); }
+.btn-save-summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 16px;
+  background: rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.8);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: var(--radius);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition);
+  font-family: var(--font);
+}
+.btn-save-summary:hover { background: rgba(255,255,255,0.18); color: #fff; }
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .mod-body { grid-template-columns: 1fr; }
+  .mod-inputs { position: static; max-height: none; border-right: none; border-bottom: 1px solid var(--mist); }
+  .mod-header { padding: 14px 16px; }
+  .mod-outputs { padding: 16px; }
+  .mod-footer { padding: 12px 16px; }
+}
+
+/* ── Toast ── */
+#toast {
+  position: fixed; bottom: 80px; right: 24px;
+  background: var(--navy); color: #fff;
+  padding: 10px 18px; border-radius: var(--radius);
+  font-size: 13px; font-weight: 500;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.3s;
+  z-index: 9999;
+  box-shadow: var(--shadow);
+}
+#toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+<div class="mod-page">
+
+  <!-- Page header -->
+  <div class="mod-header">
+    <div class="mod-header-left">
+      <h1>1031 Exchange Modeler</h1>
+      <p>Run boot analysis, debt replacement, and portfolio projections for your client's exchange</p>
+    </div>
+    <div class="mod-header-right">
+      <div class="client-chip" id="client-chip">
+        <span>Client:</span> <strong id="client-name-display">No client loaded</strong>
+      </div>
+      <button class="btn-save-summary" style="padding:7px 14px; font-size:12px;" onclick="window.print()">⬇ Save Summary</button>
+    </div>
+  </div>
+
+  <!-- Basket bar -->
+  <div id="basket-bar">
+    <div class="basket-bar-inner">
+      <div class="basket-bar-label">Replacement Portfolio</div>
+      <div id="basket-pills"></div>
+      <div class="basket-bar-link" onclick="navigateToBrowse()">← Add / Change Offerings</div>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="mod-body">
+
+    <!-- LEFT: Inputs -->
+    <div class="mod-inputs">
+
+      <!-- Section 1: Relinquished Property -->
+      <div class="input-section">
+        <div class="input-section-title">1 — Relinquished Property</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Sale Price</label>
+            <input class="form-input mono" type="number" id="inp-sale-price" placeholder="$0" min="0" step="1000" oninput="compute()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Existing Loan Balance</label>
+            <input class="form-input mono" type="number" id="inp-loan-balance" placeholder="$0" min="0" step="1000" oninput="compute()">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Closing Costs <span class="opt">(default 6%)</span></label>
+            <input class="form-input mono" type="number" id="inp-closing-costs" placeholder="auto" min="0" step="100" oninput="compute()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Adjusted Basis <span class="opt">optional</span></label>
+            <input class="form-input mono" type="number" id="inp-adj-basis" placeholder="$0" min="0" step="1000" oninput="compute()">
+          </div>
+        </div>
+        <div class="form-row full">
+          <div class="form-group">
+            <label class="form-label">Depreciation Recapture Est. <span class="opt">optional</span></label>
+            <input class="form-input mono" type="number" id="inp-depreciation" placeholder="$0" min="0" step="100" oninput="compute()">
+          </div>
+        </div>
+
+        <!-- Computed -->
+        <div class="computed-row" id="computed-relinquished">
+          <div class="computed-line">
+            <span class="computed-key">Net Sale Proceeds</span>
+            <span class="computed-val highlight" id="c-net-proceeds">—</span>
+          </div>
+          <div class="computed-line">
+            <span class="computed-key">Estimated Realized Gain</span>
+            <span class="computed-val" id="c-realized-gain">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 2: Exchange Parameters -->
+      <div class="input-section">
+        <div class="input-section-title">2 — Exchange Parameters</div>
+        <div class="form-row full">
+          <div class="form-group">
+            <label class="form-label">Sale Close Date</label>
+            <input class="form-input" type="date" id="inp-close-date" oninput="updateDeadlines()">
+          </div>
+        </div>
+        <div class="deadline-row" id="deadline-row">
+          <div class="deadline-chip" id="deadline-45">
+            <div class="label">45-Day ID Deadline</div>
+            <div class="date" id="d-45">—</div>
+          </div>
+          <div class="deadline-chip" id="deadline-180">
+            <div class="label">180-Day Close Deadline</div>
+            <div class="date" id="d-180">—</div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Exchange Type</label>
+            <select class="form-select" id="inp-exchange-type">
+              <option value="forward">Forward Exchange</option>
+              <option value="reverse">Reverse Exchange</option>
+              <option value="improvement">Improvement Exchange</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Qualified Intermediary <span class="opt">optional</span></label>
+            <input class="form-input" type="text" id="inp-qi" placeholder="QI name">
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 3: Replacement Targets -->
+      <div class="input-section">
+        <div class="input-section-title">3 — Replacement Targets</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Exchange Equity Available</label>
+            <input class="form-input mono" type="number" id="inp-exchange-equity" placeholder="auto-computed" min="0" step="1000" oninput="compute()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Debt Replacement Target</label>
+            <input class="form-input mono" type="number" id="inp-debt-target" placeholder="auto from loan bal." min="0" step="1000" oninput="compute()">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Planned Hold Period</label>
+            <select class="form-select" id="inp-hold-period" onchange="compute()">
+              <option value="5">5 Years</option>
+              <option value="7" selected>7 Years</option>
+              <option value="10">10 Years</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Marginal Tax Rate</label>
+            <input class="form-input mono" type="number" id="inp-tax-rate" placeholder="24" min="0" max="60" value="24" oninput="compute()">
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 4: Advisory Fees -->
+      <div class="input-section">
+        <div class="input-section-title">4 — Advisory Fees <span style="text-transform:none;letter-spacing:0;font-weight:400;color:var(--fog);font-size:10px;">(for net IRR calc)</span></div>
+        <div class="fee-grid">
+          <div class="form-group">
+            <label class="form-label">DST Load %</label>
+            <input class="form-input mono" type="number" id="inp-dst-load" value="7" min="0" max="20" step="0.5" oninput="compute()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Advisor Fee %/yr</label>
+            <input class="form-input mono" type="number" id="inp-advisor-fee" value="0" min="0" max="5" step="0.1" oninput="compute()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">AMF %/yr</label>
+            <input class="form-input mono" type="number" id="inp-amf" value="0.75" min="0" max="5" step="0.1" oninput="compute()">
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end mod-inputs -->
+
+    <!-- RIGHT: Outputs -->
+    <div class="mod-outputs">
+
+      <!-- Output 1: Boot Analysis -->
+      <div class="output-panel">
+        <div class="panel-header" onclick="togglePanel('boot')">
+          <div class="panel-title-row">
+            <span class="panel-icon">🔍</span>
+            <div>
+              <div class="panel-title">Boot Analysis</div>
+              <div class="panel-subtitle">Is this exchange clean?</div>
+            </div>
+          </div>
+          <div class="panel-status-chip status-na" id="boot-status-chip">Enter data</div>
+          <div class="panel-chevron open" id="chevron-boot">▼</div>
+        </div>
+        <div class="panel-body" id="body-boot">
+          <table class="boot-table" id="boot-table">
+            <tbody>
+              <tr><td class="bt-label">Gross Sale Price</td><td class="bt-val" id="bt-sale">—</td></tr>
+              <tr><td class="bt-label">− Existing Loan Payoff</td><td class="bt-val neg" id="bt-loan">—</td></tr>
+              <tr><td class="bt-label">− Closing Costs</td><td class="bt-val neg" id="bt-closing">—</td></tr>
+              <tr class="subtotal"><td class="bt-label"><strong>= Net Exchange Equity</strong></td><td class="bt-val highlight" id="bt-net-equity" style="color:var(--navy2);font-size:14px;">—</td></tr>
+              <tr class="section-gap"><td class="bt-label">Target Replacement Value</td><td class="bt-val" id="bt-target-replace">—</td></tr>
+              <tr><td class="bt-label">Equity Boot Exposure</td><td class="bt-val" id="bt-equity-boot">$0</td></tr>
+              <tr class="section-gap"><td class="bt-label">Relinquished Debt</td><td class="bt-val" id="bt-reliq-debt">—</td></tr>
+              <tr><td class="bt-label">Replacement Debt (from basket)</td><td class="bt-val" id="bt-replace-debt">—</td></tr>
+              <tr class="total"><td class="bt-label">Mortgage Boot Exposure</td><td class="bt-val" id="bt-mortgage-boot">$0</td></tr>
+            </tbody>
+          </table>
+          <div class="boot-note" id="boot-note" style="display:none;"></div>
+        </div>
+      </div>
+
+      <!-- Output 2: Debt Replacement -->
+      <div class="output-panel">
+        <div class="panel-header" onclick="togglePanel('debt')">
+          <div class="panel-title-row">
+            <span class="panel-icon">⚖️</span>
+            <div>
+              <div class="panel-title">Debt Replacement Tracker</div>
+              <div class="panel-subtitle">Mortgage boot risk monitor</div>
+            </div>
+          </div>
+          <div class="panel-status-chip status-na" id="debt-status-chip">Enter data</div>
+          <div class="panel-chevron open" id="chevron-debt">▼</div>
+        </div>
+        <div class="panel-body" id="body-debt">
+          <div class="progress-bar-wrap">
+            <div class="progress-label-row">
+              <span class="progress-label">Debt Replaced</span>
+              <span class="progress-pct" id="debt-pct-label">0%</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill amber" id="debt-progress-fill" style="width:0%"></div>
+            </div>
+            <div class="progress-caption" id="debt-caption">Enter sale price and loan balance to track debt replacement.</div>
+          </div>
+          <div class="debt-breakdown" id="debt-breakdown-wrap" style="display:none;">
+            <div class="debt-breakdown-header">Per-Offering Debt Contribution</div>
+            <div id="debt-breakdown-rows"></div>
+          </div>
+          <div class="boot-note" id="debt-note" style="display:none; margin-top:12px;"></div>
+        </div>
+      </div>
+
+      <!-- Output 3: Projected Metrics -->
+      <div class="output-panel">
+        <div class="panel-header" onclick="togglePanel('metrics')">
+          <div class="panel-title-row">
+            <span class="panel-icon">📈</span>
+            <div>
+              <div class="panel-title">Projected Portfolio Metrics</div>
+              <div class="panel-subtitle">Cash flow, IRR & breakeven analysis</div>
+            </div>
+          </div>
+          <div class="panel-status-chip status-na" id="metrics-status-chip">Basket needed</div>
+          <div class="panel-chevron open" id="chevron-metrics">▼</div>
+        </div>
+        <div class="panel-body" id="body-metrics">
+          <div class="locked-state" id="metrics-locked">
+            <div class="locked-icon">🧺</div>
+            <div class="locked-text">Add offerings to your basket to model portfolio performance and projected returns.</div>
+            <button class="btn-save-summary" style="margin:0 auto; display:inline-flex;" onclick="navigateToBrowse()">Browse Offerings →</button>
+          </div>
+          <div id="metrics-content" style="display:none;">
+            <div class="metrics-grid" id="metrics-kpi-grid">
+              <!-- KPI tiles injected here -->
+            </div>
+            <table class="metrics-table" id="metrics-detail-table">
+              <!-- rows injected here -->
+            </table>
+            <div class="income-chart-wrap">
+              <div class="income-chart-title">Projected Annual Distributions (Years 1–7)</div>
+              <canvas id="income-chart" height="140"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Output 4: Stress Test -->
+      <div class="output-panel">
+        <div class="panel-header" onclick="togglePanel('stress')">
+          <div class="panel-title-row">
+            <span class="panel-icon">🧪</span>
+            <div>
+              <div class="panel-title">Stress Test</div>
+              <div class="panel-subtitle">Portfolio scenarios: Base / Mild / Severe</div>
+            </div>
+          </div>
+          <div class="panel-status-chip status-na" id="stress-status-chip">Basket needed</div>
+          <div class="panel-chevron open" id="chevron-stress">▼</div>
+        </div>
+        <div class="panel-body" id="body-stress">
+          <div class="locked-state" id="stress-locked">
+            <div class="locked-icon">🔒</div>
+            <div class="locked-text">Add offerings to your basket to run stress scenarios against your portfolio.</div>
+          </div>
+          <div id="stress-content" style="display:none;">
+            <table class="stress-table" id="stress-table">
+              <thead>
+                <tr>
+                  <th>Metric</th>
+                  <th class="stress-header-base">Base Case</th>
+                  <th class="stress-header-mild">Mild Stress</th>
+                  <th class="stress-header-severe">Severe Stress</th>
+                </tr>
+              </thead>
+              <tbody id="stress-tbody"></tbody>
+            </table>
+            <div class="boot-note" style="background:var(--ice); border-left-color:var(--slate2); color:var(--slate); margin-top:14px;">
+              <strong>Disclosure:</strong> Stress scenarios are illustrative only and not a guarantee of future results. For suitability analysis and compliance documentation. Vacancy/expense shock and exit price change are applied uniformly across all portfolio holdings.
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end mod-outputs -->
+  </div><!-- end mod-body -->
+
+  <!-- Footer handoff bar -->
+  <div class="mod-footer">
+    <div class="footer-summary">
+      <div class="footer-stat">
+        <div class="fs-val" id="footer-equity">$—</div>
+        <div class="fs-label">Exchange Equity</div>
+      </div>
+      <div class="footer-divider"></div>
+      <div class="footer-stat">
+        <div class="fs-val" id="footer-debt">$—</div>
+        <div class="fs-label">Debt to Replace</div>
+      </div>
+      <div class="footer-divider"></div>
+      <div class="footer-stat">
+        <div class="fs-val" id="footer-boot">—</div>
+        <div class="fs-label">Boot Status</div>
+      </div>
+      <div class="footer-divider"></div>
+      <div class="footer-stat">
+        <div class="fs-val" id="footer-blended-coc">—</div>
+        <div class="fs-label">Blended Y1 CoC</div>
+      </div>
+    </div>
+    <div class="footer-actions">
+      <button class="btn-save-summary" onclick="window.print()">⬇ Save Exchange Summary</button>
+      <button class="btn-handoff" id="btn-to-builder" onclick="goToBuilder()">
+        Build Portfolio →
+      </button>
+    </div>
+  </div>
+
+</div><!-- end mod-page -->
+
+<div id="toast"></div>
+
+<script>
+// ─── State ────────────────────────────────────────────────────
+let incomeChart = null;
+
+// Scenario multipliers
+const STRESS = {
+  base:   { vacExpShock: 0.00, exitChg: 0.00 },
+  mild:   { vacExpShock: 0.10, exitChg: -0.10 },
+  severe: { vacExpShock: 0.25, exitChg: -0.20 },
+};
+
+// ─── Init ─────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  // Load AFL if available (when running inside shell)
+  if (window.AFL) {
+    initFromAFL();
+  } else {
+    // standalone mode — try again shortly
+    setTimeout(() => { if (window.AFL) initFromAFL(); }, 300);
+  }
+  compute();
+});
+
+function initFromAFL() {
+  const AFL = window.AFL;
+
+  // Populate client name
+  const client = AFL.state.client;
+  if (client && (client.name || client.exchangeAmount)) {
+    document.getElementById('client-name-display').textContent = client.name || 'Unnamed Client';
+    if (client.exchangeAmount) {
+      document.getElementById('inp-exchange-equity').value = client.exchangeAmount;
+    }
+  }
+
+  // Populate basket bar
+  const basketFunds = AFL.basket.get();
+  renderBasketBar(basketFunds);
+
+  // Pre-fill exchange equity from AFL.state.exchange if available
+  if (AFL.state.exchange && AFL.state.exchange.netEquity) {
+    document.getElementById('inp-exchange-equity').value = AFL.state.exchange.netEquity;
+    document.getElementById('inp-debt-target').value     = AFL.state.exchange.debtTarget || '';
+  }
+
+  compute();
+}
+
+// ─── Format helpers ───────────────────────────────────────────
+function fmtD(n) {
+  if (n == null || isNaN(n)) return '—';
+  return '$' + Math.round(n).toLocaleString('en-US');
+}
+function fmtPct(n, d = 2) {
+  if (n == null || isNaN(n)) return '—';
+  return n.toFixed(d) + '%';
+}
+function getVal(id) {
+  const v = parseFloat(document.getElementById(id).value);
+  return isNaN(v) ? 0 : v;
+}
+function getValOrNull(id) {
+  const v = parseFloat(document.getElementById(id).value);
+  return isNaN(v) ? null : v;
+}
+
+// ─── Deadline auto-fill ───────────────────────────────────────
+function updateDeadlines() {
+  const dateStr = document.getElementById('inp-close-date').value;
+  if (!dateStr) {
+    document.getElementById('d-45').textContent  = '—';
+    document.getElementById('d-180').textContent = '—';
+    return;
+  }
+  const close = new Date(dateStr + 'T12:00:00');
+  const d45   = new Date(close); d45.addDays   = function(n) { return new Date(this.getTime() + n*864e5); };
+  const date45  = new Date(close.getTime() +  45*864e5);
+  const date180 = new Date(close.getTime() + 180*864e5);
+  const opts = { month:'short', day:'numeric', year:'numeric' };
+  document.getElementById('d-45').textContent  = date45.toLocaleDateString('en-US', opts);
+  document.getElementById('d-180').textContent = date180.toLocaleDateString('en-US', opts);
+  compute();
+}
+
+// ─── Main compute ─────────────────────────────────────────────
+function compute() {
+  const salePrice      = getVal('inp-sale-price');
+  const loanBalance    = getVal('inp-loan-balance');
+  const adjBasis       = getValOrNull('inp-adj-basis');
+  const holdPeriod     = getVal('inp-hold-period') || 7;
+  const taxRatePct     = getVal('inp-tax-rate') || 24;
+  const dstLoadPct     = getVal('inp-dst-load') || 7;
+  const advisorFeePct  = getVal('inp-advisor-fee') || 0;
+  const amfPct         = getVal('inp-amf') || 0.75;
+
+  // Closing costs: use input or default to 6% of sale price
+  const ccInput        = getValOrNull('inp-closing-costs');
+  const closingCosts   = ccInput !== null ? ccInput : (salePrice * 0.06);
+
+  const netProceeds    = salePrice - loanBalance - closingCosts;
+  const realizedGain   = adjBasis !== null ? (salePrice - adjBasis) : null;
+
+  // Exchange equity: use manual override or computed net proceeds
+  const equityInput    = getValOrNull('inp-exchange-equity');
+  const exchangeEquity = equityInput !== null ? equityInput : Math.max(0, netProceeds);
+  if (equityInput === null && salePrice > 0) {
+    // auto-fill the input
+    document.getElementById('inp-exchange-equity').placeholder = fmtD(Math.max(0, netProceeds)).replace('$','$');
+  }
+
+  // Debt target: use manual override or loan balance
+  const debtInput      = getValOrNull('inp-debt-target');
+  const debtTarget     = debtInput !== null ? debtInput : loanBalance;
+  if (debtInput === null && loanBalance > 0) {
+    document.getElementById('inp-debt-target').placeholder = fmtD(loanBalance).replace('$','$');
+  }
+
+  // Basket funds
+  const basketFunds = window.AFL ? window.AFL.basket.get() : [];
+
+  // Blended basket metrics
+  let totalBasketEquity  = 0;
+  let blendedCoc         = 0;
+  let blendedLtv         = 0;
+  let totalImpliedDebt   = 0;
+  let perFundAllocs      = [];
+
+  if (basketFunds.length > 0 && exchangeEquity > 0) {
+    const allocPerFund = exchangeEquity / basketFunds.length;
+    basketFunds.forEach(f => {
+      const alloc      = allocPerFund;
+      const ltv        = (f.ltv || 0);  // stored as decimal if field > 1, else pct — normalise
+      const ltvDecimal = ltv > 1 ? ltv / 100 : ltv;
+      const impliedDebt = alloc > 0 ? (alloc * ltvDecimal) / (1 - ltvDecimal || 1) : 0;
+      const y1coc      = (f.y1coc || 0);
+      const cocPct     = y1coc > 1 ? y1coc : y1coc * 100;  // normalise to pct display
+      const income1    = alloc * (cocPct / 100);
+
+      totalBasketEquity += alloc;
+      blendedCoc        += (alloc * cocPct);
+      blendedLtv        += (alloc * ltvDecimal * 100);
+      totalImpliedDebt  += impliedDebt;
+
+      // Build income array from fund.income[0..9]
+      const incomeArr = [];
+      for (let i = 0; i < 10; i++) {
+        const raw = f.income && f.income[i] != null ? f.income[i] : null;
+        // income fields in sheet are % per year — multiply by alloc
+        if (raw !== null) {
+          const pct = raw > 1 ? raw : raw * 100;
+          incomeArr.push(alloc * pct / 100);
+        } else {
+          incomeArr.push(income1); // fallback to y1
+        }
+      }
+
+      perFundAllocs.push({
+        name: f.name || f.displayLabel || 'Offering',
+        alloc,
+        ltvDecimal,
+        impliedDebt,
+        cocPct,
+        income1,
+        incomeArr,
+        id: f.id
+      });
+    });
+
+    blendedCoc   = blendedCoc   / totalBasketEquity;
+    blendedLtv   = blendedLtv   / totalBasketEquity;
+  }
+
+  // ── Boot Analysis ──────────────────────────────────────────
+  // Equity boot: replacement value must be >= sale price
+  const replacementValue = exchangeEquity + totalImpliedDebt;
+  const equityBoot    = Math.max(0, salePrice - replacementValue);
+  // Mortgage boot: replacement debt must be >= relinquished debt
+  const mortgageBoot  = Math.max(0, debtTarget - totalImpliedDebt);
+  const totalBoot     = equityBoot + mortgageBoot;
+
+  let bootStatus = 'na';
+  if (salePrice > 0) {
+    if (totalBoot === 0)                        bootStatus = 'clean';
+    else if (totalBoot < salePrice * 0.05)      bootStatus = 'review';
+    else                                         bootStatus = 'boot';
+  }
+
+  // Render boot table
+  setText('bt-sale',         fmtD(salePrice));
+  setText('bt-loan',         salePrice > 0 ? '(' + fmtD(loanBalance) + ')' : '—');
+  setText('bt-closing',      salePrice > 0 ? '(' + fmtD(closingCosts) + ')' : '—');
+  setText('bt-net-equity',   salePrice > 0 ? fmtD(Math.max(0, netProceeds)) : '—');
+  setText('bt-target-replace', fmtD(salePrice));
+  setText('bt-equity-boot',  equityBoot > 0 ? fmtD(equityBoot) : '$0');
+  setText('bt-reliq-debt',   fmtD(loanBalance));
+  setText('bt-replace-debt', basketFunds.length > 0 ? fmtD(totalImpliedDebt) : '—');
+  setText('bt-mortgage-boot', mortgageBoot > 0 ? fmtD(mortgageBoot) : '$0');
+
+  // Boot status chip
+  const bootChip = document.getElementById('boot-status-chip');
+  const bootNote = document.getElementById('boot-note');
+  if (bootStatus === 'clean') {
+    bootChip.className = 'panel-status-chip status-clean';
+    bootChip.textContent = '✓ Clean Exchange';
+    bootNote.className = 'boot-note green';
+    bootNote.textContent = 'This exchange appears clean — no boot exposure detected. Confirm with your Qualified Intermediary before closing.';
+    bootNote.style.display = 'block';
+  } else if (bootStatus === 'review') {
+    bootChip.className = 'panel-status-chip status-review';
+    bootChip.textContent = '⚠ Review Required';
+    bootNote.className = 'boot-note';
+    bootNote.textContent = `Estimated boot of ${fmtD(totalBoot)} — within 5% threshold. Review with QI and CPA before closing.`;
+    bootNote.style.display = 'block';
+  } else if (bootStatus === 'boot') {
+    bootChip.className = 'panel-status-chip status-boot';
+    bootChip.textContent = '✗ Boot Likely';
+    bootNote.className = 'boot-note';
+    bootNote.innerHTML = `<strong>Boot exposure: ${fmtD(totalBoot)}</strong> — this may result in a taxable event. Boot amounts should be reviewed with the client's CPA and Qualified Intermediary before closing.`;
+    bootNote.style.display = 'block';
+  } else {
+    bootChip.className = 'panel-status-chip status-na';
+    bootChip.textContent = 'Enter data';
+    bootNote.style.display = 'none';
+  }
+
+  // ── Computed fields ────────────────────────────────────────
+  setText('c-net-proceeds', salePrice > 0 ? fmtD(Math.max(0, netProceeds)) : '—');
+  setText('c-realized-gain', realizedGain !== null ? fmtD(realizedGain) : '—');
+
+  // ── Debt tracker ───────────────────────────────────────────
+  const debtChip     = document.getElementById('debt-status-chip');
+  const debtFill     = document.getElementById('debt-progress-fill');
+  const debtPctLabel = document.getElementById('debt-pct-label');
+  const debtCaption  = document.getElementById('debt-caption');
+  const debtNote     = document.getElementById('debt-note');
+
+  if (debtTarget > 0) {
+    const pct = Math.min(100, (totalImpliedDebt / debtTarget) * 100);
+    debtFill.style.width = pct + '%';
+    debtPctLabel.textContent = pct.toFixed(1) + '%';
+    debtCaption.textContent = `${fmtD(totalImpliedDebt)} of ${fmtD(debtTarget)} replaced`;
+
+    let debtColor, debtStatusText;
+    if (pct >= 100) {
+      debtColor = 'green'; debtStatusText = '✓ Fully Covered';
+      debtNote.style.display = 'none';
+    } else if (pct >= 80) {
+      debtColor = 'amber'; debtStatusText = '⚠ Partially Covered';
+      debtNote.className = 'boot-note';
+      debtNote.textContent = `Shortfall of ${fmtD(debtTarget - totalImpliedDebt)}. Client may recognize mortgage boot. Consider adding a leveraged DST or adjusting allocations.`;
+      debtNote.style.display = 'block';
+    } else {
+      debtColor = 'red'; debtStatusText = '✗ Significant Shortfall';
+      debtNote.className = 'boot-note';
+      debtNote.innerHTML = `<strong>Shortfall: ${fmtD(debtTarget - totalImpliedDebt)}</strong>. This portfolio does not meet the debt replacement requirement. Review with QI and consider leveraged DST offerings.`;
+      debtNote.style.display = 'block';
+    }
+
+    debtFill.className = `progress-fill ${debtColor}`;
+    debtChip.className = `panel-status-chip ${debtColor === 'green' ? 'status-clean' : debtColor === 'amber' ? 'status-review' : 'status-boot'}`;
+    debtChip.textContent = debtStatusText;
+  } else {
+    debtFill.style.width = '0%';
+    debtPctLabel.textContent = '—';
+    debtCaption.textContent = 'Enter sale price and loan balance to track debt replacement.';
+    debtChip.className = 'panel-status-chip status-na';
+    debtChip.textContent = 'Enter data';
+    debtNote.style.display = 'none';
+  }
+
+  // Per-offering debt breakdown
+  const debtBreakWrap = document.getElementById('debt-breakdown-wrap');
+  const debtBreakRows = document.getElementById('debt-breakdown-rows');
+  if (perFundAllocs.length > 0) {
+    debtBreakWrap.style.display = 'block';
+    debtBreakRows.innerHTML = perFundAllocs.map(f => `
+      <div class="debt-breakdown-row">
+        <div class="name">${escH(f.name)}</div>
+        <div class="debt-col">${fmtD(f.alloc)}</div>
+        <div class="debt-col">${(f.ltvDecimal * 100).toFixed(0)}% LTV</div>
+        <div class="debt-col highlight">${fmtD(f.impliedDebt)}</div>
+      </div>
+    `).join('');
+  } else {
+    debtBreakWrap.style.display = 'none';
+  }
+
+  // ── Projected Metrics ──────────────────────────────────────
+  if (basketFunds.length > 0 && exchangeEquity > 0) {
+    document.getElementById('metrics-locked').style.display  = 'none';
+    document.getElementById('metrics-content').style.display = 'block';
+    document.getElementById('stress-locked').style.display   = 'none';
+    document.getElementById('stress-content').style.display  = 'block';
+
+    document.getElementById('metrics-status-chip').className    = 'panel-status-chip status-clean';
+    document.getElementById('metrics-status-chip').textContent  = basketFunds.length + ' offering' + (basketFunds.length > 1 ? 's' : '');
+    document.getElementById('stress-status-chip').className     = 'panel-status-chip status-clean';
+    document.getElementById('stress-status-chip').textContent   = 'Base / Mild / Severe';
+
+    const cocDecimal    = blendedCoc / 100;
+    const annualIncome  = exchangeEquity * cocDecimal;
+    const dstLoadFrac   = dstLoadPct / 100;
+    const advisorFrac   = advisorFeePct / 100;
+    const amfFrac       = amfPct / 100;
+    const annualFeeDrag = exchangeEquity * (advisorFrac + amfFrac);
+    const netAnnual     = annualIncome - annualFeeDrag;
+    const totalCashFlow = netAnnual * holdPeriod;
+    const netEquityDeployed = exchangeEquity * (1 - dstLoadFrac);
+
+    // Gross IRR approx: (total cf + equity) / equity / years - 1 (simplified)
+    const grossIrr = blendedCoc - (dstLoadFrac * 100 / holdPeriod);
+    const netIrr   = grossIrr - (advisorFeePct + amfPct);
+    const breakeven = dstLoadFrac / (cocDecimal || 0.0001); // years to recover load
+
+    // KPI tiles
+    const kpiGrid = document.getElementById('metrics-kpi-grid');
+    kpiGrid.innerHTML = [
+      { label: 'Exchange Equity',      val: fmtD(exchangeEquity),      sub: 'deployed' },
+      { label: 'Year 1 Cash Flow',     val: fmtD(annualIncome),         sub: 'gross annual' },
+      { label: 'Blended Y1 CoC',       val: fmtPct(blendedCoc),         sub: 'equity-weighted', accent: true },
+      { label: 'Est. Net IRR',         val: fmtPct(netIrr),             sub: 'after fees', accent: true },
+      { label: 'Total Cash ('+holdPeriod+'yr)',val: fmtD(totalCashFlow), sub: 'net after fees' },
+      { label: 'Breakeven Year',       val: breakeven > 0 ? 'Yr ' + breakeven.toFixed(1) : '—', sub: 'vs. no-load case' },
+    ].map(t => `
+      <div class="metric-tile ${t.accent ? 'accent' : ''}">
+        <div class="mt-label">${t.label}</div>
+        <div class="mt-val">${t.val}</div>
+        <div class="mt-sub">${t.sub}</div>
+      </div>
+    `).join('');
+
+    // Detail table
+    const detailTable = document.getElementById('metrics-detail-table');
+    detailTable.innerHTML = `
+      <tbody>
+        <tr><td class="ml">Total Equity Invested</td><td class="mv">${fmtD(exchangeEquity)}</td></tr>
+        <tr><td class="ml">DST Load / Upfront Fee (${dstLoadPct}%)</td><td class="mv">${fmtD(exchangeEquity * dstLoadFrac)}</td></tr>
+        <tr><td class="ml">Net Equity Deployed</td><td class="mv">${fmtD(netEquityDeployed)}</td></tr>
+        <tr class="divider-row"><td class="ml">Year 1 Gross Cash Flow</td><td class="mv green">${fmtD(annualIncome)}</td></tr>
+        <tr><td class="ml">Year 1 Annual Fee Drag</td><td class="mv">(${fmtD(annualFeeDrag)})</td></tr>
+        <tr><td class="ml">Year 1 Net Cash Flow</td><td class="mv green">${fmtD(netAnnual)}</td></tr>
+        <tr class="divider-row"><td class="ml">Total Cash Flow (${holdPeriod} yr, net)</td><td class="mv">${fmtD(totalCashFlow)}</td></tr>
+        <tr><td class="ml">Est. Gross IRR</td><td class="mv">${fmtPct(grossIrr)}</td></tr>
+        <tr><td class="ml">Est. Net IRR (after all fees)</td><td class="mv green">${fmtPct(netIrr)}</td></tr>
+        <tr><td class="ml">Breakeven vs. No-Load</td><td class="mv">Year ${breakeven.toFixed(1)}</td></tr>
+      </tbody>
+    `;
+
+    // Income chart
+    renderIncomeChart(perFundAllocs, holdPeriod);
+
+    // ── Stress Test ──────────────────────────────────────────
+    const sTbody = document.getElementById('stress-tbody');
+    const scenarios = ['base', 'mild', 'severe'];
+
+    function scenarioCoc(scenario) {
+      const s = STRESS[scenario];
+      return Math.max(0, blendedCoc * (1 - s.vacExpShock));
+    }
+    function scenarioCf(scenario) {
+      return exchangeEquity * scenarioCoc(scenario) / 100;
+    }
+    function scenarioTotalReturn(scenario) {
+      const s = STRESS[scenario];
+      const totalReplacement = exchangeEquity + totalImpliedDebt;
+      const exitPrice  = totalReplacement * (1 + s.exitChg);
+      const exitEquity = exitPrice - totalImpliedDebt;
+      return (scenarioCf(scenario) * holdPeriod) + Math.max(0, exitEquity) - exchangeEquity;
+    }
+    function scenarioIrr(scenario) {
+      const coc = scenarioCoc(scenario);
+      return coc - (dstLoadFrac * 100 / holdPeriod);
+    }
+    function debtCovered(scenario) {
+      if (debtTarget === 0) return '—';
+      const cf = scenarioCf(scenario);
+      // Simplified: covered if annual income > 0 (not a full DSCR calc without property debt service data)
+      return cf > 0 ? '✓ Yes' : '✗ No';
+    }
+
+    const rows = [
+      { label: 'Vacancy / Expense Shock',   vals: ['0%', '+10%', '+25%'],         cls: 'col-assumption' },
+      { label: 'Exit Price Change',          vals: ['0%', '−10%', '−20%'],         cls: 'col-assumption' },
+      { label: 'Blended CoC Yield',          vals: scenarios.map(s => fmtPct(scenarioCoc(s))), cls: ['col-base','col-mild','col-severe'] },
+      { label: 'Annual Cash Flow',           vals: scenarios.map(s => fmtD(scenarioCf(s))),   cls: ['col-base','col-mild','col-severe'] },
+      { label: 'Total Return (' + holdPeriod + 'yr)', vals: scenarios.map(s => fmtD(scenarioTotalReturn(s))), cls: ['col-base','col-mild','col-severe'] },
+      { label: 'Est. IRR',                   vals: scenarios.map(s => fmtPct(scenarioIrr(s))), cls: ['col-base','col-mild','col-severe'] },
+      { label: 'Income Positive?',           vals: scenarios.map(s => debtCovered(s)),          cls: ['col-base','col-mild','col-severe'] },
+    ];
+
+    sTbody.innerHTML = rows.map(row => {
+      const cls = Array.isArray(row.cls) ? row.cls : [row.cls, row.cls, row.cls];
+      return `<tr>
+        <td>${row.label}</td>
+        <td class="${cls[0]}">${row.vals[0]}</td>
+        <td class="${cls[1]}">${row.vals[1]}</td>
+        <td class="${cls[2]}">${row.vals[2]}</td>
+      </tr>`;
+    }).join('');
+
+  } else {
+    document.getElementById('metrics-locked').style.display  = 'block';
+    document.getElementById('metrics-content').style.display = 'none';
+    document.getElementById('stress-locked').style.display   = 'block';
+    document.getElementById('stress-content').style.display  = 'none';
+    document.getElementById('metrics-status-chip').className    = 'panel-status-chip status-na';
+    document.getElementById('metrics-status-chip').textContent  = 'Basket needed';
+    document.getElementById('stress-status-chip').className     = 'panel-status-chip status-na';
+    document.getElementById('stress-status-chip').textContent   = 'Basket needed';
+  }
+
+  // ── Footer bar ─────────────────────────────────────────────
+  setText('footer-equity',      exchangeEquity > 0 ? fmtD(exchangeEquity) : '$—');
+  setText('footer-debt',        debtTarget > 0     ? fmtD(debtTarget)     : '$—');
+  setText('footer-boot',        bootStatus === 'clean' ? '✓ Clean' : bootStatus === 'review' ? '⚠ Review' : bootStatus === 'boot' ? '✗ Boot' : '—');
+  setText('footer-blended-coc', blendedCoc > 0 ? fmtPct(blendedCoc) : '—');
+
+  // ── Persist to AFL.state.exchange ─────────────────────────
+  if (window.AFL) {
+    if (!window.AFL.state.exchange) window.AFL.state.exchange = {};
+    Object.assign(window.AFL.state.exchange, {
+      salePrice,
+      loanPayoff:      loanBalance,
+      closingCosts,
+      adjustedBasis:   adjBasis,
+      netEquity:       Math.max(0, netProceeds),
+      debtTarget,
+      holdPeriod,
+      taxRate:         taxRatePct / 100,
+      dstLoad:         dstLoadPct / 100,
+      advisorFee:      advisorFeePct / 100,
+      amf:             amfPct / 100,
+      bootStatus,
+      equityBoot,
+      mortgageBoot,
+      blendedCoc,
+      replacementValue,
+    });
+  }
+}
+
+// ─── Income chart ─────────────────────────────────────────────
+function renderIncomeChart(perFundAllocs, holdPeriod) {
+  const years = holdPeriod > 7 ? 7 : holdPeriod;
+  const labels = Array.from({ length: years }, (_, i) => 'Yr ' + (i + 1));
+
+  const COLORS = ['#1C3A63','#2A6496','#1A7A4A','#B45309','#7C3AED','#0D7490'];
+
+  const datasets = perFundAllocs.map((f, idx) => ({
+    label: f.name.length > 25 ? f.name.slice(0, 23) + '…' : f.name,
+    data: f.incomeArr.slice(0, years),
+    backgroundColor: COLORS[idx % COLORS.length],
+    borderRadius: 3,
+    borderSkipped: false,
+  }));
+
+  const ctx = document.getElementById('income-chart');
+  if (incomeChart) { incomeChart.destroy(); incomeChart = null; }
+
+  incomeChart = new Chart(ctx, {
+    type: 'bar',
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: perFundAllocs.length > 1,
+          position: 'bottom',
+          labels: { font: { family: 'DM Sans', size: 11 }, boxWidth: 12, padding: 10 },
+        },
+        tooltip: {
+          callbacks: {
+            label: ctx => ' ' + ctx.dataset.label + ': ' + fmtD(ctx.raw),
+          }
+        }
+      },
+      scales: {
+        x: { stacked: true, grid: { display: false }, ticks: { font: { family: 'DM Sans', size: 11 } } },
+        y: { stacked: true, grid: { color: '#EEF3FA' }, ticks: {
+          font: { family: 'DM Mono', size: 10 },
+          callback: v => '$' + (v >= 1000 ? (v/1000).toFixed(0) + 'k' : v),
+        }},
+      }
+    }
+  });
+}
+
+// ─── Basket bar ───────────────────────────────────────────────
+function renderBasketBar(funds) {
+  const bar   = document.getElementById('basket-bar');
+  const pills = document.getElementById('basket-pills');
+
+  if (!funds || funds.length === 0) {
+    bar.classList.remove('visible');
+    return;
+  }
+
+  bar.classList.add('visible');
+  pills.innerHTML = funds.map(f => {
+    const coc = f.y1coc ? (f.y1coc > 1 ? f.y1coc : f.y1coc * 100).toFixed(2) + '% CoC' : '';
+    const ltv = f.ltv   ? (f.ltv   > 1 ? f.ltv   : f.ltv   * 100).toFixed(0)  + '% LTV' : '';
+    return `<div class="basket-offering-pill">
+      <span class="basket-pill-name">${escH(f.name || f.displayLabel || 'Offering')}</span>
+      ${coc ? `<span class="basket-pill-coc">${coc}</span>` : ''}
+      ${ltv ? `<span class="basket-pill-coc">${ltv}</span>` : ''}
+    </div>`;
+  }).join('');
+}
+
+// ─── Panel toggle ─────────────────────────────────────────────
+function togglePanel(id) {
+  const body    = document.getElementById('body-' + id);
+  const chevron = document.getElementById('chevron-' + id);
+  const hidden  = body.classList.toggle('hidden');
+  chevron.classList.toggle('open', !hidden);
+}
+
+// ─── Navigation ───────────────────────────────────────────────
+function goToBuilder() {
+  compute(); // ensure state is written
+  if (window.AFL) {
+    AFL.navigate('builder');
+  } else {
+    showToast('Navigate to Portfolio Builder');
+  }
+}
+
+function navigateToBrowse() {
+  if (window.AFL) {
+    AFL.navigate('browse');
+  }
+}
+
+// ─── Utilities ────────────────────────────────────────────────
+function setText(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = val;
+}
+function escH(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>
