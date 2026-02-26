@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Browse Offerings — AFL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script>
+if (!window.AFL) {
+  document.write('<script src="shared.js"><\/script>');
+}
+</script>
+<style>
+/* ── Design tokens — Charcoal + Gold ── */
+:root {
+  --charcoal:   #141820;
+  --charcoal2:  #1E2430;
+  --charcoal3:  #252D3A;
+  --charcoal4:  #2E3848;
+  --slate:      #3D4E65;
+  --slate2:     #5A6E88;
+  --fog:        #7E93AB;
+  --mist:       #B8C8D8;
+  --ice:        #D8E4EE;
+  --white:      #FFFFFF;
+  --surface:    #F0F4F8;
+  --surface2:   #E4ECF4;
+
+  --gold:       #C9973A;
+  --gold2:      #E2B055;
+  --gold3:      #F0C060;
+  --gold-lt:    #FDF3DC;
+  --gold-dk:    #9A6E20;
+
+  --green:      #1A7A4A;
+  --green-lt:   #E8F7EF;
+  --amber:      #B45309;
+  --amber-lt:   #FEF3C7;
+  --red:        #991B1B;
+  --red-lt:     #FEE2E2;
+  --blue:       #1D4ED8;
+  --blue-lt:    #EFF6FF;
+
+  --radius:     8px;
+  --radius-lg:  14px;
+  --shadow-sm:  0 1px 3px rgba(20,24,32,0.10), 0 1px 2px rgba(20,24,32,0.07);
+  --shadow:     0 4px 16px rgba(20,24,32,0.13);
+  --shadow-lg:  0 12px 36px rgba(20,24,32,0.18);
+  --shadow-gold:0 4px 16px rgba(201,151,58,0.18);
+  --font:       'DM Sans', sans-serif;
+  --transition: 0.18s cubic-bezier(0.4,0,0.2,1);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font); background: var(--surface); color: var(--slate); }
+
+/* ── Browse root — no filter sidebar ── */
+#browse-root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  font-family: var(--font);
+}
+
+/* ── Action bar — all filters live here ── */
+.browse-action-bar {
+  background: linear-gradient(135deg, var(--charcoal2) 0%, var(--charcoal3) 100%);
+  border-bottom: 2px solid var(--gold-dk);
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  box-shadow: 0 2px 12px rgba(20,24,32,0.25);
+}
+
+/* Search */
+.search-wrap {
+  min-width: 180px;
+  max-width: 260px;
+  position: relative;
+  flex-shrink: 0;
+}
+.search-wrap svg {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px; height: 14px;
+  color: var(--fog);
+  pointer-events: none;
+}
+.search-input {
+  width: 100%;
+  padding: 7px 12px 7px 30px;
+  font-family: var(--font);
+  font-size: 13px;
+  background: rgba(255,255,255,0.07);
+  border: 1.5px solid rgba(255,255,255,0.15);
+  border-radius: var(--radius);
+  outline: none;
+  color: var(--white);
+  transition: all var(--transition);
+  height: 34px;
+}
+.search-input::placeholder { color: var(--fog); }
+.search-input:focus {
+  border-color: var(--gold2);
+  background: rgba(255,255,255,0.11);
+  box-shadow: 0 0 0 2px rgba(201,151,58,0.2);
+}
+
+/* Dropdown filter */
+.filter-select {
+  font-family: var(--font);
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--ice);
+  background: rgba(255,255,255,0.07);
+  border: 1.5px solid rgba(255,255,255,0.15);
+  border-radius: var(--radius);
+  padding: 0 28px 0 10px;
+  outline: none;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23B8C8D8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 9px center;
+  transition: all var(--transition);
+  height: 34px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.filter-select option { background: var(--charcoal2); color: var(--white); }
+.filter-select:focus { border-color: var(--gold2); }
+.filter-select.active {
+  border-color: var(--gold2);
+  background-color: rgba(201,151,58,0.18);
+  color: var(--gold3);
+  font-weight: 600;
+}
+
+/* Range filter popover button */
+.range-filter-wrap { position: relative; flex-shrink: 0; }
+.range-filter-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font);
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--ice);
+  background: rgba(255,255,255,0.07);
+  border: 1.5px solid rgba(255,255,255,0.15);
+  border-radius: var(--radius);
+  padding: 0 10px;
+  height: 34px;
+  cursor: pointer;
+  transition: all var(--transition);
+  white-space: nowrap;
+  user-select: none;
+}
+.range-filter-btn:hover { border-color: rgba(255,255,255,0.3); }
+.range-filter-btn.active {
+  border-color: var(--gold2);
+  background: rgba(201,151,58,0.18);
+  color: var(--gold3);
+  font-weight: 600;
+}
+.range-filter-btn svg { width: 10px; height: 10px; flex-shrink: 0; transition: transform var(--transition); }
+.range-filter-btn.open svg { transform: rotate(180deg); }
+
+.range-popover {
+  display: none;
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  background: var(--charcoal2);
+  border: 1.5px solid var(--gold-dk);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-gold), var(--shadow-lg);
+  padding: 14px 16px;
+  z-index: 300;
+  min-width: 210px;
+}
+.range-popover.open { display: block; }
+.range-popover-title {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold2);
+  margin-bottom: 10px;
+}
+.range-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.range-row:last-of-type { margin-bottom: 0; }
+.range-label { font-size: 12px; font-weight: 600; color: var(--fog); width: 30px; flex-shrink: 0; }
+.range-input {
+  flex: 1;
+  height: 34px;
+  padding: 0 10px;
+  font-family: var(--font);
+  font-size: 13px;
+  color: var(--white);
+  background: rgba(255,255,255,0.07);
+  border: 1.5px solid rgba(255,255,255,0.15);
+  border-radius: var(--radius);
+  outline: none;
+  transition: border-color var(--transition);
+  width: 85px;
+}
+.range-input:focus { border-color: var(--gold2); }
+.range-input::placeholder { color: var(--fog); font-size: 12px; }
+.range-unit { font-size: 12px; color: var(--fog); flex-shrink: 0; }
+.range-clear-btn {
+  display: block; width: 100%; margin-top: 10px; padding: 5px;
+  font-family: var(--font); font-size: 11px; font-weight: 600;
+  color: var(--gold2); background: none; border: none; cursor: pointer;
+  text-align: center; border-radius: 4px; transition: background var(--transition);
+}
+.range-clear-btn:hover { background: rgba(201,151,58,0.15); }
+
+/* Sort select */
+.sort-select {
+  font-family: var(--font); font-size: 12.5px; font-weight: 500;
+  color: var(--ice); background: rgba(255,255,255,0.07);
+  border: 1.5px solid rgba(255,255,255,0.15); border-radius: var(--radius);
+  padding: 0 28px 0 10px; outline: none; cursor: pointer;
+  -webkit-appearance: none; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23B8C8D8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 9px center;
+  transition: border-color var(--transition); height: 34px; flex-shrink: 0;
+}
+.sort-select option { background: var(--charcoal2); color: var(--white); }
+.sort-select:focus { border-color: var(--gold2); }
+
+/* Clear all */
+.btn-clear-all {
+  display: none;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font); font-size: 12px; font-weight: 600;
+  color: var(--gold2); background: rgba(201,151,58,0.12);
+  border: 1.5px solid var(--gold-dk); border-radius: var(--radius);
+  padding: 0 10px; height: 34px; cursor: pointer;
+  transition: all var(--transition); white-space: nowrap; flex-shrink: 0;
+}
+.btn-clear-all.visible { display: flex; }
+.btn-clear-all:hover { background: rgba(201,151,58,0.22); border-color: var(--gold2); }
+
+.result-count {
+  font-size: 12px; color: rgba(255,255,255,0.45); font-weight: 500;
+  white-space: nowrap; flex-shrink: 0;
+}
+.bar-spacer { flex: 1; }
+
+/* View toggle */
+.view-toggle {
+  display: flex; border: 1.5px solid rgba(255,255,255,0.15);
+  border-radius: var(--radius); overflow: hidden; background: rgba(255,255,255,0.05);
+  flex-shrink: 0;
+}
+.view-btn {
+  padding: 6px 10px; border: none; background: transparent;
+  cursor: pointer; color: var(--fog); display: flex; align-items: center;
+  transition: all var(--transition);
+}
+.view-btn.active { background: var(--gold); color: var(--charcoal); }
+.view-btn:hover:not(.active) { background: rgba(255,255,255,0.1); color: var(--white); }
+.view-btn svg { width: 15px; height: 15px; }
+
+/* ── Active filter pills bar ── */
+.active-filters {
+  background: var(--charcoal3);
+  border-bottom: 1px solid rgba(201,151,58,0.25);
+  padding: 6px 20px;
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap; flex-shrink: 0;
+}
+.active-filters.hidden { display: none; }
+.active-filter-label {
+  font-size: 10px; font-weight: 700; color: var(--gold-dk);
+  letter-spacing: 0.08em; text-transform: uppercase; margin-right: 2px;
+}
+.active-filter-pill {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 12px; font-weight: 500; color: var(--gold2);
+  background: rgba(201,151,58,0.12); border: 1px solid var(--gold-dk);
+  border-radius: 100px; padding: 2px 8px 2px 10px;
+}
+.active-filter-pill button {
+  background: none; border: none; cursor: pointer; color: var(--fog);
+  font-size: 14px; line-height: 1; padding: 0 0 0 2px;
+  display: flex; align-items: center; transition: color var(--transition);
+}
+.active-filter-pill button:hover { color: var(--red); }
+
+/* ── Content area ── */
+.browse-content {
+  flex: 1; overflow-y: auto; padding: 20px;
+}
+.browse-content::-webkit-scrollbar { width: 6px; }
+.browse-content::-webkit-scrollbar-thumb { background: var(--mist); border-radius: 3px; }
+
+/* ── Card grid ── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+  gap: 18px;
+}
+
+/* ── Fund Card ── */
+.fund-card {
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  border: 1.5px solid var(--ice);
+  overflow: hidden;
+  cursor: pointer;
+  transition: all var(--transition);
+  display: flex; flex-direction: column;
+  position: relative;
+}
+.fund-card:hover {
+  border-color: var(--gold);
+  box-shadow: var(--shadow-gold), var(--shadow);
+  transform: translateY(-2px);
+}
+.fund-card.in-basket {
+  border-color: var(--gold);
+  background: linear-gradient(180deg, var(--gold-lt) 0%, var(--white) 70px);
+}
+
+/* Card top — dark header */
+.card-top {
+  padding: 14px 16px 12px;
+  background: linear-gradient(135deg, var(--charcoal2) 0%, var(--charcoal3) 100%);
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 10px;
+}
+.card-logo-wrap {
+  width: 44px; height: 44px; border-radius: 10px;
+  background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; overflow: hidden;
+}
+.card-logo-wrap img { width: 100%; height: 100%; object-fit: contain; padding: 4px; }
+.card-logo-initials {
+  font-size: 13px; font-weight: 800; color: var(--gold2); letter-spacing: -0.02em;
+}
+.card-title-area { flex: 1; min-width: 0; }
+.card-sponsor {
+  font-size: 10px; font-weight: 600; color: var(--gold-dk);
+  text-transform: uppercase; letter-spacing: 0.09em; margin-bottom: 3px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.card-name {
+  font-size: 14px; font-weight: 700; color: var(--white); line-height: 1.25;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.card-badges {
+  display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0;
+}
+.status-badge {
+  font-size: 10px; font-weight: 700; padding: 3px 8px;
+  border-radius: 100px; letter-spacing: 0.04em; white-space: nowrap;
+}
+.status-badge.open    { background: var(--green-lt); color: var(--green); }
+.status-badge.closing { background: var(--amber-lt); color: var(--amber); }
+.status-badge.closed  { background: rgba(255,255,255,0.08); color: var(--fog); }
+.basket-badge {
+  font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 100px;
+  background: rgba(201,151,58,0.25); color: var(--gold2); letter-spacing: 0.02em;
+}
+
+/* Tags */
+.card-meta-row {
+  padding: 10px 16px 8px; display: flex; gap: 5px; flex-wrap: wrap;
+  border-bottom: 1px solid var(--ice);
+}
+.card-tag {
+  font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 4px;
+  background: var(--surface); border: 1px solid var(--ice); color: var(--slate2);
+}
+.card-tag.asset {
+  background: var(--gold-lt); border-color: rgba(201,151,58,0.35); color: var(--gold-dk);
+  font-weight: 600;
+}
+
+/* KPI row */
+.card-kpi-row {
+  padding: 12px 16px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--ice);
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px;
+}
+.kpi-cell { display: flex; flex-direction: column; align-items: center; padding: 4px 2px; }
+.kpi-label {
+  font-size: 9px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--fog); margin-bottom: 3px;
+}
+.kpi-val {
+  font-size: 16px; font-weight: 800; color: var(--charcoal2);
+  font-family: 'DM Mono', monospace; line-height: 1.1;
+}
+.kpi-val.highlight { color: var(--green); }
+.kpi-val.gold      { color: var(--gold); }
+.kpi-val.warn      { color: var(--amber); }
+.kpi-val.muted     { color: var(--fog); font-size: 12px; font-weight: 500; }
+
+/* ── Raise progress bar — 3D depth style ── */
+.card-raise-row {
+  padding: 11px 16px 10px;
+  display: flex; flex-direction: column; gap: 6px;
+  border-bottom: 1px solid var(--ice);
+}
+.raise-label-row {
+  display: flex; justify-content: space-between; align-items: baseline;
+}
+.raise-label {
+  font-size: 10px; font-weight: 700; color: var(--fog);
+  text-transform: uppercase; letter-spacing: 0.07em;
+}
+.raise-pct {
+  font-size: 12px; font-weight: 700; color: var(--charcoal3);
+  font-family: 'DM Mono', monospace;
+}
+.raise-bar-track {
+  height: 12px;
+  background: var(--ice);
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: inset 0 2px 4px rgba(20,24,32,0.13), inset 0 1px 2px rgba(20,24,32,0.08);
+  position: relative;
+}
+.raise-bar-fill {
+  height: 100%; border-radius: 6px;
+  background: linear-gradient(180deg, var(--gold3) 0%, var(--gold) 50%, var(--gold-dk) 100%);
+  box-shadow: 0 2px 6px rgba(201,151,58,0.45), inset 0 1px 0 rgba(255,255,255,0.30);
+  position: relative;
+  transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+}
+.raise-bar-fill::after {
+  content: '';
+  position: absolute; top: 1px; left: 4px; right: 4px; height: 40%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0) 100%);
+  border-radius: 3px;
+}
+.raise-bar-fill.closing-soon {
+  background: linear-gradient(180deg, #F59E3A 0%, #B45309 50%, #7C3A00 100%);
+}
+.raise-bar-fill.nearly-done {
+  background: linear-gradient(180deg, #F87171 0%, #991B1B 50%, #6B0000 100%);
+}
+
+/* Raise $ amounts */
+.raise-amounts {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-top: 2px;
+}
+.raise-amount-cell { display: flex; flex-direction: column; align-items: center; }
+.raise-amount-label {
+  font-size: 8.5px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--fog); margin-bottom: 1px;
+}
+.raise-amount-val {
+  font-size: 11px; font-weight: 700; color: var(--slate);
+  font-family: 'DM Mono', monospace;
+}
+.raise-amount-val.filed     { color: var(--charcoal3); }
+.raise-amount-val.current   { color: var(--green); }
+.raise-amount-val.remaining { color: var(--gold); }
+
+/* Suitability chip */
+.suit-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 100px;
+}
+.suit-chip.high { background: var(--green-lt); color: var(--green); }
+.suit-chip.mid  { background: var(--amber-lt); color: var(--amber); }
+.suit-chip.low  { background: var(--red-lt);   color: var(--red); }
+.suit-chip.none { background: var(--surface);   color: var(--fog); }
+
+/* Card footer */
+.card-footer {
+  padding: 10px 16px 12px;
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  margin-top: auto;
+}
+.card-footer-left { display: flex; flex-direction: column; gap: 3px; }
+.card-location {
+  font-size: 11px; color: var(--fog); font-weight: 500;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 160px;
+}
+.btn-add-basket {
+  display: flex; align-items: center; gap: 5px;
+  font-family: var(--font); font-size: 12px; font-weight: 700;
+  padding: 7px 13px; border-radius: var(--radius);
+  border: 1.5px solid var(--gold);
+  background: var(--white); color: var(--gold-dk);
+  cursor: pointer; transition: all var(--transition);
+  white-space: nowrap; flex-shrink: 0;
+}
+.btn-add-basket:hover { background: var(--gold); color: var(--charcoal); box-shadow: var(--shadow-gold); }
+.btn-add-basket.in-basket { background: var(--gold); color: var(--charcoal); border-color: var(--gold); }
+.btn-add-basket:disabled { opacity: 0.35; cursor: not-allowed; }
+.btn-add-basket svg { width: 13px; height: 13px; }
+
+/* ── List/table view ── */
+.fund-table {
+  width: 100%; border-collapse: collapse; background: var(--white);
+  border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); font-size: 13px;
+}
+.fund-table thead { background: var(--charcoal2); color: var(--white); }
+.fund-table th {
+  padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap;
+  cursor: pointer; user-select: none; transition: background var(--transition);
+}
+.fund-table th:hover { background: var(--charcoal3); }
+.fund-table th.sorted { background: var(--charcoal3); color: var(--gold2); }
+.sort-arrow { margin-left: 4px; opacity: 0.5; }
+.fund-table tbody tr {
+  border-bottom: 1px solid var(--ice); cursor: pointer; transition: background var(--transition);
+}
+.fund-table tbody tr:last-child { border-bottom: none; }
+.fund-table tbody tr:hover { background: var(--surface); }
+.fund-table tbody tr.in-basket { background: var(--gold-lt); }
+.fund-table td { padding: 11px 14px; vertical-align: middle; }
+.td-name { font-weight: 600; color: var(--charcoal2); }
+.td-sponsor { color: var(--fog); font-size: 11px; }
+.td-mono { font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 500; }
+.td-green { color: var(--green); font-weight: 600; }
+.td-gold  { color: var(--gold);  font-weight: 600; }
+.td-actions { display: flex; gap: 6px; align-items: center; justify-content: flex-end; }
+.btn-sm {
+  font-family: var(--font); font-size: 11px; font-weight: 600; padding: 5px 9px;
+  border-radius: 6px; border: 1.5px solid var(--ice); background: var(--white);
+  color: var(--slate); cursor: pointer; transition: all var(--transition); white-space: nowrap;
+}
+.btn-sm:hover { border-color: var(--gold); color: var(--gold-dk); }
+.btn-sm.primary { background: var(--charcoal2); border-color: var(--charcoal2); color: var(--white); }
+.btn-sm.primary:hover { background: var(--gold); border-color: var(--gold); color: var(--charcoal); }
+
+/* ── Empty/loading states ── */
+.state-msg {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 80px 20px; text-align: center; color: var(--fog);
+}
+.state-msg .icon { font-size: 40px; margin-bottom: 16px; opacity: 0.5; }
+.state-msg h3 { font-size: 16px; font-weight: 700; color: var(--slate2); margin-bottom: 6px; }
+.state-msg p { font-size: 14px; max-width: 320px; }
+
+.skeleton-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 18px;
+}
+.skeleton-card {
+  background: var(--white); border-radius: var(--radius-lg); border: 1.5px solid var(--ice);
+  padding: 16px; height: 280px; overflow: hidden; position: relative;
+}
+.skeleton-card::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.7) 50%, transparent 100%);
+  animation: shimmer 1.4s infinite;
+}
+@keyframes shimmer { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+.skel { background: var(--ice); border-radius: 4px; margin-bottom: 8px; }
+.skel-h  { height: 14px; }
+.skel-sm { height: 10px; width: 60%; }
+.skel-lg { height: 22px; width: 75%; }
+</style>
+</head>
+<body>
+
+<div id="browse-root">
+
+  <!-- ── Action bar — all filters here, no sidebar ── -->
+  <div class="browse-action-bar">
+
+    <!-- Search -->
+    <div class="search-wrap">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="7" cy="7" r="4.5"/><path d="M11 11l2.5 2.5"/>
+      </svg>
+      <input type="text" class="search-input" id="search-input" placeholder="Search offerings, sponsors…">
+    </div>
+
+    <!-- Status -->
+    <select class="filter-select" id="filter-status">
+      <option value="">All Status</option>
+      <option value="Open">Open</option>
+      <option value="Closing Soon">Closing Soon</option>
+      <option value="Closed">Closed</option>
+    </select>
+
+    <!-- Asset Class — populated from data -->
+    <select class="filter-select" id="filter-asset-class">
+      <option value="">All Asset Classes</option>
+    </select>
+
+    <!-- Sector — populated from data -->
+    <select class="filter-select" id="filter-sector">
+      <option value="">All Sectors</option>
+    </select>
+
+    <!-- State — populated from data -->
+    <select class="filter-select" id="filter-state">
+      <option value="">All States</option>
+    </select>
+
+    <!-- LTV range popover -->
+    <div class="range-filter-wrap" id="ltv-wrap">
+      <button class="range-filter-btn" id="ltv-btn">
+        LTV
+        <svg viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1l4 4 4-4"/></svg>
+      </button>
+      <div class="range-popover" id="ltv-popover">
+        <div class="range-popover-title">LTV Range (%)</div>
+        <div class="range-row">
+          <span class="range-label">Min</span>
+          <input type="number" class="range-input" id="ltv-min" placeholder="e.g. 0" min="0" max="100" step="1">
+          <span class="range-unit">%</span>
+        </div>
+        <div class="range-row">
+          <span class="range-label">Max</span>
+          <input type="number" class="range-input" id="ltv-max" placeholder="e.g. 65" min="0" max="100" step="1">
+          <span class="range-unit">%</span>
+        </div>
+        <button class="range-clear-btn" id="ltv-clear">Clear</button>
+      </div>
+    </div>
+
+    <!-- CoC range popover -->
+    <div class="range-filter-wrap" id="coc-wrap">
+      <button class="range-filter-btn" id="coc-btn">
+        Y1 CoC
+        <svg viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 1l4 4 4-4"/></svg>
+      </button>
+      <div class="range-popover" id="coc-popover">
+        <div class="range-popover-title">Y1 CoC Range (%)</div>
+        <div class="range-row">
+          <span class="range-label">Min</span>
+          <input type="number" class="range-input" id="coc-min" placeholder="e.g. 4" min="0" max="20" step="0.25">
+          <span class="range-unit">%</span>
+        </div>
+        <div class="range-row">
+          <span class="range-label">Max</span>
+          <input type="number" class="range-input" id="coc-max" placeholder="e.g. 8" min="0" max="20" step="0.25">
+          <span class="range-unit">%</span>
+        </div>
+        <button class="range-clear-btn" id="coc-clear">Clear</button>
+      </div>
+    </div>
+
+    <!-- Sort -->
+    <select class="sort-select" id="sort-select">
+      <option value="y1coc_desc">Y1 CoC ↓ High</option>
+      <option value="y1coc_asc">Y1 CoC ↑ Low</option>
+      <option value="ltv_asc">LTV ↑ Low</option>
+      <option value="ltv_desc">LTV ↓ High</option>
+      <option value="remaining_desc">% Remaining ↓</option>
+      <option value="remaining_asc">% Remaining ↑</option>
+      <option value="name_asc">Name A→Z</option>
+      <option value="newest">Newest First</option>
+    </select>
+
+    <span class="result-count" id="result-count"></span>
+    <span class="bar-spacer"></span>
+
+    <button class="btn-clear-all" id="clear-all-btn">✕ Clear filters</button>
+
+    <div class="view-toggle">
+      <button class="view-btn active" id="view-grid" title="Grid view">
+        <svg viewBox="0 0 16 16" fill="currentColor">
+          <rect x="1" y="1" width="6" height="6" rx="1.2"/>
+          <rect x="9" y="1" width="6" height="6" rx="1.2"/>
+          <rect x="1" y="9" width="6" height="6" rx="1.2"/>
+          <rect x="9" y="9" width="6" height="6" rx="1.2"/>
+        </svg>
+      </button>
+      <button class="view-btn" id="view-list" title="List view">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+          <path d="M4 4h9M4 8h9M4 12h9M1.5 4h.01M1.5 8h.01M1.5 12h.01"/>
+        </svg>
+      </button>
+    </div>
+  </div><!-- /action-bar -->
+
+  <!-- Active filter pills -->
+  <div class="active-filters hidden" id="active-filters-bar">
+    <span class="active-filter-label">Active:</span>
+  </div>
+
+  <!-- Content -->
+  <div class="browse-content" id="browse-content"></div>
+
+</div><!-- /browse-root -->
+
+<script>
+(function () {
+  'use strict';
+
+  let allFunds = [];
+  let filtered = [];
+  let viewMode = 'grid';
+  let client   = null;
+
+  // PCT fields that GViz returns as decimals (0.0525 → 5.25%)
+  const PCT_FIELDS = new Set([
+    'y1coc','ltv','occupancy','preferred','repComp',
+    'capRate','salesLoad','sponsorAvgIrr','sponsorBestIrr','sponsorWorstIrr'
+  ]);
+
+  const filters = {
+    status:    '',
+    assetClass:'',
+    sector:    '',
+    state:     '',
+    ltvMin:    null,
+    ltvMax:    null,
+    cocMin:    null,
+    cocMax:    null,
+    search:    ''
+  };
+  let sortKey = 'y1coc_desc';
+
+  const $ = id => document.getElementById(id);
+
+  // ── PCT fix: GViz decimal → human percent ────────────────
+  function fixPct(val, field) {
+    if (val == null || !PCT_FIELDS.has(field)) return val;
+    const n = Number(val);
+    if (isNaN(n)) return val;
+    return (Math.abs(n) < 1 && n !== 0) ? n * 100 : n;
+  }
+
+  // ── Helpers ──────────────────────────────────────────────
+  function fmt(n, decimals=2, suffix='%') {
+    if (n == null || isNaN(Number(n))) return '—';
+    return Number(n).toFixed(decimals) + suffix;
+  }
+
+  // Money: always 2 decimal places, e.g. $36.15 M
+  function fmtMoney(n) {
+    if (n == null || isNaN(Number(n))) return '—';
+    n = Number(n);
+    if (n >= 1e9) return '$' + (n / 1e9).toFixed(2) + ' B';
+    if (n >= 1e6) return '$' + (n / 1e6).toFixed(2) + ' M';
+    if (n >= 1e3) return '$' + (n / 1e3).toFixed(2) + ' K';
+    return '$' + n.toFixed(0);
+  }
+
+  function initials(str) {
+    if (!str) return '??';
+    return str.split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase();
+  }
+  function esc(s) {
+    if (!s) return '';
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function statusOf(fund) {
+    if (fund.status) return fund.status;
+    if (!fund.offeringClose) return 'Open';
+    const close = new Date(fund.offeringClose);
+    if (isNaN(close)) return 'Open';
+    const daysLeft = (close - new Date()) / (1000*60*60*24);
+    if (daysLeft < 0)  return 'Closed';
+    if (daysLeft < 30) return 'Closing Soon';
+    return 'Open';
+  }
+  function pctRemaining(fund) {
+    if (!fund.filedRaise || !fund.equityRemaining) return null;
+    return Math.min(100, Math.max(0, (fund.equityRemaining / fund.filedRaise) * 100));
+  }
+  function extractStates(str) {
+    if (window.AFL && window.AFL.extractStates) return window.AFL.extractStates(str);
+    if (!str) return [];
+    return str.split(/[\s,]+/).map(s=>s.trim().toUpperCase()).filter(s=>/^[A-Z]{2}$/.test(s));
+  }
+
+  // ── Suitability chip ─────────────────────────────────────
+  function suitChip(fund) {
+    if (!window.AFL || !window.AFL.suitScore) return '';
+    if (!client || !client.exchangeAmount) return '';
+    const score = window.AFL.suitScore(fund, client);
+    if (score == null || isNaN(score)) return '';
+    const s = parseInt(score, 10);
+    let cls, label;
+    if (s >= 70)      { cls='high'; label='★ ' + s + '% match'; }
+    else if (s >= 45) { cls='mid';  label='◆ ' + s + '% match'; }
+    else              { cls='low';  label='▼ ' + s + '% match'; }
+    return `<span class="suit-chip ${cls}">${label}</span>`;
+  }
+
+  function statusBadge(status) {
+    const cls = status === 'Open' ? 'open' : status === 'Closing Soon' ? 'closing' : 'closed';
+    return `<span class="status-badge ${cls}">${esc(status)}</span>`;
+  }
+
+  function ltvClass(ltv) {
+    if (ltv == null || isNaN(ltv)) return 'muted';
+    if (ltv <= 55) return 'highlight';
+    if (ltv > 65)  return 'warn';
+    return '';
+  }
+
+  function inBasket(id) {
+    if (window.AFL && window.AFL.basket) return window.AFL.basket.has(id);
+    try { return JSON.parse(localStorage.getItem('afl_basket')||'[]').includes(id); } catch(e){ return false; }
+  }
+  function basketFull() {
+    if (window.AFL && window.AFL.basket) return window.AFL.basket.get().length >= 3;
+    try { return JSON.parse(localStorage.getItem('afl_basket')||'[]').length >= 3; } catch(e){ return false; }
+  }
+
+  // ── Build card ───────────────────────────────────────────
+  function buildCard(fund) {
+    const status = statusOf(fund);
+    const pctRem = pctRemaining(fund);
+    const isIn   = inBasket(fund.id);
+    const full   = !isIn && basketFull();
+
+    // Apply PCT fix
+    const coc = fixPct(fund.y1coc, 'y1coc');
+    const ltv = fixPct(fund.ltv,   'ltv');
+    const occ = fixPct(fund.occupancy, 'occupancy');
+    const chip = suitChip(fund);
+
+    const logoHtml = fund.sponsorLogoUrl
+      ? `<img src="${esc(fund.sponsorLogoUrl)}" alt="${esc(fund.sponsor)}" loading="lazy"
+           onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+         <span class="card-logo-initials" style="display:none">${esc(initials(fund.sponsor))}</span>`
+      : `<span class="card-logo-initials">${esc(initials(fund.sponsor))}</span>`;
+
+    // Raise bar: fill = % remaining
+    let raiseHtml = '';
+    if (pctRem != null) {
+      const barW = pctRem.toFixed(1);
+      const barCls = pctRem < 10 ? ' nearly-done' : pctRem < 25 ? ' closing-soon' : '';
+      const filed     = fmtMoney(fund.filedRaise);
+      const current   = fmtMoney(fund.currentRaise);
+      const remaining = fmtMoney(fund.equityRemaining);
+      raiseHtml = `
+        <div class="card-raise-row">
+          <div class="raise-label-row">
+            <span class="raise-label">Raise Progress</span>
+            <span class="raise-pct">${pctRem.toFixed(0)}% remaining</span>
+          </div>
+          <div class="raise-bar-track">
+            <div class="raise-bar-fill${barCls}" style="width:${barW}%"></div>
+          </div>
+          <div class="raise-amounts">
+            <div class="raise-amount-cell">
+              <span class="raise-amount-label">Filed Raise</span>
+              <span class="raise-amount-val filed">${esc(filed)}</span>
+            </div>
+            <div class="raise-amount-cell">
+              <span class="raise-amount-label">Current Raise</span>
+              <span class="raise-amount-val current">${esc(current)}</span>
+            </div>
+            <div class="raise-amount-cell">
+              <span class="raise-amount-label">Remaining</span>
+              <span class="raise-amount-val remaining">${esc(remaining)}</span>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    return `
+    <div class="fund-card${isIn?' in-basket':''}" data-id="${fund.id}">
+      <div class="card-top">
+        <div class="card-logo-wrap">${logoHtml}</div>
+        <div class="card-title-area">
+          <div class="card-sponsor">${esc(fund.sponsor||'—')}</div>
+          <div class="card-name">${esc(fund.name||'Unnamed Offering')}</div>
+        </div>
+        <div class="card-badges">
+          ${statusBadge(status)}
+          ${isIn ? '<span class="basket-badge">In Basket</span>' : ''}
+        </div>
+      </div>
+      <div class="card-meta-row">
+        ${fund.assetClass ? `<span class="card-tag asset">${esc(fund.assetClass)}</span>` : ''}
+        ${fund.sector     ? `<span class="card-tag">${esc(fund.sector)}</span>` : ''}
+        ${fund.focus      ? `<span class="card-tag">${esc(fund.focus)}</span>` : ''}
+      </div>
+      <div class="card-kpi-row">
+        <div class="kpi-cell">
+          <span class="kpi-label">Y1 CoC</span>
+          <span class="kpi-val ${coc!=null&&coc>=4?'highlight':''}">${fmt(coc)}</span>
+        </div>
+        <div class="kpi-cell">
+          <span class="kpi-label">LTV</span>
+          <span class="kpi-val ${ltvClass(ltv)}">${fmt(ltv)}</span>
+        </div>
+        <div class="kpi-cell">
+          <span class="kpi-label">Occupancy</span>
+          <span class="kpi-val ${occ!=null&&occ>=90?'highlight':''}">${fmt(occ)}</span>
+        </div>
+      </div>
+      ${raiseHtml}
+      <div class="card-footer">
+        <div class="card-footer-left">
+          ${chip ? chip : `<span class="card-location">📍 ${esc(fund.location||'—')}</span>`}
+          ${chip ? `<span class="card-location">📍 ${esc(fund.location||'—')}</span>` : ''}
+        </div>
+        <button class="btn-add-basket${isIn?' in-basket':''}" data-id="${fund.id}"${full?' disabled':''}
+          title="${full?'Basket full (max 3)':isIn?'Remove from basket':'Add to basket'}">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            ${isIn ? '<path d="M3 8l3.5 3.5L13 4.5"/>' : '<path d="M8 3v10M3 8h10"/>'}
+          </svg>
+          ${isIn ? 'In Basket ✓' : '+ Basket'}
+        </button>
+      </div>
+    </div>`;
+  }
+
+  // ── Build table row ──────────────────────────────────────
+  function buildRow(fund) {
+    const status = statusOf(fund);
+    const isIn   = inBasket(fund.id);
+    const full   = !isIn && basketFull();
+    const chip   = suitChip(fund);
+    const coc    = fixPct(fund.y1coc, 'y1coc');
+    const ltv    = fixPct(fund.ltv, 'ltv');
+    const occ    = fixPct(fund.occupancy, 'occupancy');
+    return `
+    <tr data-id="${fund.id}" class="${isIn?'in-basket':''}">
+      <td><div class="td-name">${esc(fund.name||'Unnamed')}</div><div class="td-sponsor">${esc(fund.sponsor||'—')}</div></td>
+      <td><span class="card-tag asset" style="white-space:nowrap">${esc(fund.assetClass||'—')}</span></td>
+      <td><span class="card-tag" style="white-space:nowrap">${esc(fund.sector||'—')}</span></td>
+      <td>${statusBadge(status)}</td>
+      <td class="td-mono td-green">${fmt(coc)}</td>
+      <td class="td-mono ${ltvClass(ltv)==='highlight'?'td-green':''}">${fmt(ltv)}</td>
+      <td class="td-mono">${fmt(occ)}</td>
+      <td class="td-mono">${fmtMoney(fund.minInvest)}</td>
+      <td>${fund.holdPeriod!=null?fund.holdPeriod+'yr':'—'}</td>
+      <td>${chip||'—'}</td>
+      <td>
+        <div class="td-actions">
+          <button class="btn-sm" data-id="${fund.id}">View</button>
+          <button class="btn-sm primary btn-add-basket${isIn?' in-basket':''}" data-id="${fund.id}" ${full?'disabled':''}>
+            ${isIn?'✓ In Basket':'+ Basket'}
+          </button>
+        </div>
+      </td>
+    </tr>`;
+  }
+
+  // ── Sort ─────────────────────────────────────────────────
+  function sortFunds(arr) {
+    const sorted = [...arr];
+    const getY1  = f => fixPct(f.y1coc,'y1coc') || 0;
+    const getLtv = f => fixPct(f.ltv,'ltv') || 0;
+    switch(sortKey) {
+      case 'y1coc_desc':    sorted.sort((a,b)=>getY1(b)-getY1(a)); break;
+      case 'y1coc_asc':     sorted.sort((a,b)=>getY1(a)-getY1(b)); break;
+      case 'ltv_asc':       sorted.sort((a,b)=>(getLtv(a)||99)-(getLtv(b)||99)); break;
+      case 'ltv_desc':      sorted.sort((a,b)=>getLtv(b)-getLtv(a)); break;
+      case 'remaining_desc':sorted.sort((a,b)=>(pctRemaining(b)||0)-(pctRemaining(a)||0)); break;
+      case 'remaining_asc': sorted.sort((a,b)=>(pctRemaining(a)||0)-(pctRemaining(b)||0)); break;
+      case 'name_asc':      sorted.sort((a,b)=>(a.name||'').localeCompare(b.name||'')); break;
+      case 'newest':
+        sorted.sort((a,b)=>{
+          const da=a.offeringOpen?new Date(a.offeringOpen):new Date(0);
+          const db=b.offeringOpen?new Date(b.offeringOpen):new Date(0);
+          return db-da;
+        }); break;
+    }
+    return sorted;
+  }
+
+  // ── Apply filters ────────────────────────────────────────
+  function applyFilters() {
+    const q = filters.search.toLowerCase().trim();
+    filtered = allFunds.filter(f => {
+      if (q) {
+        const hay = [f.name,f.sponsor,f.location,f.sector,f.assetClass,f.focus].join(' ').toLowerCase();
+        if (!hay.includes(q)) return false;
+      }
+      if (filters.status    && statusOf(f) !== filters.status)    return false;
+      if (filters.assetClass && f.assetClass !== filters.assetClass) return false;
+      if (filters.sector    && f.sector !== filters.sector)       return false;
+      if (filters.state) {
+        if (!extractStates(f.location).includes(filters.state)) return false;
+      }
+      const ltvVal = fixPct(f.ltv, 'ltv');
+      const cocVal = fixPct(f.y1coc, 'y1coc');
+      if (filters.ltvMin != null && ltvVal != null && ltvVal < filters.ltvMin) return false;
+      if (filters.ltvMax != null && ltvVal != null && ltvVal > filters.ltvMax) return false;
+      if (filters.cocMin != null && cocVal != null && cocVal < filters.cocMin) return false;
+      if (filters.cocMax != null && cocVal != null && cocVal > filters.cocMax) return false;
+      return true;
+    });
+    filtered = sortFunds(filtered);
+  }
+
+  // ── Has active filters ───────────────────────────────────
+  function hasActiveFilters() {
+    return !!(filters.status || filters.assetClass || filters.sector || filters.state ||
+              filters.ltvMin!=null || filters.ltvMax!=null ||
+              filters.cocMin!=null || filters.cocMax!=null || filters.search.trim());
+  }
+
+  // ── Active pills ─────────────────────────────────────────
+  function renderActivePills() {
+    const bar = $('active-filters-bar');
+    const pills = [];
+    if (filters.status)     pills.push({ label:`Status: ${filters.status}`,     clear(){ filters.status=''; $('filter-status').value=''; } });
+    if (filters.assetClass) pills.push({ label:`Class: ${filters.assetClass}`,  clear(){ filters.assetClass=''; $('filter-asset-class').value=''; } });
+    if (filters.sector)     pills.push({ label:`Sector: ${filters.sector}`,      clear(){ filters.sector=''; $('filter-sector').value=''; } });
+    if (filters.state)      pills.push({ label:`State: ${filters.state}`,        clear(){ filters.state=''; $('filter-state').value=''; } });
+    if (filters.ltvMin!=null) pills.push({ label:`LTV ≥ ${filters.ltvMin}%`,    clear(){ filters.ltvMin=null; $('ltv-min').value=''; updateRangeBtn('ltv'); } });
+    if (filters.ltvMax!=null) pills.push({ label:`LTV ≤ ${filters.ltvMax}%`,    clear(){ filters.ltvMax=null; $('ltv-max').value=''; updateRangeBtn('ltv'); } });
+    if (filters.cocMin!=null) pills.push({ label:`CoC ≥ ${filters.cocMin}%`,    clear(){ filters.cocMin=null; $('coc-min').value=''; updateRangeBtn('coc'); } });
+    if (filters.cocMax!=null) pills.push({ label:`CoC ≤ ${filters.cocMax}%`,    clear(){ filters.cocMax=null; $('coc-max').value=''; updateRangeBtn('coc'); } });
+
+    const anyActive = hasActiveFilters();
+    $('clear-all-btn').classList.toggle('visible', anyActive);
+
+    if (!pills.length) { bar.classList.add('hidden'); return; }
+    bar.classList.remove('hidden');
+    bar.innerHTML = '<span class="active-filter-label">Active:</span>'
+      + pills.map((p,i)=>`
+        <span class="active-filter-pill">
+          ${esc(p.label)}
+          <button data-pill="${i}" title="Remove">✕</button>
+        </span>`).join('');
+    bar.querySelectorAll('button[data-pill]').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        pills[parseInt(btn.dataset.pill)].clear();
+        fullRender();
+      });
+    });
+  }
+
+  function updateRangeBtn(which) {
+    const btn = $(which+'-btn');
+    const active = which==='ltv'
+      ? (filters.ltvMin!=null || filters.ltvMax!=null)
+      : (filters.cocMin!=null || filters.cocMax!=null);
+    btn.classList.toggle('active', active);
+  }
+
+  // ── Render ───────────────────────────────────────────────
+  function renderContent() {
+    const content = $('browse-content');
+    $('result-count').textContent = `${filtered.length} offering${filtered.length!==1?'s':''}`;
+    renderActivePills();
+
+    $('filter-status').classList.toggle('active', !!filters.status);
+    $('filter-asset-class').classList.toggle('active', !!filters.assetClass);
+    $('filter-sector').classList.toggle('active', !!filters.sector);
+    $('filter-state').classList.toggle('active', !!filters.state);
+
+    if (!filtered.length) {
+      content.innerHTML = `
+        <div class="state-msg">
+          <div class="icon">🔍</div>
+          <h3>No offerings found</h3>
+          <p>Try adjusting your filters or search term.</p>
+        </div>`;
+      return;
+    }
+
+    if (viewMode === 'grid') {
+      content.innerHTML = `<div class="card-grid">${filtered.map(buildCard).join('')}</div>`;
+    } else {
+      content.innerHTML = `
+        <table class="fund-table">
+          <thead><tr>
+            <th data-sort="name_asc">Offering <span class="sort-arrow">↕</span></th>
+            <th>Class</th><th>Sector</th><th>Status</th>
+            <th data-sort="y1coc_desc">Y1 CoC <span class="sort-arrow">↕</span></th>
+            <th data-sort="ltv_asc">LTV <span class="sort-arrow">↕</span></th>
+            <th>Occupancy</th><th>Min Invest</th><th>Hold</th><th>Suitability</th><th></th>
+          </tr></thead>
+          <tbody>${filtered.map(buildRow).join('')}</tbody>
+        </table>`;
+      content.querySelectorAll('th[data-sort]').forEach(th => {
+        th.addEventListener('click', () => {
+          sortKey = th.dataset.sort;
+          $('sort-select').value = sortKey;
+          applyFilters(); renderContent();
+        });
+      });
+    }
+
+    // Navigation clicks
+    content.querySelectorAll('[data-id]').forEach(el => {
+      if (el.classList.contains('fund-card') || el.tagName==='TR') {
+        el.addEventListener('click', e => {
+          if (e.target.closest('.btn-add-basket')) return;
+          const id = parseInt(el.dataset.id);
+          if (window.AFL && window.AFL.navigate) window.AFL.navigate('offering', { id, ids:[id] });
+        });
+      }
+    });
+    content.querySelectorAll('.btn-add-basket').forEach(btn => {
+      btn.addEventListener('click', e => { e.stopPropagation(); handleBasketClick(parseInt(btn.dataset.id)); });
+    });
+    content.querySelectorAll('.btn-sm:not(.btn-add-basket)').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const id = parseInt(btn.closest('tr').dataset.id);
+        if (window.AFL && window.AFL.navigate) window.AFL.navigate('offering', { id, ids:[id] });
+      });
+    });
+  }
+
+  function fullRender() { applyFilters(); renderContent(); }
+
+  // ── Basket ───────────────────────────────────────────────
+  function handleBasketClick(id) {
+    if (window.AFL && window.AFL.basket) {
+      if (window.AFL.basket.has(id)) window.AFL.basket.remove(id);
+      else {
+        if (window.AFL.basket.get().length >= 3) { alert('Basket full — max 3 offerings.'); return; }
+        window.AFL.basket.add(id);
+      }
+      if (window.AFL.updateHeader) window.AFL.updateHeader();
+    } else {
+      try {
+        let basket = JSON.parse(localStorage.getItem('afl_basket')||'[]');
+        if (basket.includes(id)) basket = basket.filter(x=>x!==id);
+        else { if (basket.length>=3){ alert('Basket full.'); return; } basket.push(id); }
+        localStorage.setItem('afl_basket', JSON.stringify(basket));
+      } catch(e){}
+    }
+    fullRender();
+  }
+
+  // ── Populate dropdowns ───────────────────────────────────
+  function buildDropdownOptions() {
+    const classes = [...new Set(allFunds.map(f=>f.assetClass).filter(Boolean))].sort();
+    const acEl = $('filter-asset-class');
+    classes.forEach(c => { const o=document.createElement('option'); o.value=c; o.textContent=c; acEl.appendChild(o); });
+
+    const sectors = [...new Set(allFunds.map(f=>f.sector).filter(Boolean))].sort();
+    const secEl = $('filter-sector');
+    sectors.forEach(s => { const o=document.createElement('option'); o.value=s; o.textContent=s; secEl.appendChild(o); });
+
+    const stateSet = new Set();
+    allFunds.forEach(f => extractStates(f.location).forEach(s=>stateSet.add(s)));
+    const stEl = $('filter-state');
+    [...stateSet].sort().forEach(s => { const o=document.createElement('option'); o.value=s; o.textContent=s; stEl.appendChild(o); });
+  }
+
+  // ── Popover toggle ───────────────────────────────────────
+  function togglePopover(which) {
+    const pop = $(which+'-popover'), btn = $(which+'-btn');
+    const wasOpen = pop.classList.contains('open');
+    document.querySelectorAll('.range-popover').forEach(p=>p.classList.remove('open'));
+    document.querySelectorAll('.range-filter-btn').forEach(b=>b.classList.remove('open'));
+    if (!wasOpen) { pop.classList.add('open'); btn.classList.add('open'); }
+  }
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.range-filter-wrap')) {
+      document.querySelectorAll('.range-popover').forEach(p=>p.classList.remove('open'));
+      document.querySelectorAll('.range-filter-btn').forEach(b=>b.classList.remove('open'));
+    }
+  });
+
+  // ── Clear all ────────────────────────────────────────────
+  function clearAll() {
+    filters.status=''; filters.assetClass=''; filters.sector=''; filters.state='';
+    filters.ltvMin=null; filters.ltvMax=null; filters.cocMin=null; filters.cocMax=null; filters.search='';
+    $('search-input').value='';
+    $('filter-status').value=''; $('filter-asset-class').value='';
+    $('filter-sector').value=''; $('filter-state').value='';
+    $('ltv-min').value=''; $('ltv-max').value='';
+    $('coc-min').value=''; $('coc-max').value='';
+    $('ltv-btn').classList.remove('active');
+    $('coc-btn').classList.remove('active');
+    fullRender();
+  }
+
+  // ── Wire controls ────────────────────────────────────────
+  function wireControls() {
+    let searchTimer;
+    $('search-input').addEventListener('input', e => {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(() => { filters.search=e.target.value; fullRender(); }, 200);
+    });
+    $('filter-status').addEventListener('change', e => { filters.status=e.target.value; fullRender(); });
+    $('filter-asset-class').addEventListener('change', e => { filters.assetClass=e.target.value; fullRender(); });
+    $('filter-sector').addEventListener('change', e => { filters.sector=e.target.value; fullRender(); });
+    $('filter-state').addEventListener('change', e => { filters.state=e.target.value; fullRender(); });
+    $('sort-select').addEventListener('change', e => { sortKey=e.target.value; fullRender(); });
+
+    $('ltv-btn').addEventListener('click', e => { e.stopPropagation(); togglePopover('ltv'); });
+    $('ltv-min').addEventListener('input', e => { const v=parseFloat(e.target.value); filters.ltvMin=isNaN(v)?null:v; updateRangeBtn('ltv'); fullRender(); });
+    $('ltv-max').addEventListener('input', e => { const v=parseFloat(e.target.value); filters.ltvMax=isNaN(v)?null:v; updateRangeBtn('ltv'); fullRender(); });
+    $('ltv-clear').addEventListener('click', e => { e.stopPropagation(); filters.ltvMin=null; filters.ltvMax=null; $('ltv-min').value=''; $('ltv-max').value=''; updateRangeBtn('ltv'); fullRender(); });
+
+    $('coc-btn').addEventListener('click', e => { e.stopPropagation(); togglePopover('coc'); });
+    $('coc-min').addEventListener('input', e => { const v=parseFloat(e.target.value); filters.cocMin=isNaN(v)?null:v; updateRangeBtn('coc'); fullRender(); });
+    $('coc-max').addEventListener('input', e => { const v=parseFloat(e.target.value); filters.cocMax=isNaN(v)?null:v; updateRangeBtn('coc'); fullRender(); });
+    $('coc-clear').addEventListener('click', e => { e.stopPropagation(); filters.cocMin=null; filters.cocMax=null; $('coc-min').value=''; $('coc-max').value=''; updateRangeBtn('coc'); fullRender(); });
+
+    $('clear-all-btn').addEventListener('click', clearAll);
+    $('view-grid').addEventListener('click', () => { viewMode='grid'; $('view-grid').classList.add('active'); $('view-list').classList.remove('active'); fullRender(); });
+    $('view-list').addEventListener('click', () => { viewMode='list'; $('view-list').classList.add('active'); $('view-grid').classList.remove('active'); fullRender(); });
+  }
+
+  // ── Skeleton ─────────────────────────────────────────────
+  function showSkeleton() {
+    $('browse-content').innerHTML = `
+      <div class="skeleton-grid">${Array(6).fill().map(()=>`
+        <div class="skeleton-card">
+          <div class="skel skel-h" style="width:50px;height:44px;border-radius:10px"></div>
+          <div class="skel skel-sm" style="margin-top:12px"></div>
+          <div class="skel skel-lg"></div>
+          <div class="skel skel-h" style="margin-top:16px"></div>
+          <div class="skel skel-h"></div>
+          <div class="skel skel-sm"></div>
+        </div>`).join('')}
+      </div>`;
+  }
+  function showError(msg) {
+    $('browse-content').innerHTML = `<div class="state-msg"><div class="icon">⚠️</div><h3>Could not load offerings</h3><p>${esc(msg)}</p></div>`;
+  }
+
+  // ── PCT fix for fallback fetcher raw data ────────────────
+  function applyPctFixToFunds(funds) {
+    return funds.map(f => {
+      const fixed = Object.assign({}, f);
+      PCT_FIELDS.forEach(field => {
+        if (fixed[field] != null) fixed[field] = fixPct(fixed[field], field);
+      });
+      return fixed;
+    });
+  }
+
+  // ── Init ─────────────────────────────────────────────────
+  async function init(params = {}) {
+    client = (params && params.client) || null;
+    if (!client && window.AFL && window.AFL.state) client = window.AFL.state.client || null;
+
+    wireControls();
+    showSkeleton();
+
+    try {
+      let funds;
+      if (window.AFL && typeof window.AFL.loadFunds === 'function') {
+        await window.AFL.loadFunds();
+        funds = window.AFL.state.funds || [];
+        // If shared.js older than v1.1.0, apply fix here too
+        if (!window.AFL.version || window.AFL.version < '1.1.0') {
+          funds = applyPctFixToFunds(funds);
+        }
+      } else {
+        funds = await fetchFundsFallback();
+        funds = applyPctFixToFunds(funds);
+      }
+      allFunds = funds;
+      buildDropdownOptions();
+      fullRender();
+    } catch(err) {
+      console.error('[Browse] Failed to load funds:', err);
+      showError('Please check your network connection and Google Sheets access.');
+    }
+  }
+
+  // ── Fallback fetcher (no shared.js) ─────────────────────
+  async function fetchFundsFallback() {
+    const SHEET_ID = '1xVFw8pFrJzcxD8CH7ainimPKD6GW9tn1bb8ggHYUfRs';
+    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=Sheet1`;
+    const res  = await fetch(url);
+    const text = await res.text();
+    const json = JSON.parse(text.replace(/^[^(]+\(|\);?$/g,''));
+    const cols = json.table.cols.map(c=>c.label);
+    const COL_MAP = {
+      'Sponsor':'sponsor','Offering Name':'name','Asset Class':'assetClass',
+      'Sector':'sector','Focus':'focus','Filed Raise':'filedRaise',
+      'Current Raise':'currentRaise','Remaining Raise':'equityRemaining',
+      'Offering Open':'offeringOpen','Offering Close':'offeringClose',
+      'Year 1 Cash on Cash Distribution':'y1coc','Year 1 Cash on Cash':'y1coc',
+      'Loan to Value':'ltv','(Avg)% Leased':'occupancy','% Leased':'occupancy',
+      'Preferred':'preferred','Hold Period':'holdPeriod','Minimum - DST':'minInvest',
+      '# Assets':'numAssets','Property Location(s)':'location',
+      'Acquisition Cap Rate':'capRate','Rep Comp':'repComp',
+      'Sponsor AUM':'sponsorAum','Sponsor Average IRR':'sponsorAvgIrr',
+      'Sponsor Logo URL':'sponsorLogoUrl',
+    };
+    return json.table.rows
+      .filter(row=>row.c&&row.c.some(c=>c&&c.v!=null))
+      .map((row,i)=>{
+        const obj={id:i+1};
+        cols.forEach((col,ci)=>{
+          const cell=row.c[ci];
+          const field=COL_MAP[col]||col;
+          let val=null;
+          if (cell) {
+            val=(cell.v!==undefined&&cell.v!==null)?cell.v:null;
+            // For pct fields, prefer formatted string e.g. "5.25%"
+            if (PCT_FIELDS.has(field)&&cell.f&&typeof cell.f==='string'&&cell.f.includes('%')) {
+              const p=parseFloat(cell.f.replace('%','').trim());
+              if (!isNaN(p)) val=p;
+            }
+          }
+          obj[field]=val;
+        });
+        return obj;
+      });
+  }
+
+  window.currentModule = { init };
+
+  if (!window._aflShellActive) {
+    function tryInit() {
+      if (window.AFL) init({});
+      else setTimeout(tryInit, 50);
+    }
+    if (document.readyState==='loading') document.addEventListener('DOMContentLoaded', tryInit);
+    else tryInit();
+  }
+
+})();
+</script>
+</body>
+</html>
