@@ -1,0 +1,1349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<title>AFL — Portfolio Builder</title>
+<style>
+/* ═══════════════════════════════════════════════
+   SHELL ESCAPE — builder uses position:fixed to
+   escape #main's padding and overflow-y:auto.
+   Sits below the 60px header, right of the 220px
+   sidebar, covering the rest of the viewport.
+═══════════════════════════════════════════════ */
+#builder-root {
+  position: fixed;
+  top: var(--header-h, 60px);
+  left: var(--nav-w, 220px);
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--surface, #F4F7FB);
+  font-family: var(--font, 'DM Sans', sans-serif);
+  font-size: 14px;
+  color: var(--navy, #0B1F3B);
+  z-index: 10;
+}
+
+/* ─── Tokens (mirrors index.html, safe to restate) ─── */
+:root {
+  --o1:#3B82F6; --o1-lt:#EFF6FF; --o1-mid:#BFDBFE;
+  --o2:#7C3AED; --o2-lt:#F5F3FF; --o2-mid:#DDD6FE;
+  --o3:#D97706; --o3-lt:#FFFBEB; --o3-mid:#FDE68A;
+}
+
+/* ─── Toolbar (replaces mode-bar, sits atop layout) ─── */
+.bld-toolbar {
+  background: #fff;
+  border-bottom: 1px solid var(--mist, #C8D8E8);
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 44px;
+  flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(11,31,59,0.06);
+}
+.bld-toolbar-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--navy, #0B1F3B);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.bld-toolbar-sep { flex: 1; }
+.bld-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 12px;
+  border-radius: 7px;
+  border: 1.5px solid var(--mist, #C8D8E8);
+  background: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--navy, #0B1F3B);
+  font-family: var(--font, 'DM Sans', sans-serif);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.bld-btn:hover { border-color: var(--slate2, #5C7A99); background: var(--surface, #F4F7FB); }
+.bld-btn.primary { background: var(--navy, #0B1F3B); color: #fff; border-color: var(--navy, #0B1F3B); }
+.bld-btn.primary:hover { background: var(--navy2, #1C3A63); }
+.bld-btn.success { background: var(--green, #1A7A4A); color: #fff; border-color: var(--green, #1A7A4A); }
+.bld-btn.success:hover { opacity: .9; }
+.bld-btn.danger { color: var(--red, #991B1B); border-color: #FECACA; }
+.bld-btn.danger:hover { background: var(--red-lt, #FEE2E2); }
+.bld-btn.sm { padding: 3px 9px; font-size: 11px; }
+
+/* ─── Main two-column layout ─── */
+.bld-layout {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ─── LEFT PANEL ─── */
+.bld-left {
+  width: 390px;
+  flex-shrink: 0;
+  background: #fff;
+  border-right: 1px solid var(--mist, #C8D8E8);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+.bld-section {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--mist, #C8D8E8);
+}
+.bld-section:last-child { border-bottom: none; flex: 1; }
+.bld-section-title {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--slate2, #5C7A99);
+  margin-bottom: 11px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.bld-count { background: var(--navy2,#1C3A63); color:#fff; border-radius:10px; padding:1px 7px; font-size:9px; }
+
+/* Client card */
+.client-card {
+  background: var(--navy, #0B1F3B);
+  border-radius: 10px;
+  padding: 12px 14px;
+  color: #fff;
+  position: relative;
+}
+.client-card.empty {
+  background: var(--surface2, #EEF3FA);
+  border: 1.5px dashed var(--mist, #C8D8E8);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 60px;
+}
+.client-name { font-size: 14px; font-weight: 700; letter-spacing: -.02em; }
+.client-meta {
+  font-size: 11px;
+  color: rgba(255,255,255,.45);
+  margin-top: 3px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.client-change-btn {
+  position: absolute;
+  top: 9px; right: 10px;
+  padding: 3px 9px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  border: 1px solid rgba(255,255,255,.2);
+  background: rgba(255,255,255,.1);
+  color: rgba(255,255,255,.75);
+  cursor: pointer;
+  font-family: var(--font,'DM Sans',sans-serif);
+}
+.client-change-btn:hover { background: rgba(255,255,255,.18); }
+
+/* Sector filter pills */
+.filter-row { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 9px; }
+.f-pill {
+  padding: 3px 9px;
+  border-radius: 20px;
+  border: 1.5px solid var(--mist,#C8D8E8);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--slate2,#5C7A99);
+  background: #fff;
+  cursor: pointer;
+  font-family: var(--font,'DM Sans',sans-serif);
+  transition: all .13s;
+}
+.f-pill.active { background: var(--navy,#0B1F3B); color: #fff; border-color: var(--navy,#0B1F3B); }
+
+/* Search */
+.search-wrap { position: relative; }
+.search-input {
+  width: 100%;
+  padding: 8px 12px 8px 32px;
+  border: 1.5px solid var(--mist,#C8D8E8);
+  border-radius: 7px;
+  font-size: 13px;
+  font-family: var(--font,'DM Sans',sans-serif);
+  background: #fff;
+  color: var(--navy,#0B1F3B);
+  outline: none;
+  transition: border-color .18s;
+}
+.search-input:focus { border-color: var(--navy2,#1C3A63); }
+.search-ico { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 13px; pointer-events: none; }
+.search-results {
+  position: absolute;
+  z-index: 50;
+  width: 100%;
+  top: calc(100% + 4px);
+  background: #fff;
+  border: 1.5px solid var(--mist,#C8D8E8);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(11,31,59,.12);
+  max-height: 260px;
+  overflow-y: auto;
+  display: none;
+}
+.search-results.open { display: block; }
+.s-item {
+  padding: 9px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--mist,#C8D8E8);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background .1s;
+}
+.s-item:last-child { border-bottom: none; }
+.s-item:hover { background: var(--ice,#E8F0F8); }
+.s-item.added { opacity: .4; pointer-events: none; }
+.s-name { font-size: 12.5px; font-weight: 600; color: var(--navy,#0B1F3B); line-height: 1.3; }
+.s-meta { font-size: 10.5px; color: var(--slate2,#5C7A99); }
+
+/* Fund slots */
+.slots-wrap { display: flex; flex-direction: column; gap: 9px; }
+.fund-slot {
+  border: 1.5px solid var(--mist,#C8D8E8);
+  border-radius: 10px;
+  padding: 11px 12px;
+  position: relative;
+  background: #fff;
+}
+.fund-slot.s1 { border-color: var(--o1-mid); background: var(--o1-lt); }
+.fund-slot.s2 { border-color: var(--o2-mid); background: var(--o2-lt); }
+.fund-slot.s3 { border-color: var(--o3-mid); background: var(--o3-lt); }
+.fund-slot.empty {
+  border-style: dashed;
+  background: var(--surface,#F4F7FB);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60px;
+  cursor: pointer;
+  color: var(--slate2,#5C7A99);
+  font-size: 12px;
+  font-weight: 500;
+}
+.fund-slot.empty:hover { border-color: var(--slate2,#5C7A99); }
+.slot-num {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 800; color: #fff; flex-shrink: 0;
+}
+.n1 { background: var(--o1); } .n2 { background: var(--o2); } .n3 { background: var(--o3); }
+.slot-header { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 8px; }
+.slot-name { font-size: 12.5px; font-weight: 700; color: var(--navy,#0B1F3B); line-height: 1.3; flex: 1; }
+.slot-sponsor { font-size: 10.5px; color: var(--slate2,#5C7A99); margin-top: 1px; }
+.slot-remove {
+  position: absolute; top: 9px; right: 9px;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: rgba(153,27,27,.1); border: none; cursor: pointer;
+  font-size: 10px; color: var(--red,#991B1B);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font,'DM Sans',sans-serif);
+}
+.slot-remove:hover { background: var(--red-lt,#FEE2E2); }
+
+/* Allocation row */
+.alloc-row { display: flex; align-items: center; gap: 7px; margin-top: 7px; }
+.alloc-lbl { font-size: 10.5px; font-weight: 600; color: var(--slate2,#5C7A99); white-space: nowrap; }
+.alloc-input {
+  width: 110px;
+  padding: 5px 8px;
+  border: 1.5px solid var(--mist,#C8D8E8);
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: 'DM Mono', monospace;
+  color: var(--navy,#0B1F3B);
+  background: #fff;
+  outline: none;
+  text-align: right;
+  transition: border-color .18s;
+}
+.alloc-input:focus { border-color: var(--navy2,#1C3A63); }
+.alloc-input.err { border-color: var(--red,#991B1B); background: var(--red-lt,#FEE2E2); }
+.alloc-pct { font-size: 10.5px; color: var(--slate2,#5C7A99); font-family: 'DM Mono',monospace; }
+.min-warn { font-size: 10px; color: var(--red,#991B1B); margin-top: 3px; display: none; }
+.min-warn.show { display: block; }
+.slot-chips { display: flex; gap: 5px; margin-top: 8px; flex-wrap: wrap; }
+
+/* Peer chips */
+.chip {
+  display: inline-flex; align-items: center;
+  padding: 2px 7px; border-radius: 20px;
+  font-size: 10px; font-weight: 700;
+}
+.chip.g { background: var(--green-lt,#E8F7EF); color: var(--green,#1A7A4A); }
+.chip.b { background: var(--red-lt,#FEE2E2); color: var(--red,#991B1B); }
+.chip.n { background: var(--ice,#E8F0F8); color: var(--slate2,#5C7A99); }
+.chip.a { background: var(--amber-lt,#FEF3C7); color: var(--amber,#B45309); }
+
+/* Totals bar */
+.totals-bar {
+  background: var(--navy,#0B1F3B);
+  border-radius: 8px;
+  padding: 10px 13px;
+  margin-top: 11px;
+}
+.totals-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+}
+.totals-row + .totals-row {
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px solid rgba(255,255,255,.1);
+}
+.t-lbl { color: rgba(255,255,255,.5); font-weight: 500; }
+.t-val { color: #fff; font-weight: 700; font-family: 'DM Mono',monospace; }
+.t-val.ok { color: #34D399; } .t-val.err { color: #F87171; }
+.t-progress { height: 4px; background: rgba(255,255,255,.12); border-radius: 2px; margin-top: 7px; overflow: hidden; }
+.t-fill { height: 100%; border-radius: 2px; transition: width .3s; }
+
+/* ─── RIGHT PANEL ─── */
+.bld-right {
+  flex: 1;
+  overflow-y: auto;
+  padding: 18px 20px;
+  background: var(--surface,#F4F7FB);
+}
+
+/* KPI grid */
+.kpi-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; margin-bottom: 14px; }
+.kpi-tile {
+  background: #fff;
+  border: 1px solid var(--mist,#C8D8E8);
+  border-radius: 12px;
+  padding: 12px 14px;
+  box-shadow: 0 1px 3px rgba(11,31,59,.07);
+}
+.kpi-lbl { font-size: 9.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--slate2,#5C7A99); margin-bottom: 3px; }
+.kpi-val { font-size: 22px; font-weight: 800; color: var(--navy,#0B1F3B); letter-spacing: -.03em; font-family: 'DM Mono',monospace; line-height: 1; }
+.kpi-sub { font-size: 10.5px; color: var(--slate2,#5C7A99); margin-top: 4px; }
+.kpi-bar { height: 3px; background: var(--mist,#C8D8E8); border-radius: 2px; margin-top: 6px; overflow: hidden; }
+.kpi-fill { height: 100%; border-radius: 2px; }
+.kpi-bkdn { display: flex; gap: 5px; margin-top: 5px; flex-wrap: wrap; }
+.kpi-bd { font-size: 9px; color: var(--slate2,#5C7A99); display: flex; align-items: center; gap: 3px; }
+.kpi-bd-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+.kpi-good { color: var(--green,#1A7A4A); font-weight: 600; }
+.kpi-bad  { color: var(--red,#991B1B); font-weight: 600; }
+
+/* Panel */
+.panel {
+  background: #fff;
+  border: 1px solid var(--mist,#C8D8E8);
+  border-radius: 12px;
+  padding: 15px 17px;
+  box-shadow: 0 1px 3px rgba(11,31,59,.07);
+  margin-bottom: 13px;
+}
+.panel-title {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--slate2,#5C7A99);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Chart panels */
+.charts-row { display: grid; grid-template-columns: 3fr 2fr; gap: 12px; margin-bottom: 13px; }
+.chart-panel {
+  background: #fff;
+  border: 1px solid var(--mist,#C8D8E8);
+  border-radius: 12px;
+  padding: 14px 16px;
+  box-shadow: 0 1px 3px rgba(11,31,59,.07);
+}
+.chart-wrap { height: 190px; position: relative; }
+.chart-wrap-sm { height: 160px; position: relative; }
+
+/* Suitability cards */
+.suit-cards { display: grid; gap: 10px; margin-bottom: 13px; }
+.suit-card { border-radius: 12px; padding: 13px 14px; border: 1.5px solid; }
+.suit-card.sc1 { background: var(--o1-lt); border-color: var(--o1-mid); }
+.suit-card.sc2 { background: var(--o2-lt); border-color: var(--o2-mid); }
+.suit-card.sc3 { background: var(--o3-lt); border-color: var(--o3-mid); }
+.suit-score-big { font-size: 30px; font-weight: 800; letter-spacing: -.04em; font-family: 'DM Mono',monospace; line-height: 1; }
+.suit-lbl { font-size: 10.5px; font-weight: 600; margin-top: 3px; }
+.suit-reasons { margin-top: 8px; display: flex; flex-direction: column; gap: 4px; }
+.suit-r { font-size: 10px; display: flex; align-items: flex-start; gap: 4px; line-height: 1.4; color: var(--slate,#3A5270); }
+.suit-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; margin-top: 3px; }
+
+/* Flags */
+.flags-wrap { display: flex; flex-direction: column; gap: 7px; }
+.flag {
+  display: flex; align-items: flex-start; gap: 8px;
+  padding: 8px 11px; border-radius: 7px; border: 1.5px solid;
+  font-size: 12px; line-height: 1.5;
+}
+.flag.pass { background: var(--green-lt,#E8F7EF); border-color: #BBF7D0; color: var(--green,#1A7A4A); }
+.flag.warn { background: var(--amber-lt,#FEF3C7); border-color: #FDE68A; color: var(--amber,#B45309); }
+.flag.fail { background: var(--red-lt,#FEE2E2); border-color: #FECACA; color: var(--red,#991B1B); }
+.flag.info { background: var(--ice,#E8F0F8); border-color: var(--mist,#C8D8E8); color: var(--slate,#3A5270); }
+.flag-ico { font-size: 13px; flex-shrink: 0; margin-top: 1px; }
+
+/* Projection table */
+.proj-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.proj-table th {
+  padding: 6px 8px;
+  background: var(--navy,#0B1F3B);
+  color: rgba(255,255,255,.55);
+  font-size: 10px; font-weight: 600;
+  letter-spacing: .05em; text-transform: uppercase; text-align: center;
+}
+.proj-table th.hl { color: #fff; background: var(--navy2,#1C3A63); }
+.proj-table th:first-child { text-align: left; border-radius: 7px 0 0 0; min-width: 110px; }
+.proj-table th:last-child { border-radius: 0 7px 0 0; }
+.proj-table td { padding: 6px 8px; border-bottom: 1px solid var(--mist,#C8D8E8); text-align: center; color: var(--navy,#0B1F3B); }
+.proj-table td:first-child { text-align: left; font-weight: 600; color: var(--slate,#3A5270); font-size: 11px; }
+.proj-table td.hl { background: var(--ice,#E8F0F8); font-weight: 700; color: var(--navy2,#1C3A63); }
+.proj-table tr:last-child td { border-bottom: none; }
+.proj-table tr.total-row { background: var(--ice,#E8F0F8); font-weight: 700; }
+.proj-table tr.cum-row td { color: var(--slate2,#5C7A99); font-size: 11px; }
+
+/* Map */
+.map-wrap { height: 170px; margin-bottom: 7px; }
+#us-map-builder { width: 100%; height: 100%; }
+.state-base { fill: #D1DCE6; stroke: #fff; stroke-width: .6; }
+.state-o1 { fill: var(--o1); stroke: #fff; stroke-width: .6; }
+.state-o2 { fill: var(--o2); stroke: #fff; stroke-width: .6; }
+.state-o3 { fill: var(--o3); stroke: #fff; stroke-width: .6; }
+.state-multi { fill: #06B6D4; stroke: #fff; stroke-width: .6; }
+.map-legend { display: flex; flex-wrap: wrap; gap: 6px; }
+.map-leg { display: flex; align-items: center; gap: 4px; font-size: 10px; color: var(--slate2,#5C7A99); }
+.map-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+/* Action bar */
+.bld-action-bar {
+  background: #fff;
+  border-top: 1px solid var(--mist,#C8D8E8);
+  padding: 9px 20px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-shrink: 0;
+  box-shadow: 0 -2px 10px rgba(11,31,59,.06);
+}
+.action-right { margin-left: auto; display: flex; gap: 7px; align-items: center; }
+
+/* Saved dropdown */
+.saved-dd { position: relative; display: inline-block; }
+.saved-menu {
+  position: absolute; bottom: calc(100% + 5px); left: 0;
+  background: #fff; border: 1.5px solid var(--mist,#C8D8E8);
+  border-radius: 9px; box-shadow: 0 12px 32px rgba(11,31,59,.14);
+  min-width: 230px; z-index: 200; padding: 5px; display: none;
+}
+.saved-menu.open { display: block; }
+.saved-item {
+  padding: 7px 10px; border-radius: 7px; cursor: pointer;
+  font-size: 12px; display: flex; align-items: center;
+  justify-content: space-between; gap: 8px;
+}
+.saved-item:hover { background: var(--ice,#E8F0F8); }
+.saved-del { font-size: 11px; color: var(--red,#991B1B); padding: 2px 5px; border-radius: 4px; cursor: pointer; }
+.saved-del:hover { background: var(--red-lt,#FEE2E2); }
+.saved-empty { padding: 10px; font-size: 12px; color: var(--slate2,#5C7A99); text-align: center; }
+
+/* Empty analytics state */
+.empty-right {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  min-height: 380px; gap: 10px;
+  color: var(--slate2,#5C7A99); text-align: center;
+}
+.empty-right h3 { font-size: 16px; color: var(--navy,#0B1F3B); }
+
+/* Metrics table */
+.metrics-tbl { width: 100%; border-collapse: collapse; font-size: 12px; }
+.metrics-tbl td { padding: 5px 0; border-bottom: 1px solid var(--mist,#C8D8E8); }
+.metrics-tbl tr:last-child td { border-bottom: none; }
+.metrics-tbl td:first-child { color: var(--slate2,#5C7A99); font-weight: 500; }
+.metrics-tbl td:last-child { font-weight: 600; text-align: right; color: var(--navy,#0B1F3B); }
+
+/* Toast */
+.bld-toast {
+  position: fixed; bottom: 70px; left: 50%;
+  transform: translateX(-50%) translateY(8px);
+  background: var(--navy,#0B1F3B); color: #fff;
+  padding: 8px 18px; border-radius: 8px;
+  font-size: 13px; font-weight: 600;
+  opacity: 0; transition: all .22s;
+  z-index: 999; pointer-events: none;
+  font-family: var(--font,'DM Sans',sans-serif);
+}
+.bld-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* Print */
+@media print {
+  .bld-toolbar, .bld-action-bar, .bld-left,
+  .slot-remove, .bld-btn, #builder-toast { display: none !important; }
+  #builder-root { height: auto; overflow: visible; margin: 0; }
+  .bld-layout { display: block; }
+  .bld-right { padding: 0; overflow: visible; }
+  .panel, .kpi-tile, .chart-panel, .suit-card { break-inside: avoid; box-shadow: none; border: 1px solid #ccc; }
+  .kpi-grid { grid-template-columns: repeat(4,1fr); }
+  .charts-row { grid-template-columns: 1fr 1fr; }
+  .print-hdr { display: block !important; }
+}
+.print-hdr { display: none; padding: 12px 0 8px; border-bottom: 2px solid var(--navy,#0B1F3B); margin-bottom: 16px; }
+.print-hdr h1 { font-size: 20px; font-weight: 800; color: var(--navy,#0B1F3B); }
+.print-hdr p { font-size: 12px; color: var(--slate2,#5C7A99); margin-top: 3px; }
+</style>
+</head>
+<body>
+
+<div id="builder-root">
+  <div style="display:flex;align-items:center;justify-content:center;height:100%;flex-direction:column;gap:10px;color:var(--slate2,#5C7A99)">
+    <div style="width:28px;height:28px;border:3px solid var(--mist,#C8D8E8);border-top-color:var(--navy2,#1C3A63);border-radius:50%;animation:bspin .7s linear infinite"></div>
+    <div style="font-size:13px">Loading Portfolio Builder…</div>
+    <style>@keyframes bspin{to{transform:rotate(360deg)}}</style>
+  </div>
+</div>
+
+<div class="bld-toast" id="builder-toast"></div>
+
+<script>
+(function(){
+'use strict';
+
+// ─── State ────────────────────────────────────────────────
+let _funds   = [];
+let _peers   = {};
+let _client  = null;
+let _sel     = [];   // [{fund, alloc}] max 3
+let _distCh  = null;
+let _donutCh = null;
+let _mapTopo = null;
+let _sector  = 'all';
+
+const O_HEX  = ['#3B82F6','#7C3AED','#D97706'];
+const FIPS   = {"01":"AL","02":"AK","04":"AZ","05":"AR","06":"CA","08":"CO","09":"CT","10":"DE","12":"FL","13":"GA","15":"HI","16":"ID","17":"IL","18":"IN","19":"IA","20":"KS","21":"KY","22":"LA","23":"ME","24":"MD","25":"MA","26":"MI","27":"MN","28":"MS","29":"MO","30":"MT","31":"NE","32":"NV","33":"NH","34":"NJ","35":"NM","36":"NY","37":"NC","38":"ND","39":"OH","40":"OK","41":"OR","42":"PA","44":"RI","45":"SC","46":"SD","47":"TN","48":"TX","49":"UT","50":"VT","51":"VA","53":"WA","54":"WV","55":"WI","56":"WY"};
+
+// ─── Resolve AFL from shell or window.AFL ─────────────────
+function getAFL(){
+  return window.AFL || null;
+}
+
+// ─── Init ─────────────────────────────────────────────────
+async function init(shellParams){
+  // ── FIX: Wait up to 3s for AFL to become available ──────
+  let AFL = getAFL();
+  if(!AFL){
+    await new Promise(res => {
+      let tries = 0;
+      const t = setInterval(() => {
+        if(window.AFL || ++tries > 30){ clearInterval(t); res(); }
+      }, 100);
+    });
+    AFL = getAFL();
+  }
+  // ────────────────────────────────────────────────────────
+  if(!AFL){ err('AFL shared library not available.'); return; }
+
+  try{
+    if(!AFL.state.funds||!AFL.state.funds.length) await AFL.loadFunds();
+  }catch(e){ err('Could not load offering data: '+e.message); return; }
+
+  _funds  = AFL.state.funds || [];
+  if(!_funds.length){ err('No offering data found in Google Sheets.'); return; }
+  _peers  = AFL.peerStats ? AFL.peerStats(_funds) : {};
+  _client = AFL.state.client || null;
+
+  // Pre-populate from basket
+  const basket = AFL.basket && AFL.basket.get ? AFL.basket.get() : [];
+  _sel = basket.slice(0,3).map((f,i,arr)=>({fund:f, alloc:autoAlloc(f,arr.length)}));
+
+  // Nav param: single fund to pre-add
+  const np = (shellParams&&shellParams.params)||shellParams||{};
+  const navId = Number(np.fundId||np.id||0);
+  if(navId && !_sel.find(s=>s.fund.id===navId) && _sel.length<3){
+    const f = _funds.find(f=>f.id===navId);
+    if(f){ _sel.push({fund:f, alloc:autoAlloc(f,_sel.length+1)}); if(AFL.basket.add)AFL.basket.add(navId); }
+  }
+
+  paint();
+  bindGlobal();
+}
+
+function autoAlloc(fund, n){
+  if(!_client||!_client.exchangeAmount) return fund.minInvest||100000;
+  return Math.floor((_client.exchangeAmount/Math.max(1,n))/1000)*1000;
+}
+
+function bindGlobal(){
+  window.addEventListener('afl:client-updated', e=>{
+    _client = e.detail || getAFL().state.client;
+    reLeft(); reRight();
+  });
+  document.addEventListener('click', e=>{
+    if(!e.target.closest('.search-wrap')) closeSearch();
+    if(!e.target.closest('.saved-dd')) closeSaved();
+  });
+}
+
+// ─── Paint full shell ─────────────────────────────────────
+function paint(){
+  const AFL = getAFL();
+  document.getElementById('builder-root').innerHTML = `
+<div class="print-hdr" id="print-hdr">
+  <h1>DST Portfolio Analysis</h1>
+  <p id="print-meta"></p>
+</div>
+
+<!-- Toolbar -->
+<div class="bld-toolbar">
+  <span class="bld-toolbar-title">📐 Portfolio Builder</span>
+  ${_client&&_client.name?`<span style="font-size:11px;color:var(--slate2,#5C7A99);font-weight:500">· ${x(_client.name)}</span>`:''}
+  <span class="bld-toolbar-sep"></span>
+  <button class="bld-btn" onclick="window._bld.generatePDF()">🖨️ Print / PDF</button>
+  ${AFL&&AFL.navigate?`<button class="bld-btn" onclick="window.AFL.navigate('browse')">← Browse</button>`:''}
+</div>
+
+<!-- Two-column layout -->
+<div class="bld-layout">
+  <div class="bld-left" id="bleft">${leftHTML()}</div>
+  <div class="bld-right" id="bright">${rightHTML()}</div>
+</div>
+
+<!-- Action bar -->
+<div class="bld-action-bar">
+  <button class="bld-btn success" onclick="window._bld.generatePDF()">🖨️ Generate PDF Tear Sheet</button>
+  <button class="bld-btn primary" onclick="window._bld.sendToClient()">✉️ Send to Client</button>
+  <button class="bld-btn" onclick="window._bld.savePF()">💾 Save Portfolio</button>
+  <div class="saved-dd" id="saved-dd">
+    <button class="bld-btn" onclick="window._bld.toggleSaved()">📂 Load ▾</button>
+    <div class="saved-menu" id="saved-menu">${savedMenuHTML()}</div>
+  </div>
+  <div class="action-right">
+    <button class="bld-btn" onclick="window._bld.autoAlloc()">⚖️ Equal Split</button>
+    <button class="bld-btn danger" onclick="window._bld.clearAll()">✕ Clear</button>
+  </div>
+</div>`;
+
+  afterRight();
+}
+
+// ─── Left panel HTML ──────────────────────────────────────
+function leftHTML(){
+  const AFL = getAFL();
+  return `
+<!-- Client -->
+<div class="bld-section">
+  <div class="bld-section-title">👤 Client Profile</div>
+  ${clientCardHTML()}
+</div>
+
+<!-- Search -->
+<div class="bld-section">
+  <div class="bld-section-title">🔍 Add Offerings <span class="bld-count">${_sel.length}/3</span></div>
+  ${_sel.length<3?`
+  <div class="filter-row">${filterPillsHTML()}</div>
+  <div class="search-wrap">
+    <span class="search-ico">🔍</span>
+    <input class="search-input" id="fund-search" type="text"
+      placeholder="Search name, sponsor, sector…"
+      oninput="window._bld.onSearch(this.value)"
+      onfocus="window._bld.openSearch()"/>
+    <div class="search-results" id="search-results"></div>
+  </div>` :
+  `<div style="font-size:12px;color:var(--slate2,#5C7A99);text-align:center;padding:4px 0">
+    ✅ Max 3 offerings — remove one to add another.
+  </div>`}
+</div>
+
+<!-- Slots -->
+<div class="bld-section">
+  <div class="bld-section-title">📐 Construction</div>
+  <div class="slots-wrap">${slotsHTML()}</div>
+  ${_sel.length?totalsHTML():''}
+</div>`;
+}
+
+function clientCardHTML(){
+  const AFL = getAFL();
+  if(!_client||(!_client.name&&!_client.exchangeAmount)){
+    return `<div class="client-card empty">
+      <span style="font-size:24px">👤</span>
+      <div>
+        <div style="font-size:13px;font-weight:600;color:var(--slate,#3A5270)">No Client Loaded</div>
+        <div style="font-size:11px;color:var(--slate2,#5C7A99);margin-top:2px">Add a client for suitability scoring &amp; projections.</div>
+      </div>
+      ${AFL&&AFL.navigate?`<button class="bld-btn sm" style="margin-left:auto;flex-shrink:0" onclick="window.AFL.navigate('client')">+ Add</button>`:''}
+    </div>`;
+  }
+  return `<div class="client-card">
+    ${AFL&&AFL.navigate?`<button class="client-change-btn" onclick="window.AFL.navigate('client')">Change</button>`:''}
+    <div class="client-name">${x(_client.name)}</div>
+    <div class="client-meta">
+      ${_client.exchangeAmount?`<span>💰 ${fmt.money(_client.exchangeAmount)}</span>`:''}
+      ${_client.riskTolerance?`<span>⚖️ ${x(_client.riskTolerance)}</span>`:''}
+      ${_client.investmentObjective?`<span>🎯 ${x(_client.investmentObjective)}</span>`:''}
+      ${_client.horizon?`<span>⏳ ${_client.horizon}yr</span>`:''}
+      ${_client.taxBracket?`<span>📊 ${_client.taxBracket}%</span>`:''}
+    </div>
+  </div>`;
+}
+
+function filterPillsHTML(){
+  const secs = ['all',...new Set(_funds.map(f=>f.sector).filter(Boolean))].slice(0,8);
+  return secs.map(s=>`<button class="f-pill${_sector===s?' active':''}" onclick="window._bld.setFilter('${s}')">${s==='all'?'All':x(s)}</button>`).join('');
+}
+
+function slotsHTML(){
+  const out = [];
+  for(let i=0;i<3;i++){
+    const s = _sel[i];
+    out.push(s ? filledSlot(s,i) :
+      `<div class="fund-slot empty" onclick="document.getElementById('fund-search')&&document.getElementById('fund-search').focus()">
+        + Add Offering ${i+1}
+      </div>`);
+  }
+  return out.join('');
+}
+
+function filledSlot(s, i){
+  const f = s.fund;
+  const pct = (_client&&_client.exchangeAmount&&s.alloc)
+    ? ((s.alloc/_client.exchangeAmount)*100).toFixed(0)+'%' : null;
+  const belowMin = f.minInvest&&s.alloc<f.minInvest;
+  // Map field names: index.html uses y1CoC, shared.js uses y1coc — handle both
+  const coc = f.y1coc||f.y1CoC||0;
+  const ltv = f.ltv||0;
+  return `<div class="fund-slot s${i+1}">
+    <button class="slot-remove" onclick="window._bld.remove(${f.id})">✕</button>
+    <div class="slot-header">
+      <div class="slot-num n${i+1}">${i+1}</div>
+      <div>
+        <div class="slot-name">${x(f.name||'Offering '+f.id)}</div>
+        <div class="slot-sponsor">${x(f.sponsor||'')}${f.sector?' · '+x(f.sector||f.assetClass||''):''}</div>
+      </div>
+    </div>
+    <div class="alloc-row">
+      <span class="alloc-lbl">Allocation $</span>
+      <input class="alloc-input${belowMin?' err':''}" type="number" min="0" step="5000"
+        value="${s.alloc||''}" placeholder="amount"
+        oninput="window._bld.setAlloc(${f.id},this.value)"/>
+      ${pct?`<span class="alloc-pct">${pct}</span>`:''}
+    </div>
+    <div class="min-warn${belowMin?' show':''}" id="warn-${f.id}">⚠️ Below min: ${fmt.money(f.minInvest)}</div>
+    <div class="slot-chips">
+      <span class="chip n">Y1 ${fmt.pct(coc)}</span>
+      <span class="chip ${ltv<50?'g':ltv<65?'n':'b'}">LTV ${fmt.pct(ltv)}</span>
+      ${f.holdPeriod?`<span class="chip n">${f.holdPeriod}yr</span>`:''}
+      <span class="chip ${(f.status||'Open')==='Open'?'g':'b'}">● ${x(f.status||'Open')}</span>
+    </div>
+  </div>`;
+}
+
+function totalsHTML(){
+  const total = _sel.reduce((s,x)=>s+(Number(x.alloc)||0),0);
+  const budget = _client&&_client.exchangeAmount?_client.exchangeAmount:null;
+  const pct = budget?(total/budget)*100:null;
+  const over = budget&&total>budget;
+  const rem = budget?budget-total:null;
+  return `<div class="totals-bar">
+    <div class="totals-row">
+      <span class="t-lbl">Total Allocated</span>
+      <span class="t-val ${over?'err':total>0?'ok':''}">${fmt.money(total)}</span>
+    </div>
+    ${budget?`
+    <div class="totals-row">
+      <span class="t-lbl">Exchange Proceeds</span>
+      <span class="t-val">${fmt.money(budget)}</span>
+    </div>
+    <div class="totals-row">
+      <span class="t-lbl">${over?'Over by':'Remaining'}</span>
+      <span class="t-val ${over?'err':'ok'}">${fmt.money(Math.abs(rem))}</span>
+    </div>
+    <div class="t-progress"><div class="t-fill" style="width:${Math.min(100,pct||0).toFixed(1)}%;background:${over?'#F87171':'#34D399'}"></div></div>`:''}
+  </div>`;
+}
+
+// ─── Right panel HTML ─────────────────────────────────────
+function rightHTML(){
+  if(!_sel.length) return `<div class="empty-right">
+    <div style="font-size:42px">📐</div>
+    <h3>Build Your Portfolio</h3>
+    <p style="font-size:13px;max-width:280px;line-height:1.65">Add up to 3 DST offerings from the left panel. Live analytics and suitability scoring will appear here.</p>
+  </div>`;
+
+  const n = _sel.length;
+  const tot = _sel.reduce((s,x)=>s+(Number(x.alloc)||0),0)||1;
+  // Field name compatibility: shared.js v1.1 uses y1coc; index.html uses y1CoC
+  const bCoc = wavg(f=>f.y1coc||f.y1CoC||0);
+  const bLtv  = wavg(f=>f.ltv||0);
+  const bOcc  = wavg(f=>f.pctLeased||f.occupancy||0);
+  const avgHold = _sel.reduce((s,x)=>s+(parseFloat(x.fund.holdPeriod)||0),0)/n;
+  const peerCoc = _peers.y1coc&&_peers.y1coc.avg||_peers.avgY1CoC||null;
+  const peerLtv = _peers.ltv&&_peers.ltv.avg||_peers.avgLTV||null;
+
+  const suitR = _sel.map(s=>_client?callSuit(s.fund,_client):null);
+  const avgSuit = suitR.every(r=>r!==null)?Math.round(suitR.reduce((s,r)=>s+r.score,0)/n):null;
+
+  const stateMap={};
+  const AFL=getAFL();
+  if(AFL&&AFL.extractStates){
+    _sel.forEach((s,i)=>AFL.extractStates(s.fund.location||'').forEach(st=>{stateMap[st]=stateMap[st]!==undefined?'multi':i;}));
+  }
+  const mapLeg = _sel.map((s,i)=>`<div class="map-leg"><div class="map-dot" style="background:${O_HEX[i]}"></div>${x(s.fund.name||'')} · ${AFL&&AFL.extractStates?AFL.extractStates(s.fund.location||'').join(', ')||'—':'—'}</div>`).join('');
+
+  return `
+<!-- KPIs -->
+<div class="kpi-grid">
+  ${kpi('Blended LTV', fmt.pct(bLtv),
+    peerLtv?(bLtv<peerLtv?`<span class="kpi-good">↓ ${(peerLtv-bLtv).toFixed(1)}% below peers</span>`:`<span class="kpi-bad">↑ ${(bLtv-peerLtv).toFixed(1)}% above peers</span>`):'weighted avg',
+    `width:${Math.min(100,bLtv)}%;background:${bLtv<50?'#34D399':bLtv<65?'#FBBF24':'#F87171'}`,
+    _sel.map((s,i)=>`<div class="kpi-bd"><div class="kpi-bd-dot" style="background:${O_HEX[i]}"></div>${fmt.pct(s.fund.ltv||s.fund.ltv||0)}</div>`).join(''))}
+  ${kpi('Blended Y1 CoC', fmt.pct(bCoc),
+    peerCoc?(bCoc>peerCoc?`<span class="kpi-good">↑ ${(bCoc-peerCoc).toFixed(2)}% above peers</span>`:`<span class="kpi-bad">↓ ${(peerCoc-bCoc).toFixed(2)}% below peers</span>`):'weighted avg',
+    `width:${Math.min(100,(bCoc/8)*100)}%;background:#3B82F6`,
+    _sel.map((s,i)=>`<div class="kpi-bd"><div class="kpi-bd-dot" style="background:${O_HEX[i]}"></div>${fmt.pct(s.fund.y1coc||s.fund.y1CoC||0)}</div>`).join(''))}
+  ${kpi('Total Allocated', fmt.money(tot),
+    _client&&_client.exchangeAmount?`${((tot/_client.exchangeAmount)*100).toFixed(0)}% of exchange`:'of target',
+    `width:${_client&&_client.exchangeAmount?Math.min(100,(tot/_client.exchangeAmount)*100).toFixed(0):0}%;background:${_client&&_client.exchangeAmount&&tot>_client.exchangeAmount?'#F87171':'#34D399'}`,
+    _sel.map((s,i)=>`<div class="kpi-bd"><div class="kpi-bd-dot" style="background:${O_HEX[i]}"></div>${fmt.money(s.alloc)}</div>`).join(''))}
+  ${kpi('Avg Hold Period', fmt.num(avgHold,1)+' yr',
+    _client&&_client.horizon?`vs ${_client.horizon}yr horizon`:'avg across portfolio',
+    `width:${Math.min(100,(avgHold/15)*100)}%;background:#7C3AED`,
+    _sel.map((s,i)=>`<div class="kpi-bd"><div class="kpi-bd-dot" style="background:${O_HEX[i]}"></div>${parseFloat(s.fund.holdPeriod)||'—'}yr</div>`).join(''))}
+</div>
+
+<!-- Suitability -->
+${_client&&_client.name?`
+<div class="panel">
+  <div class="panel-title">★ Suitability — ${x(_client.name)}${avgSuit!==null?`<span style="margin-left:auto;font-size:15px;font-weight:800;font-family:'DM Mono',monospace;color:${avgSuit>=70?'var(--green,#1A7A4A)':avgSuit>=45?'var(--amber,#B45309)':'var(--red,#991B1B)'}">${avgSuit}% avg</span>`:''}</div>
+  <div class="suit-cards" style="grid-template-columns:repeat(${n},1fr)">${_sel.map((s,i)=>suitCard(s,i,suitR[i])).join('')}</div>
+</div>`:`
+<div class="panel" style="text-align:center;padding:13px">
+  <span style="font-size:12px;color:var(--slate2,#5C7A99)">No client loaded — </span>
+  ${AFL&&AFL.navigate?`<a href="#" onclick="window.AFL.navigate('client');return false" style="font-size:12px;color:var(--blue,#1D4ED8)">add a client profile</a>`:''}
+  <span style="font-size:12px;color:var(--slate2,#5C7A99)"> for suitability scoring.</span>
+</div>`}
+
+<!-- Charts row -->
+<div class="charts-row">
+  <div class="chart-panel">
+    <div class="panel-title">📈 Projected Annual Distributions</div>
+    <div class="chart-wrap"><canvas id="dist-chart"></canvas></div>
+  </div>
+  <div class="chart-panel">
+    <div class="panel-title">🍩 Allocation</div>
+    <div class="chart-wrap-sm"><canvas id="donut-chart"></canvas></div>
+  </div>
+</div>
+
+<!-- Projection table -->
+${projTableHTML()}
+
+<!-- Map + Metrics -->
+<div class="charts-row" style="grid-template-columns:1fr 1fr">
+  <div class="chart-panel">
+    <div class="panel-title">📍 Geographic Footprint</div>
+    <div class="map-wrap"><svg id="us-map-builder" viewBox="0 0 960 600" preserveAspectRatio="xMidYMid meet" style="width:100%;height:100%"></svg></div>
+    <div class="map-legend">${mapLeg}</div>
+  </div>
+  <div class="chart-panel">
+    <div class="panel-title">⚡ Portfolio Metrics</div>
+    ${metricsHTML()}
+  </div>
+</div>
+
+<!-- Compliance flags -->
+<div class="panel">
+  <div class="panel-title">🛡️ Compliance &amp; Flags</div>
+  <div class="flags-wrap">${flagsHTML(suitR,bLtv,bCoc,tot,avgHold)}</div>
+</div>`;
+}
+
+// ─── Component helpers ────────────────────────────────────
+function kpi(lbl,val,sub,fillStyle,bkdn){
+  return `<div class="kpi-tile">
+    <div class="kpi-lbl">${lbl}</div>
+    <div class="kpi-val">${val}</div>
+    <div class="kpi-sub">${sub}</div>
+    <div class="kpi-bar"><div class="kpi-fill" style="${fillStyle}"></div></div>
+    ${bkdn?`<div class="kpi-bkdn">${bkdn}</div>`:''}
+  </div>`;
+}
+
+function suitCard(s,i,r){
+  if(!r) return `<div class="suit-card sc${i+1}"><div style="font-size:12px;color:var(--slate2,#5C7A99)">No client</div></div>`;
+  const sc=r.score;
+  const c=sc>=70?'var(--green,#1A7A4A)':sc>=45?'var(--amber,#B45309)':'var(--red,#991B1B)';
+  const lbl=sc>=70?'Strong Match':sc>=45?'Moderate':'Poor Match';
+  return `<div class="suit-card sc${i+1}">
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+      <div style="width:16px;height:16px;border-radius:50%;background:${O_HEX[i]};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;flex-shrink:0">${i+1}</div>
+      <span style="font-size:11px;font-weight:600;color:var(--slate,#3A5270);line-height:1.3">${x((s.fund.name||'').length>24?(s.fund.name||'').slice(0,22)+'…':s.fund.name||'')}</span>
+    </div>
+    <div class="suit-score-big" style="color:${c}">${sc}<span style="font-size:13px">%</span></div>
+    <div class="suit-lbl" style="color:${c}">${lbl}</div>
+    <div class="suit-reasons">${(r.reasons||[]).slice(0,4).map(r=>{
+      const t=r&&typeof r==='object'?(r.text||''):String(r||'');
+      const col=r&&r.type==='pos'?'var(--green,#1A7A4A)':r&&r.type==='neg'?'var(--red,#991B1B)':'var(--amber,#B45309)';
+      return`<div class="suit-r"><div class="suit-dot" style="background:${col}"></div><span>${x(t)}</span></div>`;
+    }).join('')}</div>
+  </div>`;
+}
+
+function projTableHTML(){
+  const hasC = _client&&_client.exchangeAmount;
+  const holdYrs = Math.max(..._sel.map(s=>parseFloat(s.fund.holdPeriod)||7));
+  const years = Array.from({length:Math.min(holdYrs,10)},(_,i)=>i+1);
+  return `<div class="panel">
+    <div class="panel-title">📊 Distribution Projections${hasC?' — '+fmt.money(_sel.reduce((s,x)=>s+(Number(x.alloc)||0),0)):''}</div>
+    <div style="overflow-x:auto">
+      <table class="proj-table">
+        <thead><tr>
+          <th>Offering</th>
+          ${years.map((y,i)=>`<th ${i===0?'class="hl"':''}>Yr ${y}</th>`).join('')}
+        </tr></thead>
+        <tbody>
+          ${_sel.map((s,fi)=>{
+            const f=s.fund; const alloc=Number(s.alloc)||0;
+            const coc=f.y1coc||f.y1CoC||0;
+            return`<tr>
+              <td style="display:flex;align-items:center;gap:5px;padding:6px 8px">
+                <div style="width:8px;height:8px;border-radius:50%;background:${O_HEX[fi]};flex-shrink:0"></div>
+                ${x((f.name||'Fund').length>18?(f.name||'Fund').slice(0,16)+'…':f.name||'Fund'+(fi+1))}
+                <span class="chip n" style="margin-left:3px">${fmt.pct(coc)}</span>
+              </td>
+              ${years.map((y,yi)=>{
+                const yc=(f.income&&f.income[y-1]!=null)?f.income[y-1]:coc;
+                const active=!f.holdPeriod||y<=parseFloat(f.holdPeriod);
+                const d=active&&yc&&hasC?alloc*yc/100:null;
+                return`<td ${yi===0?'class="hl"':''}>${d!=null?'$'+fmt.num(d):'—'}</td>`;
+              }).join('')}
+            </tr>`;
+          }).join('')}
+          <tr class="total-row">
+            <td>Total / Year</td>
+            ${years.map((y,yi)=>{
+              const t=_sel.reduce((sum,s)=>{
+                const f=s.fund; const coc=f.y1coc||f.y1CoC||0;
+                const yc=(f.income&&f.income[y-1]!=null)?f.income[y-1]:coc;
+                const active=!f.holdPeriod||y<=parseFloat(f.holdPeriod);
+                return sum+(active&&yc&&(_client&&_client.exchangeAmount)?(Number(s.alloc)||0)*yc/100:0);
+              },0);
+              return`<td ${yi===0?'class="hl"':''}>${t>0?'$'+fmt.num(t):'—'}</td>`;
+            }).join('')}
+          </tr>
+          <tr class="cum-row">
+            <td>Cumulative</td>
+            ${years.map((y,yi)=>{
+              let cum=0;
+              for(let yr=1;yr<=y;yr++){_sel.forEach(s=>{
+                const f=s.fund; const coc=f.y1coc||f.y1CoC||0;
+                const yc=(f.income&&f.income[yr-1]!=null)?f.income[yr-1]:coc;
+                const active=!f.holdPeriod||yr<=parseFloat(f.holdPeriod);
+                if(active&&yc&&(_client&&_client.exchangeAmount))cum+=(Number(s.alloc)||0)*yc/100;
+              });}
+              return`<td ${yi===0?'class="hl"':''}>${cum>0?'$'+fmt.num(cum):'—'}</td>`;
+            }).join('')}
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    ${!hasC?`<div style="text-align:center;font-size:12px;color:var(--slate2,#5C7A99);margin-top:7px">
+      ${getAFL()&&getAFL().navigate?`<a href="#" onclick="window.AFL.navigate('client');return false" style="color:var(--blue,#1D4ED8)">Add a client profile</a>`:'Add a client profile'}
+      to see dollar distribution amounts.
+    </div>`:''}
+  </div>`;
+}
+
+function metricsHTML(){
+  const AFL=getAFL(); const n=_sel.length;
+  const secs=[...new Set(_sel.map(s=>s.fund.sector||s.fund.assetClass).filter(Boolean))];
+  const rows=[
+    ['Sectors', secs.map(s=>`<span class="chip n">${x(s)}</span>`).join(' ')||'—'],
+    ['Avg Occupancy', fmt.pct(bOcc())],
+    ['Blended DSCR', (wavg(f=>parseFloat(f.dscr||f.dscrBase)||0)||0).toFixed(2)+'x'],
+    ['Combined Min.', fmt.money(_sel.reduce((s,x)=>s+(x.fund.minInvest||x.fund.minimum||0),0))],
+    ['Avg Lease Rem.', fmt.num(_sel.reduce((s,x)=>s+(parseFloat(x.fund.avgLeaseTerm||0)||0),0)/n,1)+' yr'],
+    ['Sponsors', new Set(_sel.map(s=>s.fund.sponsor)).size+' sponsor'+(new Set(_sel.map(s=>s.fund.sponsor)).size>1?'s':'')],
+    ['States', AFL&&AFL.extractStates?AFL.extractStates(_sel.map(s=>s.fund.location||'').join(', ')).length+' states':'—'],
+    ['721 UpREIT', _sel.some(s=>s.fund.upReit&&!/^no$/i.test(s.fund.upReit||''))||_sel.some(s=>s.fund.hasUPREIT)?'<span class="chip g">✅ Available</span>':'—'],
+  ];
+  return `<table class="metrics-tbl">${rows.map(([l,v])=>`<tr><td>${l}</td><td>${v}</td></tr>`).join('')}</table>`;
+}
+function bOcc(){return wavg(f=>f.pctLeased||f.occupancy||0);}
+
+function flagsHTML(suitR,bLtv,bCoc,totalAlloc,avgHold){
+  const AFL=getAFL(); const flags=[];
+
+  // Accreditation
+  _sel.forEach((s,i)=>{
+    const f=s.fund; const ca=_client&&_client.accreditation;
+    if(f.exemption&&ca){
+      const need=/506[bc]/i.test(f.exemption);
+      const ok=ca==='accredited'||ca==='qualified-purchaser';
+      if(need&&!ok) flags.push({t:'fail',i:'⛔',m:`Offering ${i+1}: ${x(f.name||'')} requires accredited investor (client: ${x(ca)})`});
+      else if(ok) flags.push({t:'pass',i:'✅',m:`Offering ${i+1}: Client accreditation confirmed`});
+    }
+  });
+
+  // Concentration
+  if(_sel.length>1&&totalAlloc>0){
+    _sel.forEach((s,i)=>{
+      const pct=(Number(s.alloc)||0)/totalAlloc*100;
+      if(pct>50) flags.push({t:'warn',i:'⚠️',m:`Concentration: Offering ${i+1} is ${pct.toFixed(0)}% of portfolio — consider balancing below 50%`});
+      else if(pct>0) flags.push({t:'pass',i:'✅',m:`Offering ${i+1}: ${pct.toFixed(0)}% — within concentration limits`});
+    });
+  }
+
+  // 1031 compliance
+  if(_client&&_client.exchangeAmount){
+    if(totalAlloc>_client.exchangeAmount) flags.push({t:'fail',i:'🚨',m:`1031 Compliance: Total ${fmt.money(totalAlloc)} exceeds exchange proceeds ${fmt.money(_client.exchangeAmount)}`});
+    else if(totalAlloc>0){
+      const unused=_client.exchangeAmount-totalAlloc;
+      flags.push({t:unused<_client.exchangeAmount*0.05?'pass':'info',i:unused<_client.exchangeAmount*0.05?'✅':'ℹ️',
+        m:`1031 Compliance: ${fmt.money(totalAlloc)} of ${fmt.money(_client.exchangeAmount)} allocated${unused>0?'. '+fmt.money(unused)+' undeployed.':'.'}` });
+    }
+  }
+
+  // Suitability flags
+  suitR.forEach((r,i)=>{
+    if(!r) return;
+    (r.flags||[]).forEach(f=>{
+      const txt=typeof f==='string'?f:(f.text||String(f));
+      flags.push({t:f&&f.type||'warn',i:'ℹ️',m:`Offering ${i+1}: ${x(txt)}`});
+    });
+  });
+
+  // LTV
+  if(bLtv>65) flags.push({t:'warn',i:'⚠️',m:`Blended LTV ${fmt.pct(bLtv)} exceeds conservative threshold (≤65%)`});
+  else if(bLtv>0) flags.push({t:'pass',i:'✅',m:`Blended LTV ${fmt.pct(bLtv)} — within conservative parameters`});
+
+  // Hold vs horizon
+  if(_client&&_client.horizon&&avgHold>0){
+    if(avgHold>_client.horizon+1) flags.push({t:'warn',i:'⚠️',m:`Avg hold (${fmt.num(avgHold,1)}yr) exceeds client horizon (${_client.horizon}yr)`});
+    else flags.push({t:'pass',i:'✅',m:`Hold alignment: ${fmt.num(avgHold,1)}yr avg vs ${_client.horizon}yr horizon`});
+  }
+
+  // Diversification
+  const secs=new Set(_sel.map(s=>s.fund.sector||s.fund.assetClass).filter(Boolean));
+  if(_sel.length>1&&secs.size>1) flags.push({t:'pass',i:'✅',m:`Sector diversification: ${[...secs].join(' + ')}`});
+  else if(_sel.length>1) flags.push({t:'info',i:'ℹ️',m:`Single sector (${[...secs][0]||'—'}) — consider adding a different property type`});
+
+  if(!flags.length) flags.push({t:'info',i:'ℹ️',m:'Add offerings and a client profile to generate compliance checks.'});
+  return flags.map(f=>`<div class="flag ${f.t}"><span class="flag-ico">${f.i}</span><span>${f.m}</span></div>`).join('');
+}
+
+// ─── Charts ────────────────────────────────────────────────
+function buildDistChart(){
+  const canvas=document.getElementById('dist-chart');
+  if(!canvas||typeof Chart==='undefined') return;
+  if(_distCh){_distCh.destroy();_distCh=null;}
+  if(!_sel.length) return;
+  const holdYrs=Math.max(..._sel.map(s=>parseFloat(s.fund.holdPeriod)||7));
+  const years=Array.from({length:Math.min(holdYrs,10)},(_,i)=>'Yr '+(i+1));
+  const hasC=_client&&_client.exchangeAmount;
+  const datasets=_sel.map((s,i)=>{
+    const f=s.fund; const alloc=Number(s.alloc)||0;
+    const baseCoc=f.y1coc||f.y1CoC||0;
+    return{
+      label:(f.name||'Fund').length>18?(f.name||'Fund').slice(0,16)+'…':f.name||'Fund '+(i+1),
+      data:years.map((_,yi)=>{
+        const coc=(f.income&&f.income[yi]!=null)?f.income[yi]:baseCoc;
+        const active=!f.holdPeriod||yi+1<=parseFloat(f.holdPeriod);
+        return active&&coc&&hasC?+(alloc*coc/100).toFixed(0):0;
+      }),
+      backgroundColor:O_HEX[i]+'BF', borderColor:O_HEX[i], borderWidth:1, borderRadius:4,
+    };
+  });
+  _distCh=new Chart(canvas,{
+    type:'bar',data:{labels:years,datasets},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{font:{size:10,family:'DM Sans'},boxWidth:10,padding:8}},
+        tooltip:{callbacks:{label:c=>' '+c.dataset.label+': $'+c.parsed.y.toLocaleString(),footer:items=>'Total: $'+items.reduce((s,i)=>s+i.parsed.y,0).toLocaleString()}}},
+      scales:{
+        x:{stacked:true,grid:{display:false},ticks:{font:{size:10}}},
+        y:{stacked:true,grid:{color:'#E8F0F8'},ticks:{font:{size:10},callback:v=>'$'+(v>=1000?(v/1000).toFixed(0)+'K':v)}}
+      }
+    }
+  });
+}
+
+function buildDonutChart(){
+  const canvas=document.getElementById('donut-chart');
+  if(!canvas||typeof Chart==='undefined') return;
+  if(_donutCh){_donutCh.destroy();_donutCh=null;}
+  if(!_sel.length) return;
+  const total=_sel.reduce((s,x)=>s+(Number(x.alloc)||0),0)||1;
+  _donutCh=new Chart(canvas,{
+    type:'doughnut',
+    data:{
+      labels:_sel.map(s=>(s.fund.name||'Fund').length>18?(s.fund.name||'Fund').slice(0,16)+'…':s.fund.name||'Fund'),
+      datasets:[{data:_sel.map(s=>+((Number(s.alloc)||0)/total*100).toFixed(1)),backgroundColor:O_HEX.slice(0,_sel.length),borderColor:'#fff',borderWidth:3,hoverOffset:5}]
+    },
+    options:{responsive:true,maintainAspectRatio:false,cutout:'62%',
+      plugins:{legend:{position:'bottom',labels:{font:{size:10,family:'DM Sans'},boxWidth:10,padding:8}},
+        tooltip:{callbacks:{label:c=>' '+c.label+': '+c.parsed.toFixed(1)+'%'}}}}
+  });
+}
+
+function buildMap(){
+  const svgEl=document.getElementById('us-map-builder');
+  if(!svgEl||typeof d3==='undefined'||typeof topojson==='undefined') return;
+  const AFL=getAFL();
+  const stateMap={};
+  if(AFL&&AFL.extractStates) _sel.forEach((s,i)=>AFL.extractStates(s.fund.location||'').forEach(st=>{stateMap[st]=stateMap[st]!==undefined?'multi':i;}));
+  if(_mapTopo){paintMap(svgEl,_mapTopo,stateMap);return;}
+  fetch('https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json').then(r=>r.json()).then(us=>{_mapTopo=us;paintMap(svgEl,us,stateMap);}).catch(()=>{});
+}
+
+function paintMap(svgEl,us,stateMap){
+  const d3svg=d3.select(svgEl); d3svg.selectAll('*').remove();
+  const proj=d3.geoAlbersUsa().scale(1200).translate([480,300]);
+  const path=d3.geoPath().projection(proj);
+  d3svg.selectAll('path').data(topojson.feature(us,us.objects.states).features).enter().append('path').attr('d',path)
+    .attr('class',d=>{const a=FIPS[String(d.id).padStart(2,'0')];const w=stateMap[a];return w==='multi'?'state-multi':w===0?'state-o1':w===1?'state-o2':w===2?'state-o3':'state-base';})
+    .append('title').text(d=>FIPS[String(d.id).padStart(2,'0')]||'');
+}
+
+function afterRight(){buildDistChart();buildDonutChart();buildMap();}
+
+// ─── Fund CRUD ─────────────────────────────────────────────
+function addFund(id){
+  if(_sel.length>=3){toast('Max 3 offerings — remove one first');return;}
+  const f=_funds.find(f=>f.id===Number(id));if(!f)return;
+  if(_sel.find(s=>s.fund.id===f.id)){toast('Already added');return;}
+  _sel.push({fund:f,alloc:autoAlloc(f,_sel.length+1)});
+  const AFL=getAFL();if(AFL&&AFL.basket&&AFL.basket.add)AFL.basket.add(f.id);
+  closeSearch();const inp=document.getElementById('fund-search');if(inp)inp.value='';
+  dispatch();reLeft();reRight();
+}
+
+function remove(id){
+  _sel=_sel.filter(s=>s.fund.id!==Number(id));
+  const AFL=getAFL();if(AFL&&AFL.basket&&AFL.basket.remove)AFL.basket.remove(Number(id));
+  dispatch();reLeft();reRight();
+}
+
+function setAlloc(id,val){
+  const s=_sel.find(s=>s.fund.id===Number(id));if(!s)return;
+  s.alloc=Number(val)||0;
+  const w=document.getElementById('warn-'+id);
+  if(w)w.className='min-warn'+(s.fund.minInvest&&s.alloc<s.fund.minInvest?' show':'');
+  dispatch();
+  clearTimeout(window._bldT);window._bldT=setTimeout(()=>reRight(),420);
+}
+
+function autoAllocAll(){
+  if(!_sel.length) return;
+  const budget=(_client&&_client.exchangeAmount)||_sel.reduce((s,x)=>s+(Number(x.alloc)||0),0);
+  if(!budget){toast('Set exchange amount in client profile first');return;}
+  const per=Math.floor(budget/_sel.length/1000)*1000;
+  _sel.forEach(s=>s.alloc=per);
+  dispatch();reLeft();reRight();toast('✅ Equal allocation applied');
+}
+
+function clearAll(){
+  _sel=[];
+  const AFL=getAFL();if(AFL&&AFL.basket&&AFL.basket.clear)AFL.basket.clear();
+  dispatch();reLeft();reRight();
+}
+
+function setFilter(sec){_sector=sec;reLeft();}
+
+// ─── Search ────────────────────────────────────────────────
+function openSearch(){
+  const el=document.getElementById('search-results');if(!el)return;
+  el.classList.add('open');renderSearch('');
+}
+function closeSearch(){const el=document.getElementById('search-results');if(el)el.classList.remove('open');}
+function onSearch(q){const el=document.getElementById('search-results');if(!el)return;el.classList.add('open');renderSearch(q);}
+
+function renderSearch(q){
+  const el=document.getElementById('search-results');if(!el)return;
+  const AFL=getAFL();
+  const term=q.toLowerCase().trim();
+  const selIds=_sel.map(s=>s.fund.id);
+  const results=_funds.filter(f=>{
+    if(_sector!=='all'&&(f.sector||f.assetClass)!==_sector)return false;
+    if(!term)return true;
+    return(f.name||'').toLowerCase().includes(term)||(f.sponsor||'').toLowerCase().includes(term)||(f.sector||f.assetClass||'').toLowerCase().includes(term)||(f.location||'').toLowerCase().includes(term);
+  }).slice(0,18);
+  if(!results.length){el.innerHTML=`<div style="padding:12px;font-size:12px;color:var(--slate2,#5C7A99);text-align:center">No results</div>`;return;}
+  const coc=(f)=>f.y1coc||f.y1CoC||0;
+  const ltv=(f)=>f.ltv||0;
+  el.innerHTML=results.map(f=>{
+    const added=selIds.includes(f.id);
+    const sr=_client?callSuit(f,_client):null;
+    const chip=sr?`<span class="chip ${sr.score>=70?'g':sr.score>=45?'a':'b'}">★ ${sr.score}%</span>`:'';
+    return`<div class="s-item${added?' added':''}" onclick="window._bld.add(${f.id})">
+      <div style="flex:1;min-width:0">
+        <div class="s-name">${x(f.name||'Offering '+f.id)}</div>
+        <div class="s-meta">${x(f.sponsor||'')} · ${x(f.sector||f.assetClass||'')} · Y1 ${fmt.pct(coc(f))} · LTV ${fmt.pct(ltv(f))}</div>
+      </div>
+      ${chip}${added?`<span class="chip n">Added</span>`:''}
+    </div>`;
+  }).join('');
+}
+
+// ─── Save / Load ───────────────────────────────────────────
+function savePF(){
+  if(!_sel.length){toast('Add offerings first');return;}
+  const lbl=(_client&&_client.name?_client.name+' — ':'')+_sel.map(s=>s.fund.name||'Fund').join(', ')+' — '+new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  const key='afl_pf_'+Date.now();
+  try{
+    localStorage.setItem(key,JSON.stringify({lbl,ts:Date.now(),funds:_sel.map(s=>({id:s.fund.id,alloc:s.alloc}))}));
+    const idx=JSON.parse(localStorage.getItem('afl_pf_idx')||'[]');
+    idx.unshift(key);if(idx.length>20)idx.splice(20);
+    localStorage.setItem('afl_pf_idx',JSON.stringify(idx));
+    toast('💾 Saved: '+lbl);
+  }catch(e){toast('⚠️ Could not save');}
+}
+
+function loadPF(key){
+  try{
+    const p=JSON.parse(localStorage.getItem(key)||'{}');
+    _sel=(p.funds||[]).map(f=>{const fund=_funds.find(x=>x.id===f.id);return fund?{fund,alloc:f.alloc}:null;}).filter(Boolean).slice(0,3);
+    const AFL=getAFL();
+    if(AFL&&AFL.basket&&AFL.basket.clear)AFL.basket.clear();
+    _sel.forEach(s=>{if(AFL&&AFL.basket&&AFL.basket.add)AFL.basket.add(s.fund.id);});
+    closeSaved();dispatch();reLeft();reRight();toast('📂 Loaded: '+(p.lbl||'Portfolio'));
+  }catch(e){toast('⚠️ Could not load');}
+}
+
+function delPF(key,e){
+  e.stopPropagation();
+  try{
+    localStorage.removeItem(key);
+    const idx=JSON.parse(localStorage.getItem('afl_pf_idx')||'[]');
+    localStorage.setItem('afl_pf_idx',JSON.stringify(idx.filter(k=>k!==key)));
+    const m=document.getElementById('saved-menu');if(m)m.innerHTML=savedMenuHTML();
+    toast('🗑️ Deleted');
+  }catch(e){}
+}
+
+function savedMenuHTML(){
+  try{
+    const idx=JSON.parse(localStorage.getItem('afl_pf_idx')||'[]');
+    if(!idx.length)return'<div class="saved-empty">No saved portfolios</div>';
+    return idx.slice(0,10).map(key=>{
+      try{
+        const p=JSON.parse(localStorage.getItem(key)||'{}');
+        return`<div class="saved-item" onclick="window._bld.loadPF('${x(key)}')">
+          <div><div style="font-weight:600;font-size:12px">${x(p.lbl||'Portfolio')}</div>
+          <div style="font-size:10px;color:var(--slate2,#5C7A99)">${new Date(p.ts||0).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</div></div>
+          <button class="saved-del" onclick="window._bld.delPF('${x(key)}',event)">✕</button>
+        </div>`;
+      }catch(e){return'';}
+    }).join('');
+  }catch(e){return'<div class="saved-empty">No saved portfolios</div>';}
+}
+
+function toggleSaved(){const el=document.getElementById('saved-menu');if(!el)return;el.innerHTML=savedMenuHTML();el.classList.toggle('open');}
+function closeSaved(){const el=document.getElementById('saved-menu');if(el)el.classList.remove('open');}
+
+// ─── PDF ───────────────────────────────────────────────────
+function generatePDF(){
+  const ph=document.getElementById('print-hdr');if(ph)ph.style.display='block';
+  const pm=document.getElementById('print-meta');
+  if(pm){
+    const AFL=getAFL();
+    pm.textContent=[
+      _client&&_client.name?'Client: '+_client.name:'',
+      _sel.map(s=>s.fund.name||'').filter(Boolean).join(' + '),
+      'Generated: '+new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}),
+      _client&&_client.exchangeAmount&&AFL?'Exchange: '+AFL.fmt.money(_client.exchangeAmount):'',
+    ].filter(Boolean).join('  ·  ');
+  }
+  window.print();
+}
+
+function sendToClient(){
+  const AFL=getAFL();
+  if(!_client||!_client.email){toast('⚠️ No client email — add in client profile');return;}
+  if(!_sel.length){toast('Add offerings first');return;}
+  const subject=`DST Portfolio Analysis — ${_sel.length} Offering${_sel.length>1?'s':''}`;
+  const body=['Dear '+(_client.name||'Client')+',','','Your DST portfolio analysis:','',
+    ..._sel.map((s,i)=>`${i+1}. ${s.fund.name||''}\n   Allocation: ${fmt.money(s.alloc)}  ·  Y1 CoC: ${fmt.pct(s.fund.y1coc||s.fund.y1CoC||0)}  ·  LTV: ${fmt.pct(s.fund.ltv||0)}`),
+    '','Total: '+fmt.money(_sel.reduce((s,x)=>s+(Number(x.alloc)||0),0)),
+    'Blended Y1 CoC: '+fmt.pct(wavg(f=>f.y1coc||f.y1CoC||0))+'  ·  Blended LTV: '+fmt.pct(wavg(f=>f.ltv||0)),
+    '','Best regards'].join('\n');
+  window.dispatchEvent(new CustomEvent('afl:gmail-draft',{detail:{to:_client.email,subject,body}}));
+  toast('✉️ Opening email draft…');
+}
+
+// ─── Helpers ───────────────────────────────────────────────
+function wavg(getter){
+  const tot=_sel.reduce((s,x)=>s+(Number(x.alloc)||0),0);
+  if(!tot){const vs=_sel.map(s=>getter(s.fund)).filter(v=>v!=null&&isFinite(v));return vs.length?vs.reduce((a,b)=>a+b,0)/vs.length:0;}
+  return _sel.reduce((s,x)=>{const v=getter(x.fund);return s+(v!=null&&isFinite(v)?v*(Number(x.alloc)||0):0);},0)/tot;
+}
+
+function callSuit(fund,client){
+  const AFL=getAFL();if(!AFL||!AFL.suitScore)return null;
+  try{const r=AFL.suitScore(fund,client);if(r===null||r===undefined)return null;if(typeof r==='object'&&'score'in r)return r;return{score:Number(r)||0,reasons:[],flags:[],tooltip:''};}catch(e){return null;}
+}
+
+function dispatch(){
+  window.dispatchEvent(new CustomEvent('afl:portfolio-updated',{detail:{funds:_sel.map(s=>({id:s.fund.id,alloc:s.alloc})),blendedCoc:wavg(f=>f.y1coc||f.y1CoC||0),blendedLtv:wavg(f=>f.ltv||0)}}));
+  const AFL=getAFL();if(AFL&&AFL.updateHeader)AFL.updateHeader({basketCount:_sel.length});
+}
+
+function reLeft(){const el=document.getElementById('bleft');if(el)el.innerHTML=leftHTML();}
+function reRight(){const el=document.getElementById('bright');if(el){el.innerHTML=rightHTML();afterRight();}}
+
+function toast(msg,ms=2500){
+  const el=document.getElementById('builder-toast');if(!el)return;
+  el.textContent=msg;el.classList.add('show');
+  clearTimeout(el.__t);el.__t=setTimeout(()=>el.classList.remove('show'),ms);
+}
+
+function err(msg){document.getElementById('builder-root').innerHTML=`<div style="padding:32px;text-align:center;color:var(--red,#991B1B);font-size:14px">⚠️ ${x(msg)}</div>`;}
+
+const fmt={
+  pct:(v,d=2)=>v==null||!isFinite(v)?'—':v.toFixed(d)+'%',
+  money:(v)=>v==null||!isFinite(v)?'—':'$'+Math.round(v).toLocaleString(),
+  num:(v,d=0)=>v==null||!isFinite(v)?'—':parseFloat(v.toFixed(d)).toLocaleString(),
+};
+
+function x(s){if(s==null)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+
+// ─── Public API ────────────────────────────────────────────
+window._bld = {
+  add:addFund, remove, setAlloc,
+  autoAlloc:autoAllocAll, clearAll, setFilter,
+  onSearch, openSearch,
+  generatePDF, sendToClient,
+  savePF, loadPF, delPF, toggleSaved,
+};
+
+// ─── Module contract ───────────────────────────────────────
+window.currentModule = {
+  async init(shellParams){ await init(shellParams||{}); }
+};
+
+// Auto-init if AFL is already available
+if(window.AFL) window.currentModule.init({});
+
+})();
+</script>
+</body>
+</html>
