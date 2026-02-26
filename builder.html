@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AFL — Portfolio Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+/* ═══════════════════════════════════════════════════
+   AFL BUILDER MODULE — tokens match platform spec
+═══════════════════════════════════════════════════ */
+:root {
+  --navy:#0B1F3B;--navy2:#1C3A63;--navy3:#2A4D7A;--slate:#3A5270;--slate2:#5C7A99;
+  --fog:#8FA3BA;--mist:#C8D8E8;--ice:#E8F0F8;--white:#FFFFFF;--surface:#F4F7FB;--surface2:#EEF3FA;
+  --green:#1A7A4A;--green-lt:#E8F7EF;--amber:#B45309;--amber-lt:#FEF3C7;
+  --red:#991B1B;--red-lt:#FEE2E2;--blue:#1D4ED8;--blue-lt:#EFF6FF;
+  --o1:#3B82F6;--o1-lt:#EFF6FF;--o1-mid:#BFDBFE;
+  --o2:#7C3AED;--o2-lt:#F5F3FF;--o2-mid:#DDD6FE;
+  --o3:#D97706;--o3-lt:#FFFBEB;--o3-mid:#FDE68A;
+  --radius:8px;--radius-lg:14px;
+  --shadow-sm:0 1px 3px rgba(11,31,59,0.08),0 1px 2px rgba(11,31,59,0.05);
+  --shadow:0 4px 12px rgba(11,31,59,0.10);
+  --shadow-lg:0 12px 32px rgba(11,31,59,0.14);
+  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+  --transition:0.18s cubic-bezier(0.4,0,0.2,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);font-size:14px;background:var(--surface);color:var(--navy);-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-thumb{background:var(--mist);border-radius:3px}
+
+/* Mode bar */
+.mode-bar{background:#fff;border-bottom:1px solid var(--mist);padding:0 24px;display:flex;align-items:center;gap:12px;height:44px;position:sticky;top:0;z-index:60;box-shadow:var(--shadow-sm)}
+.mode-toggle{display:flex;background:var(--surface);border-radius:8px;padding:3px;gap:2px}
+.mode-btn{padding:5px 14px;border-radius:6px;border:none;background:transparent;font-size:12px;font-weight:500;color:var(--slate2);font-family:var(--font);cursor:pointer;transition:all var(--transition);display:flex;align-items:center;gap:5px}
+.mode-btn.active{background:#fff;color:var(--navy);font-weight:700;box-shadow:var(--shadow-sm)}
+.mode-btn .dot{width:7px;height:7px;border-radius:50%}
+.breadcrumb{font-size:12.5px;color:var(--slate2);display:flex;align-items:center;gap:7px}
+.breadcrumb a{color:var(--blue);cursor:pointer;text-decoration:none}
+.breadcrumb strong{color:var(--navy)}
+.mode-right{margin-left:auto;display:flex;gap:6px}
+.mode-right button{padding:4px 11px;font-size:11.5px;font-weight:500;border:1.5px solid var(--mist);border-radius:6px;background:#fff;color:var(--navy);font-family:var(--font);cursor:pointer;transition:all var(--transition)}
+.mode-right button:hover{border-color:var(--slate2)}
+
+/* Layout */
+.builder-layout{display:grid;grid-template-columns:410px 1fr;min-height:calc(100vh - 100px)}
+.builder-left{background:#fff;border-right:1px solid var(--mist);overflow-y:auto;max-height:calc(100vh - 100px);position:sticky;top:44px}
+.builder-right{background:var(--surface);padding:20px;overflow-y:auto}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border-radius:var(--radius);border:none;font-size:12.5px;font-weight:600;cursor:pointer;transition:all var(--transition);font-family:var(--font);white-space:nowrap}
+.btn-primary{background:var(--navy);color:#fff}.btn-primary:hover{background:var(--navy2)}
+.btn-secondary{background:#fff;color:var(--navy);border:1.5px solid var(--mist)}.btn-secondary:hover{border-color:var(--slate2);background:var(--surface)}
+.btn-danger{background:#fff;color:var(--red);border:1.5px solid #FECACA}.btn-danger:hover{background:var(--red-lt)}
+.btn-success{background:var(--green);color:#fff}.btn-success:hover{opacity:.9}
+.btn-sm{padding:4px 10px;font-size:11.5px}
+
+/* Left panel sections */
+.lpanel{padding:14px 16px;border-bottom:1px solid var(--mist)}
+.lpanel:last-child{border-bottom:none;flex:1}
+.lpanel-title{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--slate2);margin-bottom:11px;display:flex;align-items:center;gap:6px}
+.badge-count{background:var(--navy2);color:#fff;border-radius:10px;padding:1px 7px;font-size:9px}
+
+/* Client card */
+.client-card{background:var(--navy);border-radius:var(--radius-lg);padding:13px 15px;color:#fff;position:relative}
+.client-card.empty{background:var(--surface2);border:1.5px dashed var(--mist)}
+.client-name{font-size:14px;font-weight:700;letter-spacing:-.02em}
+.client-meta{font-size:11px;color:rgba(255,255,255,0.45);margin-top:3px;display:flex;gap:9px;flex-wrap:wrap}
+.client-change{position:absolute;top:9px;right:10px;padding:3px 9px;border-radius:6px;font-size:10.5px;font-weight:600;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.75);cursor:pointer;font-family:var(--font)}
+.client-change:hover{background:rgba(255,255,255,0.18)}
+
+/* Fund search */
+.search-wrap{position:relative;margin-bottom:2px}
+.search-input{width:100%;padding:8px 12px 8px 34px;border:1.5px solid var(--mist);border-radius:var(--radius);font-size:13px;font-family:var(--font);background:#fff;color:var(--navy);outline:none;transition:border-color var(--transition)}
+.search-input:focus{border-color:var(--navy2)}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none}
+.search-results{max-height:240px;overflow-y:auto;border:1.5px solid var(--mist);border-radius:var(--radius);background:#fff;margin-top:4px;display:none;position:absolute;z-index:100;width:100%;box-shadow:var(--shadow)}
+.search-results.open{display:block}
+.search-item{padding:9px 12px;cursor:pointer;border-bottom:1px solid var(--mist);transition:background .12s;display:flex;align-items:center;gap:8px}
+.search-item:last-child{border-bottom:none}
+.search-item:hover{background:var(--ice)}
+.search-item.added{opacity:.45;pointer-events:none}
+.search-item-name{font-size:12.5px;font-weight:600;color:var(--navy);line-height:1.3}
+.search-item-meta{font-size:10.5px;color:var(--slate2)}
+
+/* Filter pills */
+.filter-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:9px}
+.filter-pill{padding:4px 10px;border-radius:20px;border:1.5px solid var(--mist);font-size:11px;font-weight:600;color:var(--slate2);background:#fff;cursor:pointer;transition:all .15s;font-family:var(--font)}
+.filter-pill.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+.filter-pill:hover:not(.active){border-color:var(--slate2);color:var(--slate)}
+
+/* Fund slots */
+.fund-slot{border:1.5px solid var(--mist);border-radius:var(--radius-lg);padding:12px 13px;position:relative;background:#fff}
+.fund-slot.slot-1{border-color:var(--o1-mid);background:var(--o1-lt)}
+.fund-slot.slot-2{border-color:var(--o2-mid);background:var(--o2-lt)}
+.fund-slot.slot-3{border-color:var(--o3-mid);background:var(--o3-lt)}
+.fund-slot.empty-slot{border-style:dashed;background:var(--surface);display:flex;align-items:center;justify-content:center;min-height:66px;cursor:pointer;color:var(--slate2)}
+.fund-slot.empty-slot:hover{border-color:var(--slate2);color:var(--slate)}
+.fund-slot-num{width:19px;height:19px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#fff;flex-shrink:0}
+.n1{background:var(--o1)}.n2{background:var(--o2)}.n3{background:var(--o3)}
+.fund-slot-header{display:flex;align-items:flex-start;gap:8px;margin-bottom:9px}
+.fund-slot-name{font-size:12.5px;font-weight:700;color:var(--navy);line-height:1.3;flex:1}
+.fund-slot-sponsor{font-size:10.5px;color:var(--slate2);margin-top:1px}
+.fund-slot-remove{position:absolute;top:9px;right:9px;width:18px;height:18px;border-radius:50%;background:rgba(153,27,27,0.1);border:none;cursor:pointer;font-size:10px;color:var(--red);display:flex;align-items:center;justify-content:center}
+.fund-slot-remove:hover{background:var(--red-lt)}
+
+/* Allocation */
+.alloc-row{display:flex;align-items:center;gap:7px;margin-top:7px}
+.alloc-label{font-size:10.5px;font-weight:600;color:var(--slate2);white-space:nowrap}
+.alloc-input{width:108px;padding:5px 8px;border:1.5px solid var(--mist);border-radius:6px;font-size:13px;font-family:var(--mono);color:var(--navy);background:#fff;outline:none;transition:border-color .2s;text-align:right}
+.alloc-input:focus{border-color:var(--navy2)}
+.alloc-input.error{border-color:var(--red);background:var(--red-lt)}
+.alloc-pct{font-size:11px;color:var(--slate2);font-family:var(--mono)}
+.alloc-min-warn{font-size:10px;color:var(--red);margin-top:3px;display:none}
+.alloc-min-warn.show{display:block}
+
+/* Totals */
+.totals-bar{background:var(--navy);border-radius:var(--radius);padding:10px 13px;margin-top:11px}
+.totals-row{display:flex;justify-content:space-between;align-items:center;font-size:12px}
+.totals-row+.totals-row{margin-top:4px;padding-top:4px;border-top:1px solid rgba(255,255,255,0.1)}
+.totals-lbl{color:rgba(255,255,255,0.5);font-weight:500}
+.totals-val{color:#fff;font-weight:700;font-family:var(--mono)}
+.totals-val.ok{color:#34D399}.totals-val.warn{color:#FBBF24}.totals-val.err{color:#F87171}
+.totals-progress{height:4px;background:rgba(255,255,255,0.12);border-radius:2px;margin-top:7px;overflow:hidden}
+.totals-fill{height:100%;border-radius:2px;transition:width .3s}
+
+/* Right panels */
+.panel{background:#fff;border:1px solid var(--mist);border-radius:var(--radius-lg);padding:16px 18px;box-shadow:var(--shadow-sm);margin-bottom:14px}
+.panel-title{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--slate2);margin-bottom:12px;display:flex;align-items:center;gap:6px}
+
+/* KPI grid */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.kpi-tile{background:#fff;border:1px solid var(--mist);border-radius:var(--radius-lg);padding:12px 14px;box-shadow:var(--shadow-sm)}
+.kpi-lbl{font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--slate2);margin-bottom:3px}
+.kpi-val{font-size:22px;font-weight:800;color:var(--navy);letter-spacing:-.03em;font-family:var(--mono);line-height:1}
+.kpi-sub{font-size:10.5px;color:var(--slate2);margin-top:4px}
+.kpi-bar{height:3px;background:var(--mist);border-radius:2px;margin-top:6px;overflow:hidden}
+.kpi-fill{height:100%;border-radius:2px}
+.kpi-breakdown{display:flex;gap:5px;margin-top:5px;flex-wrap:wrap}
+.kpi-bd-item{font-size:9.5px;color:var(--slate2);display:flex;align-items:center;gap:3px}
+.kpi-bd-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.kpi-good{color:var(--green);font-weight:600}.kpi-bad{color:var(--red);font-weight:600}
+
+/* Charts row */
+.charts-row{display:grid;grid-template-columns:3fr 2fr;gap:14px;margin-bottom:14px}
+.chart-panel{background:#fff;border:1px solid var(--mist);border-radius:var(--radius-lg);padding:16px 18px;box-shadow:var(--shadow-sm)}
+.chart-wrap{height:200px;position:relative}
+.chart-wrap-sm{height:170px;position:relative}
+
+/* Map */
+.map-wrap{height:180px;margin-bottom:8px}
+.state-base{fill:#D1DCE6;stroke:#fff;stroke-width:0.6}
+.state-o1{fill:var(--o1);stroke:#fff;stroke-width:0.6;filter:drop-shadow(0 0 3px rgba(59,130,246,.5))}
+.state-o2{fill:var(--o2);stroke:#fff;stroke-width:0.6;filter:drop-shadow(0 0 3px rgba(124,58,237,.5))}
+.state-o3{fill:var(--o3);stroke:#fff;stroke-width:0.6;filter:drop-shadow(0 0 3px rgba(217,119,6,.4))}
+.state-multi{fill:#06B6D4;stroke:#fff;stroke-width:0.6}
+.map-legend{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.map-leg-item{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--slate2)}
+.map-leg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* Suit cards */
+.suit-cards{display:grid;gap:12px;margin-bottom:14px}
+.suit-card{border-radius:var(--radius-lg);padding:14px 15px;border:1.5px solid}
+.suit-card-1{background:var(--o1-lt);border-color:var(--o1-mid)}
+.suit-card-2{background:var(--o2-lt);border-color:var(--o2-mid)}
+.suit-card-3{background:var(--o3-lt);border-color:var(--o3-mid)}
+.suit-score-big{font-size:32px;font-weight:800;letter-spacing:-.04em;line-height:1;font-family:var(--mono)}
+.suit-label{font-size:10.5px;font-weight:600;margin-top:3px}
+.suit-reasons{margin-top:9px;display:flex;flex-direction:column;gap:4px}
+.suit-reason{font-size:10.5px;display:flex;align-items:flex-start;gap:5px;line-height:1.4}
+.suit-reason-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:3px}
+
+/* Peer chips */
+.peer-chip{display:inline-flex;align-items:center;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:700}
+.peer-chip.g{background:var(--green-lt);color:var(--green)}
+.peer-chip.b{background:var(--red-lt);color:var(--red)}
+.peer-chip.n{background:var(--ice);color:var(--slate2)}
+.peer-chip.a{background:var(--amber-lt);color:var(--amber)}
+
+/* Flags */
+.flags-grid{display:flex;flex-direction:column;gap:7px}
+.flag-item{display:flex;align-items:flex-start;gap:8px;padding:9px 12px;border-radius:var(--radius);border:1.5px solid;font-size:12px;line-height:1.5}
+.flag-pass{background:var(--green-lt);border-color:#BBF7D0;color:var(--green)}
+.flag-warn{background:var(--amber-lt);border-color:#FDE68A;color:var(--amber)}
+.flag-fail{background:var(--red-lt);border-color:#FECACA;color:var(--red)}
+.flag-info{background:var(--ice);border-color:var(--mist);color:var(--slate)}
+.flag-icon{font-size:14px;flex-shrink:0;margin-top:1px}
+
+/* Projection table */
+.proj-table{width:100%;border-collapse:collapse;font-size:12px}
+.proj-table th{padding:6px 9px;background:var(--navy);color:rgba(255,255,255,0.6);font-size:10px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;text-align:center}
+.proj-table th.hl{color:#fff;background:var(--navy2)}
+.proj-table th:first-child{text-align:left;border-radius:8px 0 0 0;min-width:120px}
+.proj-table th:last-child{border-radius:0 8px 0 0}
+.proj-table td{padding:6px 9px;border-bottom:1px solid var(--mist);text-align:center;color:var(--navy)}
+.proj-table td:first-child{text-align:left;font-weight:600;color:var(--slate);font-size:11px}
+.proj-table td.hl{background:var(--ice);font-weight:700;color:var(--navy2)}
+.proj-table tr:last-child td{border-bottom:none}
+.proj-table tr.proj-total{background:var(--ice);font-weight:700}
+.proj-table tr.proj-cum td{color:var(--slate2);font-size:11px}
+
+/* Action bar */
+.action-bar{background:#fff;border-top:1px solid var(--mist);padding:10px 24px;display:flex;align-items:center;gap:8px;position:sticky;bottom:0;z-index:50;box-shadow:0 -2px 12px rgba(11,31,59,0.06)}
+.action-right{margin-left:auto}
+
+/* Saved dropdown */
+.saved-dd{position:relative;display:inline-block}
+.saved-dd-menu{position:absolute;bottom:calc(100% + 6px);right:0;background:#fff;border:1.5px solid var(--mist);border-radius:10px;box-shadow:var(--shadow-lg);min-width:240px;z-index:200;padding:5px;display:none}
+.saved-dd-menu.open{display:block}
+.saved-dd-item{padding:8px 10px;border-radius:7px;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.saved-dd-item:hover{background:var(--ice)}
+.saved-dd-del{font-size:11px;color:var(--red);padding:2px 6px;border-radius:5px;cursor:pointer;flex-shrink:0}
+.saved-dd-del:hover{background:var(--red-lt)}
+.saved-dd-empty{padding:10px 12px;font-size:12px;color:var(--slate2);text-align:center}
+
+/* Toast */
+.toast{position:fixed;bottom:68px;left:50%;transform:translateX(-50%) translateY(8px);background:var(--navy);color:#fff;padding:8px 18px;border-radius:8px;font-size:13px;font-weight:600;opacity:0;transition:all .22s;z-index:999;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* Empty state */
+.empty-right{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:400px;gap:12px;color:var(--slate2);text-align:center;padding:40px 20px}
+.empty-right h3{font-size:17px;color:var(--navy)}
+
+/* Print */
+@media print {
+  .mode-bar,.action-bar,.builder-left,.filter-row,.search-wrap,
+  .fund-slot-remove,.mode-right,#builder-toast,.btn{display:none!important}
+  body{background:#fff;font-size:12px}
+  .builder-layout{display:block}
+  .builder-right{padding:0}
+  .panel,.kpi-tile,.chart-panel,.suit-card{break-inside:avoid;box-shadow:none;border:1px solid #ccc}
+  .kpi-grid{grid-template-columns:repeat(4,1fr)}
+  .charts-row{grid-template-columns:1fr 1fr}
+  .print-header{display:block!important}
+}
+.print-header{display:none;padding:14px 0 10px;border-bottom:2px solid var(--navy);margin-bottom:18px}
+.print-header h1{font-size:20px;font-weight:800;color:var(--navy);letter-spacing:-.03em}
+.print-header p{font-size:12px;color:var(--slate2);margin-top:3px}
+</style>
+</head>
+<body>
+
+<div id="builder-module">
+  <div style="display:flex;align-items:center;justify-content:center;padding:60px;gap:12px;flex-direction:column;color:var(--slate2)">
+    <div style="width:30px;height:30px;border:3px solid var(--mist);border-top-color:var(--navy2);border-radius:50%;animation:spin .7s linear infinite"></div>
+    <div>Loading Portfolio Builder…</div>
+  </div>
+  <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+</div>
+
+<div class="toast" id="builder-toast"></div>
+
+<script>
+(function(){
+'use strict';
+
+// ─── Module state ──────────────────────────────────────────
+let _allFunds  = [];
+let _peers     = {};
+let _client    = null;
+let _selected  = [];   // [{fund, alloc}] max 3
+let _distChart = null;
+let _donutChart= null;
+let _mapDrawn  = false;
+let _mapTopo   = null;
+let _filterSec = 'all';
+
+const O_HEX = ['#3B82F6','#7C3AED','#D97706'];
+const FIPS  = {"01":"AL","02":"AK","04":"AZ","05":"AR","06":"CA","08":"CO","09":"CT","10":"DE",
+  "12":"FL","13":"GA","15":"HI","16":"ID","17":"IL","18":"IN","19":"IA","20":"KS","21":"KY",
+  "22":"LA","23":"ME","24":"MD","25":"MA","26":"MI","27":"MN","28":"MS","29":"MO","30":"MT",
+  "31":"NE","32":"NV","33":"NH","34":"NJ","35":"NM","36":"NY","37":"NC","38":"ND","39":"OH",
+  "40":"OK","41":"OR","42":"PA","44":"RI","45":"SC","46":"SD","47":"TN","48":"TX","49":"UT",
+  "50":"VT","51":"VA","53":"WA","54":"WV","55":"WI","56":"WY"};
+
+// ─── Init ──────────────────────────────────────────────────
+async function init(shellParams){
+  const AFL = window.AFL;
+  if(!AFL){renderError('AFL shared library not loaded.');return;}
+  try{
+    if(!AFL.state.funds||!AFL.state.funds.length) await AFL.loadFunds();
+  }catch(e){renderError('Could not load offering data.');return;}
+
+  _allFunds = AFL.state.funds||[];
+  if(!_allFunds.length){renderError('No offering data found.');return;}
+  _peers  = AFL.peerStats(_allFunds);
+  _client = AFL.state.client||null;
+
+  // Pre-populate basket
+  const basket = AFL.basket.get?AFL.basket.get():[];
+  _selected = basket.slice(0,3).map(f=>({fund:f,alloc:calcAlloc(f,basket.length)}));
+
+  // Nav param override
+  const np=(shellParams&&shellParams.params)||shellParams||{};
+  if(np.fundId||np.id){
+    const id=Number(np.fundId||np.id);
+    const f=_allFunds.find(f=>f.id===id);
+    if(f&&!_selected.find(s=>s.fund.id===id)&&_selected.length<3){
+      _selected.push({fund:f,alloc:calcAlloc(f,_selected.length+1)});
+      if(AFL.basket.add)AFL.basket.add(id);
+    }
+  }
+
+  renderFull();
+  bindEvents();
+}
+
+function calcAlloc(fund,n){
+  if(!_client||!_client.exchangeAmount)return fund.minInvest||100000;
+  return Math.floor((_client.exchangeAmount/Math.max(1,n))/1000)*1000;
+}
+
+function bindEvents(){
+  window.addEventListener('afl:client-updated',e=>{
+    _client=e.detail||window.AFL.state.client;
+    reLeft();reRight();
+  });
+  document.addEventListener('click',e=>{
+    if(!e.target.closest('.search-wrap'))closeSearch();
+    if(!e.target.closest('.saved-dd'))closeSavedMenu();
+  });
+}
+
+// ─── Full render ───────────────────────────────────────────
+function renderFull(){
+  document.getElementById('builder-module').innerHTML=`
+<div class="print-header" id="print-header">
+  <h1>DST Portfolio Analysis</h1>
+  <p id="print-meta"></p>
+</div>
+<div class="mode-bar">
+  <div class="mode-toggle">
+    <button class="mode-btn active"><div class="dot" style="background:var(--green)"></div>Portfolio Builder</button>
+  </div>
+  <div class="breadcrumb">
+    <a onclick="window.AFL.navigate('browse')">← Browse</a> ›
+    <strong>Portfolio Builder</strong>
+    ${_client&&_client.name?`<span style="color:var(--slate2);font-size:11px">· ${x(_client.name)}</span>`:''}
+  </div>
+  <div class="mode-right">
+    <button onclick="window._afl_builder.generatePDF()">🖨️ Print / PDF</button>
+    <button onclick="window.AFL.navigate('offering')">📊 Portfolio View</button>
+    <button onclick="window.AFL.navigate('browse')">← Browse</button>
+  </div>
+</div>
+<div class="builder-layout">
+  <div class="builder-left" id="bleft">${renderLeft()}</div>
+  <div class="builder-right" id="bright">${renderRight()}</div>
+</div>
+<div class="action-bar">
+  <button class="btn btn-success" onclick="window._afl_builder.generatePDF()">🖨️ Generate PDF Tear Sheet</button>
+  <button class="btn btn-primary" onclick="window._afl_builder.sendToClient()">✉️ Send to Client</button>
+  <button class="btn btn-secondary" onclick="window._afl_builder.savePortfolio()">💾 Save Portfolio</button>
+  <div class="saved-dd" id="saved-dd">
+    <button class="btn btn-secondary" onclick="window._afl_builder.toggleSaved()">📂 Load ▾</button>
+    <div class="saved-dd-menu" id="saved-dd-menu">${renderSavedMenu()}</div>
+  </div>
+  <div class="action-right">
+    <button class="btn btn-danger" onclick="window._afl_builder.clearAll()">✕ Clear All</button>
+  </div>
+</div>`;
+  afterRight();
+}
+
+// ─── Left panel ────────────────────────────────────────────
+function renderLeft(){
+  const AFL=window.AFL;
+  return `
+<div class="lpanel">
+  <div class="lpanel-title">👤 Client Profile</div>
+  ${renderClientCard()}
+</div>
+<div class="lpanel">
+  <div class="lpanel-title">🔍 Add Offerings <span class="badge-count">${_selected.length}/3</span></div>
+  ${_selected.length<3?`
+  <div class="filter-row">${renderFilters()}</div>
+  <div class="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input class="search-input" id="fund-search" type="text" placeholder="Search name, sponsor, sector…"
+      oninput="window._afl_builder.onSearch(this.value)"
+      onfocus="window._afl_builder.openSearch()"/>
+    <div class="search-results" id="search-results"></div>
+  </div>` :
+  `<div style="font-size:12px;color:var(--slate2);text-align:center;padding:6px">✅ Max 3 offerings. Remove one to add another.</div>`}
+</div>
+<div class="lpanel">
+  <div class="lpanel-title">
+    📐 Construction
+    ${_selected.length>1?`<button class="btn btn-sm btn-secondary" style="margin-left:auto" onclick="window._afl_builder.autoAlloc()">⚖️ Equal Split</button>`:''}
+  </div>
+  <div style="display:flex;flex-direction:column;gap:9px">${renderSlots()}</div>
+  ${_selected.length?renderTotals():''}
+</div>`;
+}
+
+function renderClientCard(){
+  if(!_client||(!_client.name&&!_client.exchangeAmount)){
+    return `<div class="client-card empty" style="display:flex;align-items:center;gap:10px;min-height:62px">
+      <div style="font-size:26px">👤</div>
+      <div><div style="font-size:13px;font-weight:600;color:var(--slate)">No Client Loaded</div>
+      <div style="font-size:11px;color:var(--slate2);margin-top:2px">Add a client profile for suitability scoring &amp; projections.</div></div>
+      <button class="btn btn-sm btn-secondary" style="margin-left:auto;flex-shrink:0" onclick="window.AFL.navigate('client')">+ Add Client</button>
+    </div>`;
+  }
+  const AFL=window.AFL;
+  return `<div class="client-card">
+    <button class="client-change" onclick="window.AFL.navigate('client')">Change</button>
+    <div class="client-name">${x(_client.name)}</div>
+    <div class="client-meta">
+      ${_client.exchangeAmount?`<span>💰 ${AFL.fmt.money(_client.exchangeAmount)}</span>`:''}
+      ${_client.riskTolerance?`<span>⚖️ ${x(_client.riskTolerance)}</span>`:''}
+      ${_client.investmentObjective?`<span>🎯 ${x(_client.investmentObjective)}</span>`:''}
+      ${_client.horizon?`<span>⏳ ${_client.horizon}yr</span>`:''}
+      ${_client.taxBracket?`<span>📊 ${_client.taxBracket}%</span>`:''}
+    </div>
+  </div>`;
+}
+
+function renderFilters(){
+  const secs=['all',...new Set(_allFunds.map(f=>f.sector).filter(Boolean))].slice(0,8);
+  return secs.map(s=>`<button class="filter-pill${_filterSec===s?' active':''}" onclick="window._afl_builder.setFilter('${s}')">${s==='all'?'All':x(s)}</button>`).join('');
+}
+
+function renderSlots(){
+  const out=[];
+  for(let i=0;i<3;i++){
+    const s=_selected[i];
+    out.push(s?renderFilledSlot(s,i):`<div class="fund-slot empty-slot" onclick="document.getElementById('fund-search')&&document.getElementById('fund-search').focus()"><span style="font-size:12px">+ Add Offering ${i+1}</span></div>`);
+  }
+  return out.join('');
+}
+
+function renderFilledSlot(s,i){
+  const AFL=window.AFL;const f=s.fund;
+  const pct=(_client&&_client.exchangeAmount&&s.alloc)?((s.alloc/_client.exchangeAmount)*100).toFixed(0)+'%':null;
+  const belowMin=f.minInvest&&s.alloc<f.minInvest;
+  return `<div class="fund-slot slot-${i+1}">
+    <button class="fund-slot-remove" onclick="window._afl_builder.removeFund(${f.id})">✕</button>
+    <div class="fund-slot-header">
+      <div class="fund-slot-num n${i+1}">${i+1}</div>
+      <div>
+        <div class="fund-slot-name">${x(f.name||'Offering '+f.id)}</div>
+        <div class="fund-slot-sponsor">${x(f.sponsor||'')} · ${x(f.sector||'')}</div>
+      </div>
+    </div>
+    <div class="alloc-row">
+      <span class="alloc-label">Allocation $</span>
+      <input class="alloc-input${belowMin?' error':''}" type="number" min="0" step="5000"
+        value="${s.alloc||''}" placeholder="amount"
+        oninput="window._afl_builder.setAlloc(${f.id},this.value)"/>
+      ${pct?`<span class="alloc-pct">${pct} of exchange</span>`:''}
+    </div>
+    <div class="alloc-min-warn${belowMin?' show':''}" id="warn-${f.id}">⚠️ Below minimum: ${AFL.fmt.money(f.minInvest)}</div>
+    <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+      <span class="peer-chip n">Y1 ${AFL.fmt.pct(f.y1coc)}</span>
+      <span class="peer-chip ${f.ltv<50?'g':f.ltv<65?'n':'b'}">LTV ${AFL.fmt.pct(f.ltv)}</span>
+      ${f.holdPeriod?`<span class="peer-chip n">${f.holdPeriod}yr hold</span>`:''}
+      <span class="peer-chip ${f.status==='Open'?'g':'b'}">● ${x(f.status||'Open')}</span>
+    </div>
+  </div>`;
+}
+
+function renderTotals(){
+  const AFL=window.AFL;
+  const total=_selected.reduce((s,x)=>s+(Number(x.alloc)||0),0);
+  const budget=_client&&_client.exchangeAmount?_client.exchangeAmount:null;
+  const pct=budget?(total/budget)*100:null;
+  const over=budget&&total>budget;
+  const remaining=budget?budget-total:null;
+  return `<div class="totals-bar">
+    <div class="totals-row">
+      <span class="totals-lbl">Total Allocated</span>
+      <span class="totals-val ${over?'err':total>0?'ok':''}">${AFL.fmt.money(total)}</span>
+    </div>
+    ${budget?`
+    <div class="totals-row">
+      <span class="totals-lbl">Exchange Proceeds</span>
+      <span class="totals-val">${AFL.fmt.money(budget)}</span>
+    </div>
+    <div class="totals-row">
+      <span class="totals-lbl">${over?'Over by':'Remaining'}</span>
+      <span class="totals-val ${over?'err':'ok'}">${AFL.fmt.money(Math.abs(remaining))}</span>
+    </div>
+    <div class="totals-progress"><div class="totals-fill" style="width:${Math.min(100,pct||0).toFixed(1)}%;background:${over?'#F87171':'#34D399'}"></div></div>`:''}
+  </div>`;
+}
+
+// ─── Right panel ───────────────────────────────────────────
+function renderRight(){
+  if(!_selected.length)return`<div class="empty-right">
+    <div style="font-size:44px">📐</div>
+    <h3>Build Your Portfolio</h3>
+    <p style="font-size:13px;max-width:280px;line-height:1.65">Search and add up to 3 DST offerings on the left. Live analytics, suitability scoring, and distribution projections will appear here.</p>
+  </div>`;
+
+  const AFL=window.AFL;
+  const n=_selected.length;
+  const totalAlloc=_selected.reduce((s,x)=>s+(Number(x.alloc)||0),0)||1;
+
+  // Weighted metrics
+  const bCoc=wavg('y1coc'),bLtv=wavg('ltv'),bOcc=wavg('occupancy');
+  const avgHold=_selected.reduce((s,x)=>s+(x.fund.holdPeriod||0),0)/n;
+  const totalMin=_selected.reduce((s,x)=>s+(x.fund.minInvest||0),0);
+  const peerCoc=_peers.y1coc&&_peers.y1coc.avg;
+  const peerLtv=_peers.ltv&&_peers.ltv.avg;
+
+  // Suitability
+  const suitR=_selected.map(s=>_client?suitScore(s.fund,_client):null);
+  const avgSuit=suitR.every(r=>r!==null)?Math.round(suitR.reduce((s,r)=>s+r.score,0)/n):null;
+
+  // State map
+  const stateMap={};
+  _selected.forEach((s,i)=>AFL.extractStates(s.fund.location||'').forEach(st=>{stateMap[st]=stateMap[st]!==undefined?'multi':i;}));
+  const mapLegend=_selected.map((s,i)=>`<div class="map-leg-item"><div class="map-leg-dot" style="background:${O_HEX[i]}"></div>${x(s.fund.name||'')} · ${AFL.extractStates(s.fund.location||'').join(', ')||'—'}</div>`).join('');
+
+  return`
+<!-- Blended KPIs -->
+<div class="kpi-grid">
+  ${kpiTile('Blended LTV',AFL.fmt.pct(bLtv),
+    peerLtv?(bLtv<peerLtv?`<span class="kpi-good">↓ ${(peerLtv-bLtv).toFixed(1)}% below peers</span>`:`<span class="kpi-bad">↑ ${(bLtv-peerLtv).toFixed(1)}% above peers</span>`):'weighted avg',
+    `width:${Math.min(100,bLtv)}%;background:${bLtv<50?'#34D399':bLtv<65?'#FBBF24':'#F87171'}`,
+    _selected.map((s,i)=>`<div class="kpi-bd-item"><div class="kpi-bd-dot" style="background:${O_HEX[i]}"></div>${AFL.fmt.pct(s.fund.ltv)}</div>`).join(''))}
+  ${kpiTile('Blended Y1 CoC',AFL.fmt.pct(bCoc),
+    peerCoc?(bCoc>peerCoc?`<span class="kpi-good">↑ ${(bCoc-peerCoc).toFixed(2)}% above peers</span>`:`<span class="kpi-bad">↓ ${(peerCoc-bCoc).toFixed(2)}% below peers</span>`):'weighted avg',
+    `width:${Math.min(100,(bCoc/8)*100)}%;background:#3B82F6`,
+    _selected.map((s,i)=>`<div class="kpi-bd-item"><div class="kpi-bd-dot" style="background:${O_HEX[i]}"></div>${AFL.fmt.pct(s.fund.y1coc)}</div>`).join(''))}
+  ${kpiTile('Total Allocated',AFL.fmt.money(totalAlloc),
+    _client&&_client.exchangeAmount?`${((totalAlloc/_client.exchangeAmount)*100).toFixed(0)}% of exchange proceeds`:'of target',
+    `width:${_client&&_client.exchangeAmount?Math.min(100,(totalAlloc/_client.exchangeAmount)*100).toFixed(0):0}%;background:${_client&&_client.exchangeAmount&&totalAlloc>_client.exchangeAmount?'#F87171':'#34D399'}`,
+    _selected.map((s,i)=>`<div class="kpi-bd-item"><div class="kpi-bd-dot" style="background:${O_HEX[i]}"></div>${AFL.fmt.money(s.alloc)}</div>`).join(''))}
+  ${kpiTile('Avg Hold Period',AFL.fmt.num(avgHold,1)+' yr',
+    _client&&_client.horizon?`vs ${_client.horizon}yr client horizon`:'avg across portfolio',
+    `width:${Math.min(100,(avgHold/15)*100)}%;background:#7C3AED`,
+    _selected.map((s,i)=>`<div class="kpi-bd-item"><div class="kpi-bd-dot" style="background:${O_HEX[i]}"></div>${s.fund.holdPeriod||'—'}yr</div>`).join(''))}
+</div>
+
+<!-- Suitability -->
+${_client&&_client.name?`
+<div class="panel" style="padding-bottom:12px">
+  <div class="panel-title">★ Suitability — ${x(_client.name)}${avgSuit!==null?` <span style="margin-left:auto;font-size:15px;font-weight:800;font-family:var(--mono);color:${avgSuit>=70?'var(--green)':avgSuit>=45?'var(--amber)':'var(--red)'}">${avgSuit}% avg</span>`:''}</div>
+  <div class="suit-cards" style="grid-template-columns:repeat(${n},1fr)">
+    ${_selected.map((s,i)=>renderSuitCard(s,i,suitR[i])).join('')}
+  </div>
+</div>`:`
+<div class="panel" style="text-align:center;padding:14px">
+  <span style="font-size:12px;color:var(--slate2)">No client loaded — </span>
+  <a href="#" onclick="window.AFL.navigate('client');return false" style="font-size:12px;color:var(--blue)">add a client profile</a>
+  <span style="font-size:12px;color:var(--slate2)"> for suitability scoring.</span>
+</div>`}
+
+<!-- Charts -->
+<div class="charts-row">
+  <div class="chart-panel">
+    <div class="panel-title">📈 Projected Annual Distributions</div>
+    <div class="chart-wrap"><canvas id="dist-chart"></canvas></div>
+  </div>
+  <div class="chart-panel">
+    <div class="panel-title">🍩 Portfolio Allocation</div>
+    <div class="chart-wrap-sm"><canvas id="donut-chart"></canvas></div>
+  </div>
+</div>
+
+<!-- Projection table -->
+${renderProjTable()}
+
+<!-- Map + Metrics -->
+<div class="charts-row" style="grid-template-columns:1fr 1fr">
+  <div class="chart-panel">
+    <div class="panel-title">📍 Geographic Footprint</div>
+    <div class="map-wrap"><svg id="us-map-builder" viewBox="0 0 960 600" preserveAspectRatio="xMidYMid meet" style="width:100%;height:100%"></svg></div>
+    <div class="map-legend">${mapLegend}</div>
+  </div>
+  <div class="chart-panel">
+    <div class="panel-title">⚡ Portfolio Metrics</div>
+    ${renderMetrics()}
+  </div>
+</div>
+
+<!-- Compliance -->
+<div class="panel">
+  <div class="panel-title">🛡️ Compliance &amp; Suitability Flags</div>
+  <div class="flags-grid">${renderFlags(suitR,bLtv,bCoc,totalAlloc,avgHold)}</div>
+</div>`;
+}
+
+function kpiTile(lbl,val,sub,fillStyle,breakdown){
+  return`<div class="kpi-tile">
+    <div class="kpi-lbl">${lbl}</div>
+    <div class="kpi-val">${val}</div>
+    <div class="kpi-sub">${sub}</div>
+    <div class="kpi-bar"><div class="kpi-fill" style="${fillStyle}"></div></div>
+    ${breakdown?`<div class="kpi-breakdown">${breakdown}</div>`:''}
+  </div>`;
+}
+
+function renderSuitCard(s,i,r){
+  const f=s.fund;
+  if(!r)return`<div class="suit-card suit-card-${i+1}"><div style="color:var(--slate2);font-size:12px">No client — <a href="#" onclick="window.AFL.navigate('client');return false" style="color:var(--blue)">add profile</a></div></div>`;
+  const sc=r.score;const c=sc>=70?'var(--green)':sc>=45?'var(--amber)':'var(--red)';
+  const lbl=sc>=70?'Strong Match':sc>=45?'Moderate Match':'Poor Match';
+  const reasons=r.reasons||[];
+  return`<div class="suit-card suit-card-${i+1}">
+    <div style="display:flex;align-items:center;gap:7px;margin-bottom:7px">
+      <div style="width:17px;height:17px;border-radius:50%;background:${O_HEX[i]};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;flex-shrink:0">${i+1}</div>
+      <span style="font-size:11px;font-weight:600;color:var(--slate);line-height:1.3">${x(f.name?(f.name.length>26?f.name.slice(0,24)+'…':f.name):'')}</span>
+    </div>
+    <div class="suit-score-big" style="color:${c}">${sc}<span style="font-size:14px">%</span></div>
+    <div class="suit-label" style="color:${c}">${lbl}</div>
+    <div class="suit-reasons">
+      ${reasons.slice(0,4).map(r=>{
+        const col=r&&r.type==='pos'?'var(--green)':r&&r.type==='neg'?'var(--red)':'var(--amber)';
+        const txt=r&&typeof r==='object'?(r.text||''):String(r);
+        return`<div class="suit-reason"><div class="suit-reason-dot" style="background:${col}"></div><span style="font-size:10px;color:var(--slate)">${x(txt)}</span></div>`;
+      }).join('')}
+    </div>
+    ${r.tooltip?`<div style="margin-top:7px;font-size:10px;color:var(--slate2);font-style:italic">${x(r.tooltip)}</div>`:''}
+  </div>`;
+}
+
+function renderProjTable(){
+  const AFL=window.AFL;
+  if(!_selected.length)return'';
+  const holdYrs=Math.max(..._selected.map(s=>s.fund.holdPeriod||7));
+  const years=Array.from({length:Math.min(holdYrs,10)},(_,i)=>i+1);
+  const hasC=_client&&_client.exchangeAmount;
+
+  return`<div class="panel">
+    <div class="panel-title">📊 Distribution Projections${hasC?' — '+AFL.fmt.money(_selected.reduce((s,x)=>s+(Number(x.alloc)||0),0))+' Total':''}</div>
+    <div style="overflow-x:auto">
+      <table class="proj-table">
+        <thead><tr>
+          <th>Offering</th>
+          ${years.map((y,i)=>`<th ${i===0?'class="hl"':''}>Yr ${y}</th>`).join('')}
+        </tr></thead>
+        <tbody>
+          ${_selected.map((s,fi)=>{
+            const f=s.fund;const alloc=Number(s.alloc)||0;
+            return`<tr>
+              <td style="display:flex;align-items:center;gap:5px;padding:6px 9px">
+                <div style="width:9px;height:9px;border-radius:50%;background:${O_HEX[fi]};flex-shrink:0"></div>
+                ${x(f.name?(f.name.length>18?f.name.slice(0,16)+'…':f.name):'Fund '+(fi+1))}
+                <span class="peer-chip n" style="margin-left:3px">${AFL.fmt.pct(f.y1coc)}</span>
+              </td>
+              ${years.map((y,yi)=>{
+                const coc=(f.income&&f.income[y-1]!=null)?f.income[y-1]:f.y1coc;
+                const active=!f.holdPeriod||y<=f.holdPeriod;
+                const dist=active&&coc&&hasC?alloc*coc/100:null;
+                return`<td ${yi===0?'class="hl"':''}>${dist!=null?'$'+AFL.fmt.num(dist):'—'}</td>`;
+              }).join('')}
+            </tr>`;
+          }).join('')}
+          <tr class="proj-total">
+            <td>Total / Year</td>
+            ${years.map((y,yi)=>{
+              const t=_selected.reduce((sum,s)=>{
+                const f=s.fund;const coc=(f.income&&f.income[y-1]!=null)?f.income[y-1]:f.y1coc;
+                const active=!f.holdPeriod||y<=f.holdPeriod;
+                return sum+(active&&coc&&hasC?(Number(s.alloc)||0)*coc/100:0);
+              },0);
+              return`<td ${yi===0?'class="hl"':''}>${t>0?'$'+AFL.fmt.num(t):'—'}</td>`;
+            }).join('')}
+          </tr>
+          <tr class="proj-cum">
+            <td>Cumulative</td>
+            ${years.map((y,yi)=>{
+              let cum=0;
+              for(let yr=1;yr<=y;yr++){_selected.forEach(s=>{
+                const f=s.fund;const coc=(f.income&&f.income[yr-1]!=null)?f.income[yr-1]:f.y1coc;
+                const active=!f.holdPeriod||yr<=f.holdPeriod;
+                if(active&&coc&&hasC)cum+=(Number(s.alloc)||0)*coc/100;
+              });}
+              return`<td ${yi===0?'class="hl"':''}>${cum>0?'$'+AFL.fmt.num(cum):'—'}</td>`;
+            }).join('')}
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    ${!hasC?`<div style="text-align:center;font-size:12px;color:var(--slate2);margin-top:8px"><a href="#" onclick="window.AFL.navigate('client');return false" style="color:var(--blue)">Add a client profile</a> to see dollar distribution amounts.</div>`:''}
+  </div>`;
+}
+
+function renderMetrics(){
+  const AFL=window.AFL;const n=_selected.length;
+  const sectors=[...new Set(_selected.map(s=>s.fund.sector).filter(Boolean))];
+  const rows=[
+    ['Sectors',sectors.map(s=>`<span class="peer-chip n">${x(s)}</span>`).join(' ')],
+    ['Avg Occupancy',AFL.fmt.pct(wavg('occupancy'),1)],
+    ['Blended DSCR',(wavg('dscr')||0).toFixed(2)+'x'],
+    ['Combined Min.',AFL.fmt.money(_selected.reduce((s,x)=>s+(x.fund.minInvest||0),0))],
+    ['Avg WALT',AFL.fmt.num(_selected.reduce((s,x)=>s+(x.fund.avgLeaseTerm||0),0)/n,1)+' yr'],
+    ['Sponsors',new Set(_selected.map(s=>s.fund.sponsor)).size+' sponsor'+(_selected.length>1&&new Set(_selected.map(s=>s.fund.sponsor)).size>1?'s':'')],
+    ['States',AFL.extractStates(_selected.map(s=>s.fund.location||'').join(', ')).length+' states'],
+    ['721 UpREIT',_selected.some(s=>s.fund.upReit&&!/^no$/i.test(s.fund.upReit||''))? '<span class="peer-chip g">✅ Available</span>':'—'],
+  ];
+  return`<table style="width:100%;font-size:12px;border-collapse:collapse">
+    ${rows.map(([l,v])=>`<tr>
+      <td style="padding:5px 0;border-bottom:1px solid var(--mist);color:var(--slate2);font-weight:500">${l}</td>
+      <td style="padding:5px 0;border-bottom:1px solid var(--mist);font-weight:600;color:var(--navy);text-align:right">${v}</td>
+    </tr>`).join('')}
+  </table>`;
+}
+
+function renderFlags(suitR,bLtv,bCoc,totalAlloc,avgHold){
+  const AFL=window.AFL;const flags=[];
+
+  // Accreditation
+  _selected.forEach((s,i)=>{
+    const f=s.fund;const ca=_client&&_client.accreditation;
+    if(f.exemption&&ca){
+      const needsAccr=/506[bc]/i.test(f.exemption);
+      const isAccr=ca==='accredited'||ca==='qualified-purchaser';
+      if(needsAccr&&!isAccr)flags.push({t:'fail',i:'⛔',m:`Offering ${i+1}: ${x(f.name||'')} requires accredited investor — client status: ${x(ca)}`});
+      else if(isAccr)flags.push({t:'pass',i:'✅',m:`Offering ${i+1}: Client accreditation confirmed for ${x(f.name||'')}`});
+    }
+  });
+
+  // Concentration
+  if(_selected.length>1&&totalAlloc>0){
+    _selected.forEach((s,i)=>{
+      const pct=(Number(s.alloc)||0)/totalAlloc*100;
+      if(pct>50)flags.push({t:'warn',i:'⚠️',m:`Concentration risk: Offering ${i+1} is ${pct.toFixed(0)}% of portfolio — consider balancing below 50%`});
+      else if(pct>0)flags.push({t:'pass',i:'✅',m:`Offering ${i+1}: ${pct.toFixed(0)}% — within concentration limits`});
+    });
+  }
+
+  // 1031 compliance
+  if(_client&&_client.exchangeAmount){
+    const total=_selected.reduce((s,x)=>s+(Number(x.alloc)||0),0);
+    if(total>_client.exchangeAmount)flags.push({t:'fail',i:'🚨',m:`1031 Compliance: Total ${AFL.fmt.money(total)} exceeds exchange proceeds ${AFL.fmt.money(_client.exchangeAmount)} by ${AFL.fmt.money(total-_client.exchangeAmount)}`});
+    else if(total>0){const unused=_client.exchangeAmount-total;flags.push({t:unused<_client.exchangeAmount*0.05?'pass':'info',i:unused<_client.exchangeAmount*0.05?'✅':'ℹ️',m:`1031 Compliance: ${AFL.fmt.money(total)} of ${AFL.fmt.money(_client.exchangeAmount)} allocated.${unused>0?' '+AFL.fmt.money(unused)+' undeployed.':''}`});}
+  }
+
+  // Suitability flags
+  suitR.forEach((r,i)=>{
+    if(!r)return;
+    (r.flags||[]).forEach(f=>{
+      const txt=typeof f==='string'?f:(f.text||String(f));
+      flags.push({t:f.type||'warn',i:f.type==='fail'?'⚠️':'ℹ️',m:`Offering ${i+1}: ${x(txt)}`});
+    });
+  });
+
+  // LTV
+  if(bLtv>65)flags.push({t:'warn',i:'⚠️',m:`Blended LTV ${AFL.fmt.pct(bLtv)} is elevated — conservative threshold ≤65%. Discuss with client.`});
+  else if(bLtv>0)flags.push({t:'pass',i:'✅',m:`Blended LTV ${AFL.fmt.pct(bLtv)} — within conservative parameters`});
+
+  // Hold vs horizon
+  if(_client&&_client.horizon&&avgHold>0){
+    if(avgHold>_client.horizon+1)flags.push({t:'warn',i:'⚠️',m:`Avg hold (${AFL.fmt.num(avgHold,1)}yr) exceeds client horizon (${_client.horizon}yr) — discuss liquidity expectations`});
+    else flags.push({t:'pass',i:'✅',m:`Hold alignment: ${AFL.fmt.num(avgHold,1)}yr avg vs ${_client.horizon}yr horizon`});
+  }
+
+  // Diversification
+  const secs=new Set(_selected.map(s=>s.fund.sector).filter(Boolean));
+  if(_selected.length>1&&secs.size>1)flags.push({t:'pass',i:'✅',m:`Sector diversification: ${[...secs].join(' + ')}`});
+  else if(_selected.length>1)flags.push({t:'info',i:'ℹ️',m:`Single sector (${[...secs][0]||'—'}) — consider adding a different property type`});
+
+  if(!flags.length)flags.push({t:'info',i:'ℹ️',m:'Add offerings and a client profile to generate compliance checks.'});
+
+  return flags.map(f=>`<div class="flag-item flag-${f.t}"><span class="flag-icon">${f.i}</span><span>${f.m}</span></div>`).join('');
+}
+
+// ─── Charts ────────────────────────────────────────────────
+function buildDistChart(){
+  const canvas=document.getElementById('dist-chart');
+  if(!canvas||typeof Chart==='undefined')return;
+  if(_distChart){_distChart.destroy();_distChart=null;}
+  if(!_selected.length)return;
+  const holdYrs=Math.max(..._selected.map(s=>s.fund.holdPeriod||7));
+  const years=Array.from({length:Math.min(holdYrs,10)},(_,i)=>'Yr '+(i+1));
+  const hasC=_client&&_client.exchangeAmount;
+  const datasets=_selected.map((s,i)=>{
+    const f=s.fund;const alloc=Number(s.alloc)||0;
+    return{
+      label:f.name?(f.name.length>18?f.name.slice(0,16)+'…':f.name):'Fund '+(i+1),
+      data:years.map((_,yi)=>{
+        const y=yi+1;const coc=(f.income&&f.income[yi]!=null)?f.income[yi]:f.y1coc;
+        const active=!f.holdPeriod||y<=f.holdPeriod;
+        return active&&coc&&hasC?+(alloc*coc/100).toFixed(0):0;
+      }),
+      backgroundColor:O_HEX[i]+'BF',borderColor:O_HEX[i],borderWidth:1,borderRadius:4,
+    };
+  });
+  _distChart=new Chart(canvas,{
+    type:'bar',data:{labels:years,datasets},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{font:{size:10,family:'DM Sans'},boxWidth:10,padding:8}},
+        tooltip:{callbacks:{label:c=>' '+c.dataset.label+': $'+c.parsed.y.toLocaleString(),footer:items=>'Total: $'+items.reduce((s,i)=>s+i.parsed.y,0).toLocaleString()}}},
+      scales:{
+        x:{stacked:true,grid:{display:false},ticks:{font:{size:10,family:'DM Sans'}}},
+        y:{stacked:true,grid:{color:'#E8F0F8'},ticks:{font:{size:10,family:'DM Sans'},callback:v=>'$'+(v>=1000?(v/1000).toFixed(0)+'K':v)}}
+      }
+    }
+  });
+}
+
+function buildDonutChart(){
+  const canvas=document.getElementById('donut-chart');
+  if(!canvas||typeof Chart==='undefined')return;
+  if(_donutChart){_donutChart.destroy();_donutChart=null;}
+  if(!_selected.length)return;
+  const total=_selected.reduce((s,x)=>s+(Number(x.alloc)||0),0)||1;
+  _donutChart=new Chart(canvas,{
+    type:'doughnut',
+    data:{
+      labels:_selected.map(s=>s.fund.name?(s.fund.name.length>18?s.fund.name.slice(0,16)+'…':s.fund.name):'Fund'),
+      datasets:[{data:_selected.map(s=>+((Number(s.alloc)||0)/total*100).toFixed(1)),
+        backgroundColor:O_HEX.slice(0,_selected.length),borderColor:'#fff',borderWidth:3,hoverOffset:6}]
+    },
+    options:{responsive:true,maintainAspectRatio:false,cutout:'62%',
+      plugins:{legend:{position:'bottom',labels:{font:{size:10,family:'DM Sans'},boxWidth:10,padding:8}},
+        tooltip:{callbacks:{label:c=>' '+c.label+': '+c.parsed.toFixed(1)+'%'}}}}
+  });
+}
+
+function buildMap(){
+  const svg=document.getElementById('us-map-builder');
+  if(!svg)return;
+  if(typeof d3==='undefined'||typeof topojson==='undefined')return;
+  const AFL=window.AFL;
+  const stateMap={};
+  _selected.forEach((s,i)=>AFL.extractStates(s.fund.location||'').forEach(st=>{stateMap[st]=stateMap[st]!==undefined?'multi':i;}));
+  if(_mapTopo){paintMap(svg,_mapTopo,stateMap);return;}
+  fetch('https://cdn.jsdelivr.net/npm/us-atlas@3/states-10m.json').then(r=>r.json()).then(us=>{_mapTopo=us;paintMap(svg,us,stateMap);}).catch(()=>{});
+}
+
+function paintMap(svgEl,us,stateMap){
+  const d3svg=d3.select(svgEl);d3svg.selectAll('*').remove();
+  const proj=d3.geoAlbersUsa().scale(1200).translate([480,300]);
+  const path=d3.geoPath().projection(proj);
+  const states=topojson.feature(us,us.objects.states);
+  d3svg.selectAll('path').data(states.features).enter().append('path').attr('d',path)
+    .attr('class',d=>{
+      const abbr=FIPS[String(d.id).padStart(2,'0')];const w=stateMap[abbr];
+      if(w==='multi')return'state-multi';
+      if(w===0)return'state-o1';if(w===1)return'state-o2';if(w===2)return'state-o3';
+      return'state-base';
+    }).append('title').text(d=>FIPS[String(d.id).padStart(2,'0')]||'');
+}
+
+// ─── Fund CRUD ─────────────────────────────────────────────
+function addFund(id){
+  if(_selected.length>=3){toast('Max 3 offerings — remove one first');return;}
+  const f=_allFunds.find(f=>f.id===Number(id));if(!f)return;
+  if(_selected.find(s=>s.fund.id===f.id)){toast('Already added');return;}
+  const n=_selected.length+1;
+  _selected.push({fund:f,alloc:calcAlloc(f,n)});
+  if(window.AFL.basket.add)window.AFL.basket.add(f.id);
+  closeSearch();const inp=document.getElementById('fund-search');if(inp)inp.value='';
+  dispatch();reLeft();reRight();
+}
+
+function removeFund(id){
+  _selected=_selected.filter(s=>s.fund.id!==Number(id));
+  if(window.AFL.basket.remove)window.AFL.basket.remove(Number(id));
+  dispatch();reLeft();reRight();
+}
+
+function setAlloc(id,val){
+  const s=_selected.find(s=>s.fund.id===Number(id));if(!s)return;
+  s.alloc=Number(val)||0;
+  // Update warning inline
+  const w=document.getElementById('warn-'+id);
+  if(w){w.className='alloc-min-warn'+(s.fund.minInvest&&s.alloc<s.fund.minInvest?' show':'');}
+  dispatch();
+  clearTimeout(window._allocT);window._allocT=setTimeout(()=>reRight(),450);
+}
+
+function autoAlloc(){
+  if(!_client||!_client.exchangeAmount)return;
+  const per=Math.floor((_client.exchangeAmount/_selected.length)/1000)*1000;
+  _selected.forEach(s=>s.alloc=per);
+  dispatch();reLeft();reRight();toast('✅ Equal allocation applied');
+}
+
+function clearAll(){
+  _selected=[];
+  if(window.AFL.basket.clear)window.AFL.basket.clear();
+  dispatch();reLeft();reRight();
+}
+
+function setFilter(sec){_filterSec=sec;reLeft();}
+
+// ─── Search ────────────────────────────────────────────────
+function openSearch(){
+  const el=document.getElementById('search-results');if(!el)return;
+  el.classList.add('open');renderSearchResults('');
+}
+function closeSearch(){const el=document.getElementById('search-results');if(el)el.classList.remove('open');}
+function onSearch(q){const el=document.getElementById('search-results');if(!el)return;el.classList.add('open');renderSearchResults(q);}
+
+function renderSearchResults(q){
+  const AFL=window.AFL;const el=document.getElementById('search-results');if(!el)return;
+  const term=q.toLowerCase().trim();
+  const selIds=_selected.map(s=>s.fund.id);
+  const results=_allFunds.filter(f=>{
+    if(_filterSec!=='all'&&f.sector!==_filterSec)return false;
+    if(!term)return true;
+    return(f.name||'').toLowerCase().includes(term)||(f.sponsor||'').toLowerCase().includes(term)||(f.sector||'').toLowerCase().includes(term)||(f.location||'').toLowerCase().includes(term);
+  }).slice(0,18);
+  if(!results.length){el.innerHTML=`<div style="padding:12px;font-size:12px;color:var(--slate2);text-align:center">No results</div>`;return;}
+  el.innerHTML=results.map(f=>{
+    const added=selIds.includes(f.id);
+    const sr=_client?suitScore(f,_client):null;
+    const chip=sr?`<span class="peer-chip ${sr.score>=70?'g':sr.score>=45?'a':'b'}">★ ${sr.score}%</span>`:'';
+    return`<div class="search-item${added?' added':''}" onclick="window._afl_builder.addFund(${f.id})">
+      <div style="flex:1;min-width:0">
+        <div class="search-item-name">${x(f.name||'Offering '+f.id)}</div>
+        <div class="search-item-meta">${x(f.sponsor||'')} · ${x(f.sector||'')} · Y1 ${AFL.fmt.pct(f.y1coc)} · LTV ${AFL.fmt.pct(f.ltv)}</div>
+      </div>
+      ${chip}${added?`<span class="peer-chip n">Added</span>`:''}
+    </div>`;
+  }).join('');
+}
+
+// ─── Portfolio save/load ───────────────────────────────────
+function savePortfolio(){
+  if(!_selected.length){toast('Add offerings first');return;}
+  const label=(_client&&_client.name?_client.name+' — ':'')+_selected.map(s=>s.fund.name||'Fund').join(', ')+' — '+new Date().toLocaleDateString('en-US',{month:'short',day:'numeric'});
+  const key='afl_pf_'+Date.now();
+  const data={label,timestamp:Date.now(),clientName:_client&&_client.name,funds:_selected.map(s=>({id:s.fund.id,alloc:s.alloc}))};
+  try{
+    localStorage.setItem(key,JSON.stringify(data));
+    const idx=JSON.parse(localStorage.getItem('afl_pf_idx')||'[]');
+    idx.unshift(key);if(idx.length>20)idx.splice(20);
+    localStorage.setItem('afl_pf_idx',JSON.stringify(idx));
+    toast('💾 Saved: '+label);
+  }catch(e){toast('⚠️ Could not save');}
+}
+
+function loadPortfolio(key){
+  try{
+    const p=JSON.parse(localStorage.getItem(key)||'{}');
+    _selected=(p.funds||[]).map(f=>{const fund=_allFunds.find(x=>x.id===f.id);return fund?{fund,alloc:f.alloc}:null;}).filter(Boolean).slice(0,3);
+    if(window.AFL.basket.clear)window.AFL.basket.clear();
+    _selected.forEach(s=>{if(window.AFL.basket.add)window.AFL.basket.add(s.fund.id);});
+    closeSavedMenu();dispatch();reLeft();reRight();toast('📂 Loaded: '+(p.label||'Portfolio'));
+  }catch(e){toast('⚠️ Could not load portfolio');}
+}
+
+function deleteSaved(key,e){
+  e.stopPropagation();
+  try{
+    localStorage.removeItem(key);
+    const idx=JSON.parse(localStorage.getItem('afl_pf_idx')||'[]');
+    localStorage.setItem('afl_pf_idx',JSON.stringify(idx.filter(k=>k!==key)));
+    const m=document.getElementById('saved-dd-menu');if(m)m.innerHTML=renderSavedMenu();
+    toast('🗑️ Deleted');
+  }catch(e){}
+}
+
+function renderSavedMenu(){
+  try{
+    const idx=JSON.parse(localStorage.getItem('afl_pf_idx')||'[]');
+    if(!idx.length)return'<div class="saved-dd-empty">No saved portfolios</div>';
+    return idx.slice(0,10).map(key=>{
+      try{
+        const p=JSON.parse(localStorage.getItem(key)||'{}');
+        return`<div class="saved-dd-item" onclick="window._afl_builder.loadPortfolio('${x(key)}')">
+          <div><div style="font-weight:600;font-size:12px">${x(p.label||'Portfolio')}</div><div style="font-size:10.5px;color:var(--slate2)">${new Date(p.timestamp||0).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})}</div></div>
+          <button class="saved-dd-del" onclick="window._afl_builder.deleteSaved('${x(key)}',event)">✕</button>
+        </div>`;
+      }catch(e){return'';}
+    }).join('');
+  }catch(e){return'<div class="saved-dd-empty">No saved portfolios</div>';}
+}
+
+function toggleSaved(){const el=document.getElementById('saved-dd-menu');if(!el)return;el.innerHTML=renderSavedMenu();el.classList.toggle('open');}
+function closeSavedMenu(){const el=document.getElementById('saved-dd-menu');if(el)el.classList.remove('open');}
+
+// ─── PDF ───────────────────────────────────────────────────
+function generatePDF(){
+  const AFL=window.AFL;
+  const ph=document.getElementById('print-header');if(ph)ph.style.display='block';
+  const pm=document.getElementById('print-meta');
+  if(pm){pm.textContent=[_client&&_client.name?'Client: '+_client.name:'',_selected.map(s=>s.fund.name||'').filter(Boolean).join(' + '),'Generated: '+new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}),_client&&_client.exchangeAmount?'Exchange: '+AFL.fmt.money(_client.exchangeAmount):''].filter(Boolean).join('  ·  ');}
+  window.print();
+}
+
+// ─── Send to client ────────────────────────────────────────
+function sendToClient(){
+  const AFL=window.AFL;
+  if(!_client||!_client.email){toast('⚠️ No client email — add one in client profile');return;}
+  if(!_selected.length){toast('Add offerings first');return;}
+  const subject=`DST Portfolio Analysis — ${_selected.length} Offering${_selected.length>1?'s':''}`;
+  const body=['Dear '+(_client.name||'Client')+',','','Please find your DST portfolio analysis below:','',
+    ..._selected.map((s,i)=>`${i+1}. ${s.fund.name||''} (${s.fund.sponsor||''})\n   Allocation: ${AFL.fmt.money(s.alloc)}  ·  Y1 CoC: ${AFL.fmt.pct(s.fund.y1coc)}  ·  LTV: ${AFL.fmt.pct(s.fund.ltv)}  ·  Hold: ${s.fund.holdPeriod?s.fund.holdPeriod+'yr':'—'}`),
+    '','Total Allocated: '+AFL.fmt.money(_selected.reduce((s,x)=>s+(Number(x.alloc)||0),0)),
+    'Blended Y1 CoC: '+AFL.fmt.pct(wavg('y1coc'))+'  ·  Blended LTV: '+AFL.fmt.pct(wavg('ltv')),
+    '','Please review and feel free to reach out with any questions.','','Best regards'].join('\n');
+  window.dispatchEvent(new CustomEvent('afl:gmail-draft',{detail:{to:_client.email,subject,body}}));
+  toast('✉️ Opening email draft…');
+}
+
+// ─── Helpers ───────────────────────────────────────────────
+function wavg(field){
+  const total=_selected.reduce((s,x)=>s+(Number(x.alloc)||0),0);
+  if(!total){const vals=_selected.map(s=>s.fund[field]).filter(v=>v!=null&&isFinite(v));return vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:0;}
+  return _selected.reduce((s,x)=>{const v=x.fund[field];return s+(v!=null&&isFinite(v)?v*(Number(x.alloc)||0):0);},0)/total;
+}
+
+function suitScore(fund,client){
+  if(!window.AFL||!window.AFL.suitScore)return null;
+  try{
+    const r=window.AFL.suitScore(fund,client);if(r===null||r===undefined)return null;
+    if(typeof r==='object'&&'score'in r)return r;
+    return{score:Number(r)||0,reasons:[],flags:[],tooltip:''};
+  }catch(e){return null;}
+}
+
+function dispatch(){
+  window.dispatchEvent(new CustomEvent('afl:portfolio-updated',{detail:{funds:_selected.map(s=>({id:s.fund.id,alloc:s.alloc})),blendedCoc:wavg('y1coc'),blendedLtv:wavg('ltv')}}));
+  if(window.AFL&&window.AFL.updateHeader)window.AFL.updateHeader({basketCount:_selected.length});
+}
+
+function reLeft(){const el=document.getElementById('bleft');if(el)el.innerHTML=renderLeft();}
+function reRight(){const el=document.getElementById('bright');if(el){el.innerHTML=renderRight();afterRight();}}
+
+function afterRight(){buildDistChart();buildDonutChart();buildMap();}
+
+function toast(msg,ms=2600){
+  const el=document.getElementById('builder-toast');if(!el)return;
+  el.textContent=msg;el.classList.add('show');
+  clearTimeout(el.__t);el.__t=setTimeout(()=>el.classList.remove('show'),ms);
+}
+
+function renderError(msg){document.getElementById('builder-module').innerHTML=`<div style="padding:32px;text-align:center;color:var(--red);font-size:14px">⚠️ ${x(msg)}</div>`;}
+
+function x(s){
+  if(s==null)return'';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// ─── Public API ────────────────────────────────────────────
+window._afl_builder={
+  addFund,removeFund,setAlloc,autoAlloc,clearAll,setFilter,
+  onSearch,openSearch,
+  generatePDF,sendToClient,
+  savePortfolio,loadPortfolio,deleteSaved,toggleSaved,
+};
+
+window.currentModule={
+  async init(shellParams){await init(shellParams);}
+};
+
+if(window.AFL)window.currentModule.init({});
+
+})();
+</script>
+</body>
+</html>
