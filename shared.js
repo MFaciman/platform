@@ -401,13 +401,13 @@
       else                score -= 20;
     }
 
-    const min = fund.minInvest;
+    const min = fund.minInvest != null ? fund.minInvest : fund.minimum;
     if (min != null && isFinite(min) && client.exchangeAmount != null) {
       if (min <= client.exchangeAmount) score += 15;
       else                              score -= 15;
     }
 
-    if (fund.y1coc != null && isFinite(fund.y1coc) && fund.y1coc >= 4.0) score += 15;
+    const _coc = fund.y1coc != null ? fund.y1coc : fund.y1CoC; if (_coc != null && isFinite(_coc) && _coc >= 4.0) score += 15;
 
     if (Array.isArray(client.propTypes) && client.propTypes.length > 0) {
       if (client.propTypes.includes(fund.sector) || client.propTypes.includes(fund.propType)) {
@@ -415,7 +415,7 @@
       }
     }
 
-    if (fund.occupancy != null && isFinite(fund.occupancy) && fund.occupancy >= 90) score += 10;
+    const _occ = fund.occupancy != null ? fund.occupancy : fund.pctLeased; if (_occ != null && isFinite(_occ) && _occ >= 90) score += 10;
 
     const final = Math.min(100, Math.max(0, Math.round(score))); return { score: final, tooltip: '' };
   }
