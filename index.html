@@ -946,7 +946,7 @@ function computePeerStats() {
    SUITABILITY SCORING
 ═══════════════════════════════════════════ */
 function calcSuitabilityScore(fund) {
- const client = typeof clientForModules === 'function' ? clientForModules() : null;
+ const client = window.AFL && window.AFL.state ? window.AFL.state.client : null;
     if (!client || !client.name) return null;
     const r = window.AFL.suitScore ? window.AFL.suitScore(fund, client) : null;
     return r ? r.score : null;
