@@ -417,7 +417,7 @@
 
     if (fund.occupancy != null && isFinite(fund.occupancy) && fund.occupancy >= 90) score += 10;
 
-    return Math.min(100, Math.max(0, Math.round(score)));
+    const final = Math.min(100, Math.max(0, Math.round(score))); return { score: final, tooltip: '' };
   }
 
   // ─────────────────────────────────────────────────────────────
