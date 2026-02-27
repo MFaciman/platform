@@ -585,7 +585,7 @@ async function loadModule(name) {
       // Add shell toast
       window.AFL.toast = (msg, type) => showToast(msg, type || '');
       // Add shell suitability scoring (uses shell's STATE.client)
-      window.AFL.suitScore = window.AFL.suitScore || ((fund) => calcSuitabilityScore(fund));
+      window.AFL.suitScore = window.AFL.suitScore || ((fund) => { const s = calcSuitabilityScore(fund); return s != null ? { score: s, tooltip: '' } : null; });
       window.AFL.suitLabel = window.AFL.suitLabel || ((score) => suitLabel(score));
       // Sync shell's selected offering
       Object.defineProperty(window.AFL, 'selectedId', {
