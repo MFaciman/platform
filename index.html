@@ -585,7 +585,6 @@ async function loadModule(name) {
       // Add shell toast
       window.AFL.toast = (msg, type) => showToast(msg, type || '');
       // Add shell suitability scoring (uses shell's STATE.client)
-      window.AFL.suitScore = ((fund) => { const s = calcSuitabilityScore(fund); return s != null ? { score: s, tooltip: '' } : null; });
       window.AFL.suitLabel = window.AFL.suitLabel || ((score) => suitLabel(score));
       // Sync shell's selected offering
       Object.defineProperty(window.AFL, 'selectedId', {
@@ -947,10 +946,10 @@ function computePeerStats() {
    SUITABILITY SCORING
 ═══════════════════════════════════════════ */
 function calcSuitabilityScore(fund) {
-  const c = STATE.client;
-  if (!c.clientName) return null;
-  let score = 0;
-
+ const client = typeof clientForModules === 'function' ? clientForModules() : null;
+    if (!client || !client.name) return null;
+    const r = window.AFL.suitScore ? window.AFL.suitScore(fund, client) : null;
+    return r ? r.score : null;
   let structScore = 1;
   if (c.structurePreference.dstOnly  && fund.structure && !fund.structure.toLowerCase().includes('dst')) structScore = 0;
   if (c.structurePreference.noDebt   && fund.ltv > 0) structScore = Math.min(structScore, 0.3);
