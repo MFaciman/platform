@@ -588,6 +588,11 @@ async function loadModule(name) {
         set(v) { /* ignore — shell owns client state */ },
         configurable: true
       });
+       // Expose shell peer stats so modules get the same peer data as dashboard
+      Object.defineProperty(window.AFL, 'peer', {
+        get() { return STATE.peer; },
+        configurable: true
+      });
     } else {
       // Fallback: shared.js didn't load — build full bridge from shell data
       console.warn('[AFL Shell] shared.js not loaded — using shell bridge');
