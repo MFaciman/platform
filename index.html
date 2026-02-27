@@ -989,9 +989,9 @@ function calcSuitabilityScore(fund) {
 
 function suitLabel(score) {
   if (score == null) return null;
-  if (score >= 75) return { cls: 'high',   label: `${score} Match` };
-  if (score >= 50) return { cls: 'medium', label: `${score} Match` };
-  return { cls: 'low', label: `${score} Match` };
+  if (score >= 75) return { cls: 'high',   label: `${score}% Match` };
+  if (score >= 50) return { cls: 'medium', label: `${score}% Match` };
+  return { cls: 'low', label: `${score}% Match` };
 }
 
 /* ═══════════════════════════════════════════
