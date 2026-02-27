@@ -435,9 +435,8 @@ function renderSingleView(f) {
   const inBasket = basket.some(b => b.id === f.id);
 
   // ── FIX 1: unpack suitScore result object ──────────────
-  const _suitResult  = hasClient ? AFL.suitScore(f, client) : null;
-  const score        = _suitResult ? _suitResult.score   : null;
-  const suitTooltip  = _suitResult ? _suitResult.tooltip : null;
+  const score        = hasClient ? AFL.suitScore(f, client, AFL.peer || {}) : null;
+  const suitTooltip  = null;
   // ── END FIX 1 ─────────────────────────────────────────
 
   const basketFunds = basket.slice(0,3);
@@ -862,8 +861,7 @@ ${renderModeBar(true)}
   // ── FIX 3: unpack suitScore objects for portfolio ──────
   const scores = _funds.map(f => {
     if (!hasClient) return null;
-    const r = AFL.suitScore(f, client);
-    return r ? r.score : null;
+   return AFL.suitScore(f, client, AFL.peer || {}); 
   });
   // ── END FIX 3 ─────────────────────────────────────────
 
