@@ -1030,7 +1030,7 @@ body { font-family: var(--font); background: var(--surface); color: var(--slate)
 
     let score = null;
     if (window.AFL && typeof window.AFL.suitScore === 'function') {
-      score = window.AFL.suitScore(fund, client);
+      score = window.AFL.suitScore(fund, client, (window.AFL.peer || window.AFL.state && window.AFL.state.peer) || {});
     } else {
       // Standalone fallback scoring
       score = standaloneScore(fund, client);
