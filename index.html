@@ -957,7 +957,7 @@ function calcSuitabilityScore(fund) {
   const client = getClientForScoring();
   if (!client) return null;
   const r = window.AFL.suitScore(fund, client, STATE.peer);
-  return r ? r.score : null;
+  return r;
 }
 
 function suitLabel(score) {
