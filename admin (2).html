@@ -1,0 +1,1598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AFL Admin Panel</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0f1117;
+            color: #ccd6f6;
+            min-height: 100vh;
+        }
+
+        /* ── TOP NAV ─────────────────────────────── */
+        .admin-nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 28px;
+            background: #161927;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+        }
+        .admin-nav .brand {
+            color: #D4AF37;
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        .admin-nav .brand span {
+            color: #8892b0;
+            font-weight: 400;
+            font-size: 13px;
+            margin-left: 10px;
+        }
+        .admin-nav .user-info {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            color: #8892b0;
+            font-size: 13px;
+        }
+        .btn-logout {
+            padding: 6px 16px;
+            background: transparent;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            color: #D4AF37;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s;
+        }
+        .btn-logout:hover { background: rgba(212, 175, 55, 0.1); }
+
+        /* ── LAYOUT ──────────────────────────────── */
+        .admin-body {
+            display: flex;
+            min-height: calc(100vh - 52px);
+        }
+        .sidebar {
+            width: 220px;
+            background: #161927;
+            border-right: 1px solid rgba(136, 146, 176, 0.1);
+            padding: 20px 0;
+            flex-shrink: 0;
+        }
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 11px 24px;
+            color: #8892b0;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.15s;
+            border-left: 3px solid transparent;
+        }
+        .sidebar-item:hover {
+            background: rgba(212, 175, 55, 0.05);
+            color: #ccd6f6;
+        }
+        .sidebar-item.active {
+            color: #D4AF37;
+            background: rgba(212, 175, 55, 0.08);
+            border-left-color: #D4AF37;
+        }
+        .sidebar-item .badge {
+            background: #e74c3c;
+            color: #fff;
+            font-size: 10px;
+            padding: 2px 7px;
+            border-radius: 10px;
+            margin-left: auto;
+            font-weight: 600;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 28px 32px;
+            overflow-y: auto;
+        }
+
+        /* ── SECTION PANELS ──────────────────────── */
+        .section { display: none; }
+        .section.active { display: block; }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+        .section-header h2 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #e6f1ff;
+        }
+
+        /* ── STATS ROW ───────────────────────────── */
+        .stats-row {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 28px;
+        }
+        .stat-card {
+            flex: 1;
+            background: #161927;
+            border: 1px solid rgba(136, 146, 176, 0.1);
+            border-radius: 10px;
+            padding: 18px 22px;
+        }
+        .stat-card .stat-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #8892b0;
+            margin-bottom: 6px;
+        }
+        .stat-card .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #D4AF37;
+        }
+        .stat-card .stat-value.red { color: #e74c3c; }
+        .stat-card .stat-value.green { color: #2ecc71; }
+        .stat-card .stat-value.blue { color: #64ffda; }
+
+        /* ── TABLES ──────────────────────────────── */
+        .panel {
+            background: #161927;
+            border: 1px solid rgba(136, 146, 176, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 22px;
+            border-bottom: 1px solid rgba(136, 146, 176, 0.1);
+        }
+        .panel-header h3 {
+            font-size: 15px;
+            font-weight: 600;
+            color: #e6f1ff;
+        }
+        .panel-header .count {
+            background: rgba(212, 175, 55, 0.15);
+            color: #D4AF37;
+            font-size: 11px;
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-weight: 600;
+        }
+        .panel-header .count.pending {
+            background: rgba(231, 76, 60, 0.15);
+            color: #e74c3c;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            text-align: left;
+            padding: 10px 18px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #8892b0;
+            background: rgba(0,0,0,0.15);
+            font-weight: 500;
+        }
+        td {
+            padding: 12px 18px;
+            font-size: 13px;
+            border-top: 1px solid rgba(136, 146, 176, 0.06);
+            color: #ccd6f6;
+        }
+        tr:hover td { background: rgba(212, 175, 55, 0.03); }
+
+        .status-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .status-badge.pending { background: rgba(241, 196, 15, 0.15); color: #f1c40f; }
+        .status-badge.active { background: rgba(46, 204, 113, 0.15); color: #2ecc71; }
+        .status-badge.suspended { background: rgba(231, 76, 60, 0.15); color: #e74c3c; }
+        .status-badge.rejected { background: rgba(136, 146, 176, 0.15); color: #8892b0; }
+        .status-badge.open { background: rgba(46, 204, 113, 0.15); color: #2ecc71; }
+        .status-badge.closed { background: rgba(136, 146, 176, 0.15); color: #8892b0; }
+
+        /* ── BUTTONS ─────────────────────────────── */
+        .btn {
+            padding: 6px 14px;
+            border: none;
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .btn-approve { background: rgba(46, 204, 113, 0.15); color: #2ecc71; }
+        .btn-approve:hover { background: rgba(46, 204, 113, 0.25); }
+        .btn-reject { background: rgba(231, 76, 60, 0.15); color: #e74c3c; }
+        .btn-reject:hover { background: rgba(231, 76, 60, 0.25); }
+        .btn-edit { background: rgba(212, 175, 55, 0.15); color: #D4AF37; }
+        .btn-edit:hover { background: rgba(212, 175, 55, 0.25); }
+        .btn-delete { background: rgba(231, 76, 60, 0.1); color: #e74c3c; }
+        .btn-delete:hover { background: rgba(231, 76, 60, 0.2); }
+        .btn-primary {
+            background: linear-gradient(135deg, #D4AF37, #b8962e);
+            color: #1a1a2e;
+            padding: 10px 22px;
+            font-weight: 600;
+            font-size: 13px;
+            border-radius: 7px;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-primary:hover { background: linear-gradient(135deg, #e0be4a, #D4AF37); }
+
+        .action-btns { display: flex; gap: 6px; }
+
+        /* ── MODAL ───────────────────────────────── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.active { display: flex; }
+
+        .modal {
+            background: #1a1f35;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 32px;
+        }
+        .modal h3 {
+            color: #D4AF37;
+            font-size: 18px;
+            margin-bottom: 24px;
+        }
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 24px;
+            padding-top: 18px;
+            border-top: 1px solid rgba(136, 146, 176, 0.1);
+        }
+        .btn-cancel {
+            padding: 10px 22px;
+            background: transparent;
+            border: 1px solid rgba(136, 146, 176, 0.3);
+            color: #8892b0;
+            border-radius: 7px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        /* ── CUSTOM FIELDS ────────────────────────── */
+        .custom-field-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .custom-field-row input {
+            flex: 1;
+            padding: 9px 12px;
+            background: #0f1117;
+            border: 1px solid rgba(136, 146, 176, 0.2);
+            border-radius: 6px;
+            color: #ccd6f6;
+            font-size: 13px;
+        }
+        .custom-field-row input:focus { outline: none; border-color: #D4AF37; }
+        .custom-field-row select {
+            width: 100px;
+            padding: 9px 8px;
+            background: #0f1117;
+            border: 1px solid rgba(136, 146, 176, 0.2);
+            border-radius: 6px;
+            color: #ccd6f6;
+            font-size: 12px;
+        }
+        .custom-field-row .btn-remove-field {
+            background: rgba(231, 76, 60, 0.15);
+            color: #e74c3c;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 10px;
+            cursor: pointer;
+            font-size: 14px;
+            line-height: 1;
+        }
+        .custom-field-row .btn-remove-field:hover { background: rgba(231, 76, 60, 0.25); }
+        .no-custom-fields {
+            color: #4a5568;
+            font-size: 12px;
+            padding: 8px 0;
+        }
+
+        /* ── FORM FIELDS ─────────────────────────── */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        .form-grid .full-width { grid-column: 1 / -1; }
+
+        .form-group {
+            margin-bottom: 0;
+        }
+        .form-group label {
+            display: block;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #8892b0;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 9px 12px;
+            background: #0f1117;
+            border: 1px solid rgba(136, 146, 176, 0.2);
+            border-radius: 6px;
+            color: #ccd6f6;
+            font-size: 13px;
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #D4AF37;
+        }
+        .form-group textarea { resize: vertical; min-height: 60px; }
+
+        .form-section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #D4AF37;
+            margin: 20px 0 12px 0;
+            padding-bottom: 6px;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+            grid-column: 1 / -1;
+        }
+
+        /* ── SEARCH / FILTER BAR ─────────────────── */
+        .filter-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+        .filter-bar input {
+            flex: 1;
+            max-width: 320px;
+            padding: 9px 14px;
+            background: #161927;
+            border: 1px solid rgba(136, 146, 176, 0.2);
+            border-radius: 7px;
+            color: #ccd6f6;
+            font-size: 13px;
+        }
+        .filter-bar input:focus { outline: none; border-color: #D4AF37; }
+        .filter-bar select {
+            padding: 9px 12px;
+            background: #161927;
+            border: 1px solid rgba(136, 146, 176, 0.2);
+            border-radius: 7px;
+            color: #ccd6f6;
+            font-size: 13px;
+        }
+
+        /* ── EMPTY STATE ─────────────────────────── */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #4a5568;
+            font-size: 14px;
+        }
+
+        /* ── TOAST NOTIFICATION ──────────────────── */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 14px 22px;
+            background: #161927;
+            border: 1px solid rgba(46, 204, 113, 0.3);
+            border-radius: 8px;
+            color: #2ecc71;
+            font-size: 13px;
+            z-index: 2000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s;
+        }
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast.error { border-color: rgba(231, 76, 60, 0.3); color: #e74c3c; }
+
+        /* ── LOADING ─────────────────────────────── */
+        .loading-gate {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: #0f1117;
+            color: #8892b0;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main-content { padding: 16px; }
+            .form-grid { grid-template-columns: 1fr; }
+            .stats-row { flex-wrap: wrap; }
+        }
+    </style>
+</head>
+<body>
+    <div id="loadingGate" class="loading-gate">Loading admin panel...</div>
+
+    <div id="adminApp" style="display:none;">
+        <!-- TOP NAV -->
+        <nav class="admin-nav">
+            <div class="brand">ALTS FUND LINK <span>Admin Panel</span></div>
+            <div class="user-info">
+                <span id="adminEmail"></span>
+                <a href="index.html" class="btn-logout" style="text-decoration:none; margin-right:4px;">Go to Platform</a>
+                <button class="btn-logout" onclick="handleLogout()">Sign Out</button>
+            </div>
+        </nav>
+
+        <div class="admin-body">
+            <!-- SIDEBAR -->
+            <div class="sidebar">
+                <div class="sidebar-item active" data-section="dashboard" onclick="showSection('dashboard')">
+                    📊 Dashboard
+                </div>
+                <div class="sidebar-item" data-section="users" onclick="showSection('users')">
+                    👥 Users
+                    <span class="badge" id="pendingBadge" style="display:none;">0</span>
+                </div>
+                <div class="sidebar-item" data-section="offerings" onclick="showSection('offerings')">
+                    🏢 Offerings
+                </div>
+                <div class="sidebar-item" data-section="sponsors" onclick="showSection('sponsors')">
+                    🤝 Sponsors
+                </div>
+            </div>
+
+            <!-- MAIN CONTENT -->
+            <div class="main-content">
+
+                <!-- ══════════ DASHBOARD ══════════ -->
+                <div class="section active" id="section-dashboard">
+                    <div class="section-header">
+                        <h2>Dashboard</h2>
+                    </div>
+                    <div class="stats-row">
+                        <div class="stat-card">
+                            <div class="stat-label">Pending Approvals</div>
+                            <div class="stat-value red" id="statPending">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Active Users</div>
+                            <div class="stat-value green" id="statActive">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Open Offerings</div>
+                            <div class="stat-value" id="statOpen">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Total Sponsors</div>
+                            <div class="stat-value blue" id="statSponsors">0</div>
+                        </div>
+                    </div>
+
+                    <!-- Recent pending right on dashboard -->
+                    <div class="panel" id="dashPendingPanel" style="display:none;">
+                        <div class="panel-header">
+                            <h3>⏳ Pending Approvals</h3>
+                            <span class="count pending" id="dashPendingCount">0</span>
+                        </div>
+                        <table>
+                            <thead><tr><th>Name</th><th>Firm</th><th>Email</th><th>Registered</th><th>Actions</th></tr></thead>
+                            <tbody id="dashPendingBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- ══════════ USERS ══════════ -->
+                <div class="section" id="section-users">
+                    <div class="section-header">
+                        <h2>User Management</h2>
+                        <button class="btn-primary" onclick="openAddUserModal()">+ Add User</button>
+                    </div>
+
+                    <div class="filter-bar">
+                        <input type="text" id="userSearch" placeholder="Search by name, email, or firm..." oninput="renderUsers()">
+                        <select id="userFilter" onchange="renderUsers()">
+                            <option value="all">All Users</option>
+                            <option value="pending">Pending</option>
+                            <option value="active">Active</option>
+                            <option value="suspended">Suspended</option>
+                            <option value="rejected">Rejected</option>
+                        </select>
+                    </div>
+
+                    <!-- Pending -->
+                    <div class="panel" id="pendingPanel" style="display:none;">
+                        <div class="panel-header">
+                            <h3>⏳ Pending Approval</h3>
+                            <span class="count pending" id="pendingCount">0</span>
+                        </div>
+                        <table>
+                            <thead><tr><th>Name</th><th>Firm</th><th>BD / Entity</th><th>Email</th><th>Phone</th><th>Registered</th><th>Actions</th></tr></thead>
+                            <tbody id="pendingBody"></tbody>
+                        </table>
+                    </div>
+
+                    <!-- All Users -->
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h3>All Users</h3>
+                            <span class="count" id="allUsersCount">0</span>
+                        </div>
+                        <table>
+                            <thead><tr><th>Name</th><th>Firm</th><th>BD / Entity</th><th>Email</th><th>Role</th><th>Status</th><th>Last Login</th><th>Actions</th></tr></thead>
+                            <tbody id="allUsersBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- ══════════ OFFERINGS ══════════ -->
+                <div class="section" id="section-offerings">
+                    <div class="section-header">
+                        <h2>Offering Management</h2>
+                        <button class="btn-primary" onclick="openOfferingModal()">+ Add Offering</button>
+                    </div>
+
+                    <div class="filter-bar">
+                        <input type="text" id="offeringSearch" placeholder="Search offerings..." oninput="renderOfferings()">
+                        <select id="offeringStatusFilter" onchange="renderOfferings()">
+                            <option value="all">All Status</option>
+                            <option value="open">Open</option>
+                            <option value="closed">Closed</option>
+                        </select>
+                        <select id="offeringSponsorFilter" onchange="renderOfferings()">
+                            <option value="all">All Sponsors</option>
+                        </select>
+                    </div>
+
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h3>Offerings</h3>
+                            <span class="count" id="offeringsCount">0</span>
+                        </div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Offering</th>
+                                    <th>Sponsor</th>
+                                    <th>Asset Class</th>
+                                    <th>Y1 CoC</th>
+                                    <th>LTV</th>
+                                    <th>Minimum</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="offeringsBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- ══════════ SPONSORS ══════════ -->
+                <div class="section" id="section-sponsors">
+                    <div class="section-header">
+                        <h2>Sponsor Management</h2>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h3>Sponsors</h3>
+                            <span class="count" id="sponsorsCount">0</span>
+                        </div>
+                        <table>
+                            <thead><tr><th>Sponsor</th><th>AUM</th><th>Experience</th><th>Offerings</th><th>Exits</th><th>Avg IRR</th><th>Actions</th></tr></thead>
+                            <tbody id="sponsorsBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════ OFFERING EDIT MODAL ══════════ -->
+    <div class="modal-overlay" id="offeringModal">
+        <div class="modal">
+            <h3 id="offeringModalTitle">Add New Offering</h3>
+            <input type="hidden" id="editOfferingId">
+            <div class="form-grid">
+                <div class="form-section-title">Identity</div>
+                <div class="form-group">
+                    <label>Offering Name</label>
+                    <input type="text" id="f_offeringName">
+                </div>
+                <div class="form-group">
+                    <label>Sponsor</label>
+                    <select id="f_sponsor"><option value="">Select Sponsor</option></select>
+                </div>
+                <div class="form-group">
+                    <label>Asset Class</label>
+                    <input type="text" id="f_assetClass" placeholder="Multifamily, Industrial, Net Lease...">
+                </div>
+                <div class="form-group">
+                    <label>Sector</label>
+                    <input type="text" id="f_sector">
+                </div>
+                <div class="form-group">
+                    <label>Focus</label>
+                    <input type="text" id="f_focus" placeholder="Core, Core-Plus, Value-Add...">
+                </div>
+                <div class="form-group">
+                    <label>Structure</label>
+                    <input type="text" id="f_structure" placeholder="DST">
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select id="f_status">
+                        <option value="open">Open</option>
+                        <option value="closed">Closed</option>
+                        <option value="coming_soon">Coming Soon</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Tax Reporting</label>
+                    <input type="text" id="f_taxReporting" placeholder="K-1">
+                </div>
+
+                <div class="form-section-title">Raise</div>
+                <div class="form-group">
+                    <label>Filed Raise ($)</label>
+                    <input type="number" id="f_filedRaise">
+                </div>
+                <div class="form-group">
+                    <label>Current Raise ($)</label>
+                    <input type="number" id="f_currentRaise">
+                </div>
+                <div class="form-group">
+                    <label>Remaining Raise ($)</label>
+                    <input type="number" id="f_remainingRaise">
+                </div>
+                <div class="form-group">
+                    <label>Offering Open Date</label>
+                    <input type="text" id="f_openDate" placeholder="MM/DD/YYYY">
+                </div>
+
+                <div class="form-section-title">Terms</div>
+                <div class="form-group">
+                    <label>Year 1 Cash on Cash (%)</label>
+                    <input type="number" step="0.01" id="f_y1coc" placeholder="e.g. 4.30">
+                </div>
+                <div class="form-group">
+                    <label>Distribution Frequency</label>
+                    <input type="text" id="f_distFreq" placeholder="Monthly, Quarterly">
+                </div>
+                <div class="form-group">
+                    <label>Loan to Value (%)</label>
+                    <input type="number" step="0.01" id="f_ltv" placeholder="e.g. 49">
+                </div>
+                <div class="form-group">
+                    <label>Preferred Return (%)</label>
+                    <input type="number" step="0.01" id="f_preferred">
+                </div>
+                <div class="form-group">
+                    <label>Minimum Investment ($)</label>
+                    <input type="number" id="f_minimum">
+                </div>
+                <div class="form-group">
+                    <label>Hold Period</label>
+                    <input type="text" id="f_holdPeriod" placeholder="5-7 years">
+                </div>
+                <div class="form-group">
+                    <label>721 UpREIT</label>
+                    <select id="f_upreit">
+                        <option value="false">No</option>
+                        <option value="true">Yes</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Promote</label>
+                    <input type="text" id="f_promote">
+                </div>
+
+                <div class="form-section-title">Property</div>
+                <div class="form-group">
+                    <label># Assets</label>
+                    <input type="number" id="f_numAssets">
+                </div>
+                <div class="form-group">
+                    <label>Location(s)</label>
+                    <input type="text" id="f_locations" placeholder="Atlanta, GA (comma-separated)">
+                </div>
+                <div class="form-group">
+                    <label>Building Age (Avg)</label>
+                    <input type="number" id="f_buildingAge">
+                </div>
+                <div class="form-group">
+                    <label>% Leased</label>
+                    <input type="number" step="0.1" id="f_pctLeased" placeholder="e.g. 96">
+                </div>
+                <div class="form-group full-width">
+                    <label>Debt Terms</label>
+                    <input type="text" id="f_debtTerms" placeholder="10-year fixed, IO, 5.18%">
+                </div>
+                <div class="form-group full-width">
+                    <label>Lease Terms</label>
+                    <input type="text" id="f_leaseTerms">
+                </div>
+                <div class="form-group">
+                    <label>Rent Escalations</label>
+                    <input type="text" id="f_rentEscalations">
+                </div>
+                <div class="form-group">
+                    <label>Avg Lease Term Remaining</label>
+                    <input type="text" id="f_avgLeaseTerm">
+                </div>
+
+                <div class="form-section-title">Economics</div>
+                <div class="form-group">
+                    <label>Purchase Price ($)</label>
+                    <input type="number" id="f_purchasePrice">
+                </div>
+                <div class="form-group">
+                    <label>Appraised Valuation ($)</label>
+                    <input type="number" id="f_appraisedVal">
+                </div>
+                <div class="form-group">
+                    <label>Loaded Price ($)</label>
+                    <input type="number" id="f_loadedPrice">
+                </div>
+                <div class="form-group">
+                    <label>Acquisition Cap Rate (%)</label>
+                    <input type="number" step="0.01" id="f_capRate">
+                </div>
+                <div class="form-group">
+                    <label>Rep Comp (%)</label>
+                    <input type="number" step="0.01" id="f_repComp">
+                </div>
+                <div class="form-group">
+                    <label>Sales Load (%)</label>
+                    <input type="number" step="0.01" id="f_salesLoad">
+                </div>
+                <div class="form-group">
+                    <label>Reserve (%)</label>
+                    <input type="number" step="0.01" id="f_reserve">
+                </div>
+                <div class="form-group">
+                    <label>GP Commit ($)</label>
+                    <input type="number" id="f_gpCommit">
+                </div>
+
+                <div class="form-section-title">Projected Income (% per year)</div>
+                <div class="form-group"><label>Year 1</label><input type="number" step="0.01" id="f_iy1"></div>
+                <div class="form-group"><label>Year 2</label><input type="number" step="0.01" id="f_iy2"></div>
+                <div class="form-group"><label>Year 3</label><input type="number" step="0.01" id="f_iy3"></div>
+                <div class="form-group"><label>Year 4</label><input type="number" step="0.01" id="f_iy4"></div>
+                <div class="form-group"><label>Year 5</label><input type="number" step="0.01" id="f_iy5"></div>
+                <div class="form-group"><label>Year 6</label><input type="number" step="0.01" id="f_iy6"></div>
+                <div class="form-group"><label>Year 7</label><input type="number" step="0.01" id="f_iy7"></div>
+                <div class="form-group"><label>Year 8</label><input type="number" step="0.01" id="f_iy8"></div>
+                <div class="form-group"><label>Year 9</label><input type="number" step="0.01" id="f_iy9"></div>
+                <div class="form-group"><label>Year 10</label><input type="number" step="0.01" id="f_iy10"></div>
+
+                <div class="form-section-title">Document URLs</div>
+                <div class="form-group full-width"><label>Brochure URL</label><input type="url" id="f_brochure"></div>
+                <div class="form-group full-width"><label>PPM URL</label><input type="url" id="f_ppm"></div>
+                <div class="form-group full-width"><label>Track Record URL</label><input type="url" id="f_trackRecord"></div>
+                <div class="form-group full-width"><label>Video URL</label><input type="url" id="f_video"></div>
+                <div class="form-group full-width"><label>Sales Team Map URL</label><input type="url" id="f_salesMap"></div>
+                <div class="form-group full-width"><label>Sponsor News URL</label><input type="url" id="f_sponsorNews"></div>
+
+                <div class="form-section-title" style="display:flex; align-items:center; justify-content:space-between;">
+                    Custom Fields
+                    <button type="button" class="btn btn-edit" onclick="addCustomFieldRow()" style="font-size:12px;">+ Add Field</button>
+                </div>
+                <div class="full-width" id="customFieldsContainer">
+                    <!-- Dynamic rows go here -->
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeOfferingModal()">Cancel</button>
+                <button class="btn-primary" onclick="saveOffering()">Save Offering</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════ ADD USER MODAL ══════════ -->
+    <div class="modal-overlay" id="addUserModal">
+        <div class="modal" style="max-width:480px;">
+            <h3>Add New User</h3>
+            <p style="color:#8892b0; font-size:12px; margin:-16px 0 20px 0;">User will be created as active — no approval needed.</p>
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="au_name" placeholder="John Smith">
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="au_email" placeholder="john@bdwealth.com">
+            </div>
+            <div class="form-group">
+                <label>Temporary Password (min 6 characters)</label>
+                <input type="text" id="au_password" placeholder="temp123456">
+            </div>
+            <div class="form-group">
+                <label>Firm Name</label>
+                <input type="text" id="au_firm" placeholder="BD Wealth Group">
+            </div>
+            <div class="form-group">
+                <label>Broker Dealer / Entity Affiliation</label>
+                <input type="text" id="au_bdAffiliation" placeholder="LPL Financial, Cetera, etc.">
+            </div>
+            <div class="form-group">
+                <label>Phone</label>
+                <input type="tel" id="au_phone" placeholder="913-555-0123">
+            </div>
+            <div class="form-group">
+                <label>Role</label>
+                <select id="au_role">
+                    <option value="advisor">Advisor</option>
+                    <option value="admin">Admin</option>
+                </select>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeAddUserModal()">Cancel</button>
+                <button class="btn-primary" onclick="createUserDirect()">Create User</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast"></div>
+
+    <!-- ══════════ SCRIPTS ══════════ -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+        import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword, updateProfile } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+        import {
+            getFirestore, collection, doc, getDoc, getDocs, setDoc,
+            updateDoc, deleteDoc, query, where, orderBy, serverTimestamp
+        } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC8RQmPNlOlZpDhIKqHL5UkpBtTSMEGQs8",
+            authDomain: "alts-fund-link.firebaseapp.com",
+            projectId: "alts-fund-link",
+            storageBucket: "alts-fund-link.firebasestorage.app",
+            messagingSenderId: "1025925507856",
+            appId: "1:1025925507856:web:0f596a9c94704146379395"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Secondary app for creating users without logging admin out
+        const secondaryApp = initializeApp(firebaseConfig, 'secondary');
+        const secondaryAuth = getAuth(secondaryApp);
+
+        let allUsers = [];
+        let allOfferings = [];
+        let allSponsors = [];
+
+        // ── AUTH GATE ─────────────────────────────
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+            // Check admin role
+            const userDoc = await getDoc(doc(db, 'users', user.uid));
+            if (!userDoc.exists() || userDoc.data().role !== 'admin') {
+                document.getElementById('loadingGate').textContent = 'Access denied. Admin only.';
+                return;
+            }
+            document.getElementById('adminEmail').textContent = user.email;
+            document.getElementById('loadingGate').style.display = 'none';
+            document.getElementById('adminApp').style.display = 'block';
+            loadAllData();
+        });
+
+        window.handleLogout = async function() {
+            await signOut(auth);
+            window.location.href = 'login.html';
+        };
+
+        // ── LOAD DATA ─────────────────────────────
+        async function loadAllData() {
+            await Promise.all([loadUsers(), loadOfferings(), loadSponsors()]);
+            updateDashboard();
+        }
+
+        async function loadUsers() {
+            const snap = await getDocs(collection(db, 'users'));
+            allUsers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            renderUsers();
+        }
+
+        async function loadOfferings() {
+            const snap = await getDocs(collection(db, 'offerings'));
+            allOfferings = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            renderOfferings();
+            populateSponsorFilter();
+        }
+
+        async function loadSponsors() {
+            const snap = await getDocs(collection(db, 'sponsors'));
+            allSponsors = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            renderSponsors();
+        }
+
+        // ── DASHBOARD ─────────────────────────────
+        function updateDashboard() {
+            const pending = allUsers.filter(u => u.status === 'pending');
+            const active = allUsers.filter(u => u.status === 'active' || u.role === 'admin');
+            const open = allOfferings.filter(o => o.status === 'open');
+
+            document.getElementById('statPending').textContent = pending.length;
+            document.getElementById('statActive').textContent = active.length;
+            document.getElementById('statOpen').textContent = open.length;
+            document.getElementById('statSponsors').textContent = allSponsors.length;
+
+            // Pending badge
+            const badge = document.getElementById('pendingBadge');
+            if (pending.length > 0) {
+                badge.style.display = 'inline';
+                badge.textContent = pending.length;
+            } else {
+                badge.style.display = 'none';
+            }
+
+            // Dashboard pending panel
+            const dashPanel = document.getElementById('dashPendingPanel');
+            if (pending.length > 0) {
+                dashPanel.style.display = 'block';
+                document.getElementById('dashPendingCount').textContent = pending.length;
+                document.getElementById('dashPendingBody').innerHTML = pending.map(u => `
+                    <tr>
+                        <td>${esc(u.displayName || '—')}</td>
+                        <td>${esc(u.firmName || '—')}</td>
+                        <td>${esc(u.email)}</td>
+                        <td>${formatDate(u.meta?.createdAt)}</td>
+                        <td class="action-btns">
+                            <button class="btn btn-approve" onclick="approveUser('${u.id}')">Approve</button>
+                            <button class="btn btn-reject" onclick="rejectUser('${u.id}')">Reject</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } else {
+                dashPanel.style.display = 'none';
+            }
+        }
+
+        // ── USERS ─────────────────────────────────
+        window.renderUsers = function() {
+            const search = (document.getElementById('userSearch')?.value || '').toLowerCase();
+            const filter = document.getElementById('userFilter')?.value || 'all';
+
+            let filtered = allUsers;
+            if (search) {
+                filtered = filtered.filter(u =>
+                    (u.displayName || '').toLowerCase().includes(search) ||
+                    (u.email || '').toLowerCase().includes(search) ||
+                    (u.firmName || '').toLowerCase().includes(search) ||
+                    (u.bdAffiliation || '').toLowerCase().includes(search)
+                );
+            }
+            if (filter !== 'all') {
+                if (filter === 'active') {
+                    filtered = filtered.filter(u => u.status === 'active' || u.role === 'admin');
+                } else {
+                    filtered = filtered.filter(u => u.status === filter);
+                }
+            }
+
+            // Pending panel
+            const pending = allUsers.filter(u => u.status === 'pending');
+            const pendingPanel = document.getElementById('pendingPanel');
+            if (pending.length > 0 && (filter === 'all' || filter === 'pending')) {
+                pendingPanel.style.display = 'block';
+                document.getElementById('pendingCount').textContent = pending.length;
+                document.getElementById('pendingBody').innerHTML = pending.map(u => `
+                    <tr>
+                        <td>${esc(u.displayName || '—')}</td>
+                        <td>${esc(u.firmName || '—')}</td>
+                        <td>${esc(u.bdAffiliation || '—')}</td>
+                        <td>${esc(u.email)}</td>
+                        <td>${esc(u.phone || '—')}</td>
+                        <td>${formatDate(u.meta?.createdAt)}</td>
+                        <td class="action-btns">
+                            <button class="btn btn-approve" onclick="approveUser('${u.id}')">Approve</button>
+                            <button class="btn btn-reject" onclick="rejectUser('${u.id}')">Reject</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } else {
+                pendingPanel.style.display = 'none';
+            }
+
+            // All users table
+            document.getElementById('allUsersCount').textContent = filtered.length;
+            document.getElementById('allUsersBody').innerHTML = filtered.map(u => {
+                const status = u.role === 'admin' ? 'active' : (u.status || 'active');
+                return `
+                <tr>
+                    <td>${esc(u.displayName || '—')}</td>
+                    <td>${esc(u.firmName || '—')}</td>
+                    <td>${esc(u.bdAffiliation || '—')}</td>
+                    <td>${esc(u.email)}</td>
+                    <td>${esc(u.role || 'advisor')}</td>
+                    <td><span class="status-badge ${status}">${status}</span></td>
+                    <td>${formatDate(u.meta?.lastLogin)}</td>
+                    <td class="action-btns">
+                        ${u.role !== 'admin' && status === 'active' ? `<button class="btn btn-reject" onclick="suspendUser('${u.id}')">Suspend</button>` : ''}
+                        ${status === 'suspended' ? `<button class="btn btn-approve" onclick="approveUser('${u.id}')">Reactivate</button>` : ''}
+                    </td>
+                </tr>`;
+            }).join('');
+        };
+
+        window.approveUser = async function(uid) {
+            await updateDoc(doc(db, 'users', uid), { status: 'active' });
+            const user = allUsers.find(u => u.id === uid);
+            showToast(`${user?.displayName || 'User'} approved!`);
+            await loadUsers();
+            updateDashboard();
+            // TODO: Send approval email via EmailJS
+        };
+
+        window.rejectUser = async function(uid) {
+            if (!confirm('Reject this registration?')) return;
+            await updateDoc(doc(db, 'users', uid), { status: 'rejected' });
+            showToast('Registration rejected.');
+            await loadUsers();
+            updateDashboard();
+        };
+
+        window.suspendUser = async function(uid) {
+            if (!confirm('Suspend this user?')) return;
+            await updateDoc(doc(db, 'users', uid), { status: 'suspended' });
+            showToast('User suspended.');
+            await loadUsers();
+            updateDashboard();
+        };
+
+        // ── ADD USER (ADMIN DIRECT) ─────────────
+        window.openAddUserModal = function() {
+            document.getElementById('au_name').value = '';
+            document.getElementById('au_email').value = '';
+            document.getElementById('au_password').value = '';
+            document.getElementById('au_firm').value = '';
+            document.getElementById('au_bdAffiliation').value = '';
+            document.getElementById('au_phone').value = '';
+            document.getElementById('au_role').value = 'advisor';
+            document.getElementById('addUserModal').classList.add('active');
+        };
+
+        window.closeAddUserModal = function() {
+            document.getElementById('addUserModal').classList.remove('active');
+        };
+
+        window.createUserDirect = async function() {
+            const name = document.getElementById('au_name').value.trim();
+            const email = document.getElementById('au_email').value.trim();
+            const password = document.getElementById('au_password').value;
+            const firm = document.getElementById('au_firm').value.trim();
+            const bdAffiliation = document.getElementById('au_bdAffiliation').value.trim();
+            const phone = document.getElementById('au_phone').value.trim();
+            const role = document.getElementById('au_role').value;
+
+            if (!name || !email || !password) {
+                showToast('Name, email, and password are required.', true);
+                return;
+            }
+            if (password.length < 6) {
+                showToast('Password must be at least 6 characters.', true);
+                return;
+            }
+
+            try {
+                // Create user via secondary auth (doesn't log admin out)
+                const { signOut: signOutSecondary } = await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js');
+                const result = await createUserWithEmailAndPassword(secondaryAuth, email, password);
+                await updateProfile(result.user, { displayName: name });
+
+                // Create Firestore user doc — status: active (no approval needed)
+                await setDoc(doc(db, 'users', result.user.uid), {
+                    role: role,
+                    status: 'active',
+                    email: email,
+                    displayName: name,
+                    firmName: firm,
+                    bdAffiliation: bdAffiliation,
+                    phone: phone,
+                    firmLogo: '',
+                    licenseNumber: '',
+                    preferences: {
+                        defaultView: 'advisor',
+                        assetClassPreferences: [],
+                        structurePreferences: []
+                    },
+                    subscription: {
+                        plan: 'trial',
+                        startDate: serverTimestamp(),
+                        expiresAt: null
+                    },
+                    meta: {
+                        createdAt: serverTimestamp(),
+                        createdBy: 'admin',
+                        lastLogin: null,
+                        loginCount: 0
+                    }
+                });
+
+                // Sign out the secondary auth (cleanup)
+                await signOutSecondary(secondaryAuth);
+
+                showToast(`${name} created and activated!`);
+                closeAddUserModal();
+                await loadUsers();
+                updateDashboard();
+            } catch (error) {
+                let msg = error.message;
+                if (error.code === 'auth/email-already-in-use') msg = 'An account with this email already exists.';
+                showToast('Error: ' + msg, true);
+            }
+        };
+
+        // ── OFFERINGS ─────────────────────────────
+        window.renderOfferings = function() {
+            const search = (document.getElementById('offeringSearch')?.value || '').toLowerCase();
+            const statusFilter = document.getElementById('offeringStatusFilter')?.value || 'all';
+            const sponsorFilter = document.getElementById('offeringSponsorFilter')?.value || 'all';
+
+            let filtered = allOfferings;
+            if (search) {
+                filtered = filtered.filter(o =>
+                    (o.identity?.offeringName || '').toLowerCase().includes(search) ||
+                    (o.sponsor?.name || '').toLowerCase().includes(search)
+                );
+            }
+            if (statusFilter !== 'all') {
+                filtered = filtered.filter(o => o.status === statusFilter);
+            }
+            if (sponsorFilter !== 'all') {
+                filtered = filtered.filter(o => o.sponsor?.name === sponsorFilter);
+            }
+
+            document.getElementById('offeringsCount').textContent = filtered.length;
+            document.getElementById('offeringsBody').innerHTML = filtered.map(o => `
+                <tr>
+                    <td><strong>${esc(o.identity?.offeringName || '—')}</strong></td>
+                    <td>${esc(o.sponsor?.name || '—')}</td>
+                    <td>${esc(o.identity?.assetClass || '—')}</td>
+                    <td>${fmtPct(o.terms?.year1CashOnCash)}</td>
+                    <td>${fmtPct(o.terms?.loanToValue)}</td>
+                    <td>${fmtCurrency(o.terms?.minimumDST)}</td>
+                    <td><span class="status-badge ${o.status || 'open'}">${o.status || 'open'}</span></td>
+                    <td class="action-btns">
+                        <button class="btn btn-edit" onclick="editOffering('${o.id}')">Edit</button>
+                        <button class="btn btn-${o.status === 'open' ? 'reject' : 'approve'}"
+                            onclick="toggleOfferingStatus('${o.id}')">${o.status === 'open' ? 'Close' : 'Open'}</button>
+                    </td>
+                </tr>
+            `).join('');
+        };
+
+        function populateSponsorFilter() {
+            const sponsors = [...new Set(allOfferings.map(o => o.sponsor?.name).filter(Boolean))].sort();
+            const sel = document.getElementById('offeringSponsorFilter');
+            sel.innerHTML = '<option value="all">All Sponsors</option>' +
+                sponsors.map(s => `<option value="${esc(s)}">${esc(s)}</option>`).join('');
+
+            // Also populate modal sponsor dropdown
+            const fSponsor = document.getElementById('f_sponsor');
+            fSponsor.innerHTML = '<option value="">Select Sponsor</option>' +
+                sponsors.map(s => `<option value="${esc(s)}">${esc(s)}</option>`).join('');
+        }
+
+        window.toggleOfferingStatus = async function(id) {
+            const o = allOfferings.find(x => x.id === id);
+            const newStatus = o.status === 'open' ? 'closed' : 'open';
+            await updateDoc(doc(db, 'offerings', id), { status: newStatus, lastUpdated: serverTimestamp() });
+            showToast(`Offering ${newStatus === 'open' ? 'opened' : 'closed'}.`);
+            await loadOfferings();
+            updateDashboard();
+        };
+
+        // ── OFFERING MODAL ────────────────────────
+        window.openOfferingModal = function(id = null) {
+            const modal = document.getElementById('offeringModal');
+            document.getElementById('offeringModalTitle').textContent = id ? 'Edit Offering' : 'Add New Offering';
+            document.getElementById('editOfferingId').value = id || '';
+
+            if (id) {
+                const o = allOfferings.find(x => x.id === id);
+                if (!o) return;
+                document.getElementById('f_offeringName').value = o.identity?.offeringName || '';
+                document.getElementById('f_sponsor').value = o.sponsor?.name || '';
+                document.getElementById('f_assetClass').value = o.identity?.assetClass || '';
+                document.getElementById('f_sector').value = o.identity?.sector || '';
+                document.getElementById('f_focus').value = o.identity?.focus || '';
+                document.getElementById('f_structure').value = o.identity?.offeringStructure || '';
+                document.getElementById('f_status').value = o.status || 'open';
+                document.getElementById('f_taxReporting').value = o.identity?.taxReporting || '';
+                document.getElementById('f_filedRaise').value = o.raise?.filedRaise || '';
+                document.getElementById('f_currentRaise').value = o.raise?.currentRaise || '';
+                document.getElementById('f_remainingRaise').value = o.raise?.remainingRaise || '';
+                document.getElementById('f_openDate').value = o.raise?.offeringOpen || '';
+                document.getElementById('f_y1coc').value = pctToDisplay(o.terms?.year1CashOnCash);
+                document.getElementById('f_distFreq').value = o.terms?.distributionFrequency || '';
+                document.getElementById('f_ltv').value = pctToDisplay(o.terms?.loanToValue);
+                document.getElementById('f_preferred').value = pctToDisplay(o.terms?.preferred);
+                document.getElementById('f_minimum').value = o.terms?.minimumDST || '';
+                document.getElementById('f_holdPeriod').value = o.terms?.holdPeriod || '';
+                document.getElementById('f_upreit').value = o.terms?.upreit721 ? 'true' : 'false';
+                document.getElementById('f_promote').value = o.terms?.promote || '';
+                document.getElementById('f_numAssets').value = o.property?.numAssets || '';
+                document.getElementById('f_locations').value = (o.property?.locations || []).join(', ');
+                document.getElementById('f_buildingAge').value = o.property?.buildingAge || '';
+                document.getElementById('f_pctLeased').value = pctToDisplay(o.property?.pctLeased);
+                document.getElementById('f_debtTerms').value = o.property?.debtTerms || '';
+                document.getElementById('f_leaseTerms').value = o.property?.leaseTerms || '';
+                document.getElementById('f_rentEscalations').value = o.property?.rentEscalations || '';
+                document.getElementById('f_avgLeaseTerm').value = o.property?.avgLeaseTermRemaining || '';
+                document.getElementById('f_purchasePrice').value = o.economics?.purchasePrice || '';
+                document.getElementById('f_appraisedVal').value = o.economics?.appraisedValuation || '';
+                document.getElementById('f_loadedPrice').value = o.economics?.loadedPrice || '';
+                document.getElementById('f_capRate').value = pctToDisplay(o.economics?.acquisitionCapRate);
+                document.getElementById('f_repComp').value = pctToDisplay(o.economics?.repComp);
+                document.getElementById('f_salesLoad').value = pctToDisplay(o.economics?.salesLoad);
+                document.getElementById('f_reserve').value = pctToDisplay(o.economics?.reserve);
+                document.getElementById('f_gpCommit').value = o.economics?.gpCommit || '';
+                for (let i = 1; i <= 10; i++) {
+                    document.getElementById(`f_iy${i}`).value = pctToDisplay(o.projectedIncome?.[`year${i}`]);
+                }
+                document.getElementById('f_brochure').value = o.documents?.brochureUrl || '';
+                document.getElementById('f_ppm').value = o.documents?.ppmUrl || '';
+                document.getElementById('f_trackRecord').value = o.documents?.trackRecordUrl || '';
+                document.getElementById('f_video').value = o.documents?.videoUrl || '';
+                document.getElementById('f_salesMap').value = o.documents?.salesTeamMapUrl || '';
+                document.getElementById('f_sponsorNews').value = o.documents?.sponsorNewsUrl || '';
+
+                // Load custom fields
+                loadCustomFields(o.customFields || {});
+            } else {
+                // Clear form
+                modal.querySelectorAll('input, select, textarea').forEach(el => {
+                    if (el.type === 'hidden') return;
+                    if (el.tagName === 'SELECT') el.selectedIndex = 0;
+                    else el.value = '';
+                });
+                // Clear custom fields
+                loadCustomFields({});
+            }
+            modal.classList.add('active');
+        };
+
+        window.editOffering = function(id) { openOfferingModal(id); };
+
+        window.closeOfferingModal = function() {
+            document.getElementById('offeringModal').classList.remove('active');
+        };
+
+        window.saveOffering = async function() {
+            const id = document.getElementById('editOfferingId').value;
+            const name = document.getElementById('f_offeringName').value.trim();
+            if (!name) { alert('Offering name is required.'); return; }
+
+            const docId = id || name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+
+            const sponsorName = document.getElementById('f_sponsor').value;
+            const existingSponsor = allSponsors.find(s => s.name === sponsorName);
+
+            const data = {
+                status: document.getElementById('f_status').value,
+                lastUpdated: serverTimestamp(),
+                updatedBy: 'admin',
+
+                sponsor: {
+                    name: sponsorName,
+                    aum: existingSponsor?.aum || '',
+                    experience: existingSponsor?.experience || '',
+                    numOfferings: existingSponsor?.numOfferings || 0,
+                    fullCycleExits: existingSponsor?.fullCycleExits || 0,
+                    avgIRR: existingSponsor?.avgIRR || '',
+                    bestIRR: existingSponsor?.bestIRR || '',
+                    worstIRR: existingSponsor?.worstIRR || '',
+                },
+
+                identity: {
+                    offeringName: name,
+                    assetClass: document.getElementById('f_assetClass').value,
+                    sector: document.getElementById('f_sector').value,
+                    focus: document.getElementById('f_focus').value,
+                    offeringStructure: document.getElementById('f_structure').value,
+                    exemption: '',
+                    taxReporting: document.getElementById('f_taxReporting').value,
+                },
+
+                raise: {
+                    filedRaise: parseFloat(document.getElementById('f_filedRaise').value) || 0,
+                    currentRaise: parseFloat(document.getElementById('f_currentRaise').value) || 0,
+                    remainingRaise: parseFloat(document.getElementById('f_remainingRaise').value) || 0,
+                    offeringOpen: document.getElementById('f_openDate').value || null,
+                    offeringClose: null,
+                },
+
+                terms: {
+                    year1CashOnCash: displayToPct(document.getElementById('f_y1coc').value),
+                    distributionFrequency: document.getElementById('f_distFreq').value,
+                    loanToValue: displayToPct(document.getElementById('f_ltv').value),
+                    preferred: displayToPct(document.getElementById('f_preferred').value),
+                    promote: document.getElementById('f_promote').value,
+                    upreit721: document.getElementById('f_upreit').value === 'true',
+                    holdPeriod: document.getElementById('f_holdPeriod').value,
+                    minimumDST: parseFloat(document.getElementById('f_minimum').value) || 0,
+                },
+
+                property: {
+                    numAssets: parseInt(document.getElementById('f_numAssets').value) || 0,
+                    locations: document.getElementById('f_locations').value.split(',').map(s => s.trim()).filter(Boolean),
+                    buildingAge: parseFloat(document.getElementById('f_buildingAge').value) || 0,
+                    pctLeased: displayToPct(document.getElementById('f_pctLeased').value),
+                    debtTerms: document.getElementById('f_debtTerms').value,
+                    leaseTerms: document.getElementById('f_leaseTerms').value,
+                    rentEscalations: document.getElementById('f_rentEscalations').value,
+                    avgLeaseTermRemaining: document.getElementById('f_avgLeaseTerm').value,
+                },
+
+                economics: {
+                    purchasePrice: parseFloat(document.getElementById('f_purchasePrice').value) || 0,
+                    appraisedValuation: parseFloat(document.getElementById('f_appraisedVal').value) || 0,
+                    loadedPrice: parseFloat(document.getElementById('f_loadedPrice').value) || 0,
+                    acquisitionCapRate: displayToPct(document.getElementById('f_capRate').value),
+                    repComp: displayToPct(document.getElementById('f_repComp').value),
+                    salesLoad: displayToPct(document.getElementById('f_salesLoad').value),
+                    reserve: displayToPct(document.getElementById('f_reserve').value),
+                    gpCommit: parseFloat(document.getElementById('f_gpCommit').value) || 0,
+                },
+
+                projectedIncome: {
+                    year1: displayToPct(document.getElementById('f_iy1').value),
+                    year2: displayToPct(document.getElementById('f_iy2').value),
+                    year3: displayToPct(document.getElementById('f_iy3').value),
+                    year4: displayToPct(document.getElementById('f_iy4').value),
+                    year5: displayToPct(document.getElementById('f_iy5').value),
+                    year6: displayToPct(document.getElementById('f_iy6').value),
+                    year7: displayToPct(document.getElementById('f_iy7').value),
+                    year8: displayToPct(document.getElementById('f_iy8').value),
+                    year9: displayToPct(document.getElementById('f_iy9').value),
+                    year10: displayToPct(document.getElementById('f_iy10').value),
+                },
+
+                documents: {
+                    brochureUrl: document.getElementById('f_brochure').value,
+                    ppmUrl: document.getElementById('f_ppm').value,
+                    trackRecordUrl: document.getElementById('f_trackRecord').value,
+                    videoUrl: document.getElementById('f_video').value,
+                    salesTeamMapUrl: document.getElementById('f_salesMap').value,
+                    sponsorNewsUrl: document.getElementById('f_sponsorNews').value,
+                },
+
+                meta: {
+                    createdAt: id ? undefined : serverTimestamp(),
+                    createdBy: 'admin',
+                    sponsorId: null
+                },
+
+                customFields: collectCustomFields()
+            };
+
+            // Remove undefined fields
+            if (id) delete data.meta.createdAt;
+
+            try {
+                await setDoc(doc(db, 'offerings', docId), data, { merge: true });
+                showToast(id ? 'Offering updated!' : 'Offering created!');
+                closeOfferingModal();
+                await loadOfferings();
+                updateDashboard();
+            } catch (err) {
+                showToast('Error: ' + err.message, true);
+            }
+        };
+
+        // ── SPONSORS ──────────────────────────────
+        window.renderSponsors = function() {
+            document.getElementById('sponsorsCount').textContent = allSponsors.length;
+            document.getElementById('sponsorsBody').innerHTML = allSponsors.map(s => `
+                <tr>
+                    <td><strong>${esc(s.name || '—')}</strong></td>
+                    <td>${esc(s.aum || '—')}</td>
+                    <td>${esc(s.experience || '—')}</td>
+                    <td>${s.numOfferings || 0}</td>
+                    <td>${s.fullCycleExits || 0}</td>
+                    <td>${esc(s.avgIRR || '—')}</td>
+                    <td><button class="btn btn-edit" onclick="editSponsor('${s.id}')">Edit</button></td>
+                </tr>
+            `).join('');
+        };
+
+        window.editSponsor = function(id) {
+            // TODO: Build sponsor edit modal (similar pattern to offering modal)
+            showToast('Sponsor edit coming soon — edit in Firebase Console for now.');
+        };
+
+        // ── NAVIGATION ────────────────────────────
+        window.showSection = function(name) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.sidebar-item').forEach(s => s.classList.remove('active'));
+            document.getElementById('section-' + name)?.classList.add('active');
+            document.querySelector(`.sidebar-item[data-section="${name}"]`)?.classList.add('active');
+        };
+
+        // ── HELPERS ───────────────────────────────
+        function esc(str) {
+            const d = document.createElement('div');
+            d.textContent = str || '';
+            return d.innerHTML;
+        }
+
+        function formatDate(ts) {
+            if (!ts) return '—';
+            const d = ts.toDate ? ts.toDate() : new Date(ts);
+            return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+
+        function fmtPct(val) {
+            if (!val && val !== 0) return '—';
+            return (val < 1 ? val * 100 : val).toFixed(2) + '%';
+        }
+
+        function fmtCurrency(val) {
+            if (!val) return '—';
+            return '$' + Number(val).toLocaleString();
+        }
+
+        function pctToDisplay(val) {
+            if (!val && val !== 0) return '';
+            return (val < 1 ? val * 100 : val).toFixed(2);
+        }
+
+        function displayToPct(val) {
+            const n = parseFloat(val);
+            if (isNaN(n)) return 0;
+            return n > 1 ? n / 100 : n;
+        }
+
+        // ── CUSTOM FIELDS ──────────────────────────
+        let customFieldCounter = 0;
+
+        window.addCustomFieldRow = function(key = '', value = '', type = 'text') {
+            customFieldCounter++;
+            const container = document.getElementById('customFieldsContainer');
+            const row = document.createElement('div');
+            row.className = 'custom-field-row';
+            row.id = `cf-row-${customFieldCounter}`;
+            row.innerHTML = `
+                <input type="text" placeholder="Field name (e.g. DSCR)" value="${esc(key)}" class="cf-key" style="flex:0.8;">
+                <select class="cf-type" onchange="updateCfInput(${customFieldCounter}, this.value)">
+                    <option value="text" ${type === 'text' ? 'selected' : ''}>Text</option>
+                    <option value="number" ${type === 'number' ? 'selected' : ''}>Number</option>
+                    <option value="percent" ${type === 'percent' ? 'selected' : ''}>Percent</option>
+                    <option value="currency" ${type === 'currency' ? 'selected' : ''}>Currency</option>
+                    <option value="boolean" ${type === 'boolean' ? 'selected' : ''}>Yes/No</option>
+                </select>
+                <input type="text" placeholder="Value" value="${esc(String(value))}" class="cf-value">
+                <button type="button" class="btn-remove-field" onclick="document.getElementById('cf-row-${customFieldCounter}').remove()">✕</button>
+            `;
+            container.appendChild(row);
+        };
+
+        window.updateCfInput = function(id, type) {
+            const row = document.getElementById(`cf-row-${id}`);
+            const input = row.querySelector('.cf-value');
+            if (type === 'boolean') {
+                const currentVal = input.value.toLowerCase();
+                const sel = document.createElement('select');
+                sel.className = 'cf-value';
+                sel.innerHTML = `<option value="true" ${currentVal === 'true' ? 'selected' : ''}>Yes</option><option value="false" ${currentVal !== 'true' ? 'selected' : ''}>No</option>`;
+                input.replaceWith(sel);
+            } else {
+                if (input.tagName === 'SELECT') {
+                    const val = input.value;
+                    const inp = document.createElement('input');
+                    inp.type = 'text';
+                    inp.className = 'cf-value';
+                    inp.placeholder = 'Value';
+                    inp.value = val;
+                    input.replaceWith(inp);
+                }
+            }
+        };
+
+        function loadCustomFields(fields) {
+            const container = document.getElementById('customFieldsContainer');
+            container.innerHTML = '';
+            customFieldCounter = 0;
+
+            const keys = Object.keys(fields || {});
+            if (keys.length === 0) {
+                container.innerHTML = '<div class="no-custom-fields">No custom fields. Click "+ Add Field" to create one.</div>';
+                return;
+            }
+            keys.forEach(key => {
+                const entry = fields[key];
+                const type = entry?.type || 'text';
+                const value = entry?.value != null ? entry.value : '';
+                addCustomFieldRow(key, value, type);
+            });
+        }
+
+        function collectCustomFields() {
+            const rows = document.querySelectorAll('.custom-field-row');
+            const fields = {};
+            rows.forEach(row => {
+                const key = row.querySelector('.cf-key')?.value?.trim();
+                const type = row.querySelector('.cf-type')?.value || 'text';
+                let value = row.querySelector('.cf-value')?.value?.trim() || '';
+
+                if (!key) return;
+
+                // Convert value based on type
+                if (type === 'number') value = parseFloat(value) || 0;
+                else if (type === 'percent') value = parseFloat(value) || 0;
+                else if (type === 'currency') value = parseFloat(String(value).replace(/[$,]/g, '')) || 0;
+                else if (type === 'boolean') value = value === 'true';
+
+                fields[key] = { type, value };
+            });
+            return fields;
+        }
+
+        function showToast(msg, isError = false) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = 'toast show' + (isError ? ' error' : '');
+            setTimeout(() => t.className = 'toast', 3000);
+        }
+    </script>
+</body>
+</html>
