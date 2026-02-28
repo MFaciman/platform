@@ -1,0 +1,941 @@
+<!--
+  AFL Testing Module — Production Shell Module
+  File: testing.html
+  Loaded by: index.html shell via loadModule('testing')
+  Data: Receives funds from shell — no Google Sheets fetch here.
+  Field names: Match shell's fund objects (y1CoC, minimum, equityOffered, etc.)
+-->
+<style>
+/* ═══════════════════════════════════════════
+   TESTING MODULE STYLES
+   (Only styles unique to this module — shell
+    provides base design tokens & layout)
+═══════════════════════════════════════════ */
+
+/* ═══ TAKE TEST BUTTON (on browse cards & detail view) ═══ */
+.btn-take-test {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 10px; border-radius: var(--radius, 8px);
+  font-family: var(--font, 'DM Sans', sans-serif); font-size: 11px; font-weight: 700;
+  cursor: pointer; border: 1px solid var(--blue, #1D4ED8);
+  background: var(--blue-lt, #EFF6FF); color: var(--blue, #1D4ED8);
+  transition: all 0.18s ease;
+  text-transform: uppercase; letter-spacing: 0.3px;
+}
+.btn-take-test:hover { background: var(--blue, #1D4ED8); color: #fff; transform: translateY(-1px); }
+.btn-take-test.certified { background: var(--green-lt, #E8F7EF); color: var(--green, #1A7A4A); border-color: var(--green, #1A7A4A); }
+.btn-take-test.certified:hover { background: var(--green, #1A7A4A); color: #fff; }
+.btn-take-test.failed { background: var(--red-lt, #FEE2E2); color: var(--red, #991B1B); border-color: var(--red, #991B1B); }
+.btn-take-test.failed:hover { background: var(--red, #991B1B); color: #fff; }
+
+/* ═══ HERO TEST BUTTON (offering detail) ═══ */
+.btn-test-hero {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 20px; border-radius: var(--radius, 8px);
+  font-family: var(--font, 'DM Sans', sans-serif); font-size: 13px; font-weight: 700;
+  cursor: pointer; border: 2px solid var(--blue, #1D4ED8);
+  background: var(--blue-lt, #EFF6FF); color: var(--blue, #1D4ED8);
+  transition: all 0.18s ease;
+}
+.btn-test-hero:hover { background: var(--blue, #1D4ED8); color: #fff; transform: translateY(-2px); box-shadow: var(--shadow, 0 4px 12px rgba(11,31,59,0.1)); }
+
+/* ═══ PROGRESS BAR ═══ */
+.test-header-bar {
+  background: var(--white, #fff); border: 1px solid var(--mist, #C8D8E8);
+  border-radius: var(--radius-lg, 14px); padding: 18px 24px; margin-bottom: 16px;
+  display: flex; align-items: center; justify-content: space-between;
+  box-shadow: var(--shadow-sm, 0 1px 3px rgba(11,31,59,0.08));
+}
+.test-progress-bar { width: 180px; height: 5px; background: var(--surface2, #EEF3FA); border-radius: 3px; overflow: hidden; }
+.test-progress-fill { height: 100%; background: linear-gradient(90deg, var(--blue, #1D4ED8), #7C3AED); border-radius: 3px; transition: width 0.4s ease; }
+.progress-text { font-size: 12px; font-weight: 600; color: var(--fog, #8FA3BA); font-family: var(--mono, 'DM Mono', monospace); }
+
+/* ═══ QUESTION CARD ═══ */
+.question-card {
+  background: var(--white, #fff); border: 1.5px solid var(--mist, #C8D8E8);
+  border-radius: var(--radius-lg, 14px); padding: 22px; margin-bottom: 12px;
+  transition: all 0.18s ease; box-shadow: var(--shadow-sm, 0 1px 3px rgba(11,31,59,0.08));
+}
+.question-card.answered { border-color: var(--blue, #1D4ED8); }
+.question-number { font-size: 10px; font-weight: 700; color: var(--blue, #1D4ED8); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; }
+.question-category-tag { display: inline-block; padding: 1px 7px; background: #EDE9FE; color: #7C3AED; border-radius: 3px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; margin-left: 8px; }
+.question-type-tag { display: inline-block; padding: 1px 5px; border-radius: 3px; font-size: 9px; font-weight: 700; letter-spacing: 0.3px; margin-left: 6px; }
+.tag-mc { background: var(--blue-lt, #EFF6FF); color: var(--blue, #1D4ED8); }
+.tag-tf { background: var(--amber-lt, #FEF3C7); color: var(--amber, #B45309); }
+.question-text { font-size: 14px; font-weight: 500; line-height: 1.5; margin-bottom: 14px; color: var(--navy, #0B1F3B); }
+
+/* ═══ ANSWER OPTIONS ═══ */
+.answer-options { display: flex; flex-direction: column; gap: 6px; }
+.answer-option {
+  display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+  background: var(--surface, #F4F7FB); border: 1.5px solid var(--mist, #C8D8E8);
+  border-radius: var(--radius, 8px); cursor: pointer; transition: all 0.18s ease;
+  font-size: 13px; color: var(--navy, #0B1F3B);
+}
+.answer-option:hover { border-color: var(--blue, #1D4ED8); background: var(--blue-lt, #EFF6FF); }
+.answer-option.selected { border-color: var(--blue, #1D4ED8); background: var(--blue-lt, #EFF6FF); box-shadow: 0 0 0 1px var(--blue, #1D4ED8); }
+.radio-dot { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--mist, #C8D8E8); flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.18s ease; }
+.answer-option.selected .radio-dot { border-color: var(--blue, #1D4ED8); background: var(--blue, #1D4ED8); }
+.answer-option.selected .radio-dot::after { content: ''; width: 5px; height: 5px; border-radius: 50%; background: #fff; }
+.answer-option.correct-answer { border-color: var(--green, #1A7A4A) !important; background: var(--green-lt, #E8F7EF) !important; }
+.answer-option.wrong-answer { border-color: var(--red, #991B1B) !important; background: var(--red-lt, #FEE2E2) !important; }
+
+/* ═══ RESULTS ═══ */
+.results-hero { text-align: center; padding: 40px 24px; background: var(--white, #fff); border: 1px solid var(--mist, #C8D8E8); border-radius: var(--radius-lg, 14px); margin-bottom: 20px; box-shadow: var(--shadow-sm); }
+.score-ring { width: 140px; height: 140px; border-radius: 50%; margin: 0 auto 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
+.score-ring::before { content: ''; position: absolute; inset: 0; border-radius: 50%; padding: 3px; background: conic-gradient(var(--score-color, #1D4ED8) calc(var(--score-pct, 0) * 3.6deg), var(--mist, #C8D8E8) 0); -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; mask-composite: exclude; }
+.score-number { font-size: 36px; font-weight: 700; font-family: var(--mono, 'DM Mono', monospace); line-height: 1; }
+.score-pct { font-size: 11px; color: var(--fog, #8FA3BA); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 3px; }
+.result-pass { color: var(--green, #1A7A4A); font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+.result-fail { color: var(--red, #991B1B); font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+.result-summary { font-size: 13px; color: var(--slate, #3A5270); max-width: 450px; margin: 0 auto; }
+
+.stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
+.stat-box { background: var(--white, #fff); border: 1px solid var(--mist, #C8D8E8); border-radius: var(--radius, 8px); padding: 16px; text-align: center; box-shadow: var(--shadow-sm); }
+.stat-num { font-size: 22px; font-weight: 700; font-family: var(--mono, 'DM Mono', monospace); }
+.stat-lbl { font-size: 10px; color: var(--fog, #8FA3BA); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+
+/* ═══ ADMIN ═══ */
+.tm-admin-table { width: 100%; border-collapse: collapse; }
+.tm-admin-table th { text-align: left; padding: 8px 12px; font-size: 10px; font-weight: 700; color: var(--fog, #8FA3BA); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--mist, #C8D8E8); }
+.tm-admin-table td { padding: 10px 12px; font-size: 13px; border-bottom: 1px solid var(--surface2, #EEF3FA); vertical-align: middle; }
+.tm-admin-table tr:hover td { background: var(--surface, #F4F7FB); }
+
+.cat-group { margin-bottom: 6px; }
+.cat-group-head { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; background: var(--surface, #F4F7FB); border: 1px solid var(--mist, #C8D8E8); border-radius: var(--radius, 8px); cursor: pointer; transition: all 0.18s ease; }
+.cat-group-head:hover { background: var(--surface2, #EEF3FA); }
+.cat-group-head h4 { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.cat-group-head .cnt { font-size: 11px; color: var(--fog, #8FA3BA); font-weight: 400; }
+.cat-group-head .chev { transition: transform 0.2s; color: var(--fog, #8FA3BA); }
+.cat-group.expanded .chev { transform: rotate(180deg); }
+.cat-group .cat-body { display: none; }
+.cat-group.expanded .cat-body { display: block; }
+
+/* Toggle switch */
+.tm-toggle { width: 34px; height: 18px; background: var(--mist, #C8D8E8); border-radius: 9px; position: relative; cursor: pointer; transition: background 0.18s ease; display: inline-block; flex-shrink: 0; }
+.tm-toggle.active { background: var(--green, #1A7A4A); }
+.tm-toggle::after { content: ''; width: 14px; height: 14px; background: #fff; border-radius: 50%; position: absolute; top: 2px; left: 2px; transition: left 0.18s ease; box-shadow: 0 1px 2px rgba(0,0,0,0.15); }
+.tm-toggle.active::after { left: 18px; }
+
+/* History rows */
+.hist-row { display: grid; grid-template-columns: 2fr 1.5fr 1fr 1fr 1fr 90px; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--surface2, #EEF3FA); font-size: 13px; }
+.hist-row:hover { background: var(--surface, #F4F7FB); }
+.hist-header { font-size: 10px; font-weight: 700; color: var(--fog, #8FA3BA); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--mist, #C8D8E8); }
+
+/* Email recipients */
+.email-row { display: flex; align-items: center; gap: 10px; padding: 9px 12px; background: var(--surface, #F4F7FB); border: 1px solid var(--mist, #C8D8E8); border-radius: var(--radius, 8px); margin-bottom: 6px; font-size: 13px; }
+.email-row .rm-btn { margin-left: auto; background: none; border: none; color: var(--fog, #8FA3BA); cursor: pointer; font-size: 14px; padding: 2px 6px; border-radius: 3px; }
+.email-row .rm-btn:hover { color: var(--red, #991B1B); background: var(--red-lt, #FEE2E2); }
+
+/* Sub-tabs */
+.tm-sub-tabs { display: flex; gap: 4px; margin-bottom: 16px; }
+.tm-sub-tab { padding: 7px 14px; border-radius: var(--radius, 8px); font-family: var(--font, 'DM Sans', sans-serif); font-size: 12px; font-weight: 600; cursor: pointer; border: 1.5px solid var(--mist, #C8D8E8); background: var(--white, #fff); color: var(--slate, #3A5270); transition: all 0.18s ease; }
+.tm-sub-tab:hover { background: var(--surface, #F4F7FB); }
+.tm-sub-tab.active { background: var(--blue-lt, #EFF6FF); color: var(--blue, #1D4ED8); border-color: var(--blue, #1D4ED8); }
+
+/* Modal (testing module's own modal for question editing) */
+.tm-modal-overlay { position: fixed; inset: 0; background: rgba(11,31,59,0.55); backdrop-filter: blur(4px); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; visibility: hidden; transition: all 0.25s ease; }
+.tm-modal-overlay.show { opacity: 1; visibility: visible; }
+.tm-modal { background: var(--white, #fff); border-radius: var(--radius-xl, 20px); width: 100%; max-width: 580px; max-height: 88vh; overflow-y: auto; box-shadow: var(--shadow-xl, 0 24px 64px rgba(11,31,59,0.18)); transform: translateY(16px); transition: transform 0.25s ease; }
+.tm-modal-overlay.show .tm-modal { transform: translateY(0); }
+.tm-modal-head { padding: 22px 26px 16px; border-bottom: 1px solid var(--mist, #C8D8E8); display: flex; align-items: center; justify-content: space-between; }
+.tm-modal-head h3 { font-size: 16px; font-weight: 700; }
+.tm-modal-mid { padding: 22px 26px; }
+.tm-modal-foot { padding: 14px 26px 22px; border-top: 1px solid var(--mist, #C8D8E8); display: flex; justify-content: flex-end; gap: 8px; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+  .test-header-bar { flex-direction: column; gap: 10px; }
+  .hist-row { grid-template-columns: 1fr 1fr; gap: 4px; }
+}
+</style>
+
+<!-- QUESTION EDIT MODAL -->
+<div class="tm-modal-overlay" id="tmQuestionModal">
+  <div class="tm-modal">
+    <div class="tm-modal-head">
+      <h3 id="tmModalTitle">Add Question</h3>
+      <button class="btn btn-ghost btn-sm" onclick="TMcloseMod()">✕</button>
+    </div>
+    <div class="tm-modal-mid">
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <select class="form-select" id="tmQCat">
+          <option value="Offering Structure">Offering Structure</option>
+          <option value="Distributions & Returns">Distributions & Returns</option>
+          <option value="Sponsor & Track Record">Sponsor & Track Record</option>
+          <option value="Property & Asset Details">Property & Asset Details</option>
+          <option value="Fees & Expenses">Fees & Expenses</option>
+          <option value="Risk Factors & Suitability">Risk Factors & Suitability</option>
+          <option value="Tax & Regulatory">Tax & Regulatory</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Question Type</label>
+        <select class="form-select" id="tmQType" onchange="TMtoggleAns()">
+          <option value="MC">Multiple Choice</option>
+          <option value="TF">True / False</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Question Text</label>
+        <textarea class="form-input" style="height:70px;resize:vertical;padding:10px 12px;" id="tmQText" placeholder="Use {{Field Name}} for dynamic data..."></textarea>
+        <div style="font-size:10px;color:var(--fog);margin-top:3px;">Variables: {{Offering Name}}, {{Sponsor}}, {{Distribution Rate}}, {{Min Investment}}, {{Property Type}}, {{Hold Period}}, {{LTV}}, {{State}}</div>
+      </div>
+      <div id="tmMcFields">
+        <div class="form-group">
+          <label class="form-label">Answer Options (select correct)</label>
+          <div id="tmAnsOpts">
+            <div style="display:flex;gap:6px;margin-bottom:6px;align-items:center;"><input type="radio" name="tmCorrect" value="0" checked style="accent-color:var(--blue);"><input type="text" class="form-input" placeholder="Option A" data-opt="0"></div>
+            <div style="display:flex;gap:6px;margin-bottom:6px;align-items:center;"><input type="radio" name="tmCorrect" value="1" style="accent-color:var(--blue);"><input type="text" class="form-input" placeholder="Option B" data-opt="1"></div>
+            <div style="display:flex;gap:6px;margin-bottom:6px;align-items:center;"><input type="radio" name="tmCorrect" value="2" style="accent-color:var(--blue);"><input type="text" class="form-input" placeholder="Option C" data-opt="2"></div>
+            <div style="display:flex;gap:6px;margin-bottom:6px;align-items:center;"><input type="radio" name="tmCorrect" value="3" style="accent-color:var(--blue);"><input type="text" class="form-input" placeholder="Option D" data-opt="3"></div>
+          </div>
+        </div>
+      </div>
+      <div id="tmTfFields" style="display:none;">
+        <div class="form-group">
+          <label class="form-label">Correct Answer</label>
+          <select class="form-select" id="tmTfAns">
+            <option value="True">True</option>
+            <option value="False">False</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Explanation</label>
+        <textarea class="form-input" style="height:60px;resize:vertical;padding:10px 12px;" id="tmQExpl" placeholder="Why is this correct..."></textarea>
+      </div>
+    </div>
+    <div class="tm-modal-foot">
+      <button class="btn btn-ghost" onclick="TMcloseMod()">Cancel</button>
+      <button class="btn btn-primary" onclick="TMsaveQ()">Save Question</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODULE CONTENT MOUNT POINT -->
+<div id="tmRoot"></div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   AFL TESTING MODULE — Shell-Compatible Production Build
+   
+   Loaded by shell's loadModule('testing').
+   Receives funds data from shell — NO Google Sheets fetch.
+   All fund field names match shell's parsing:
+     f.name, f.sponsor, f.y1CoC, f.ltv, f.minimum,
+     f.equityOffered, f.holdPeriod, f.assetClass,
+     f.location, f.pctLeased, f.structure, 
+     f.distributionFreq, f.id
+═══════════════════════════════════════════════════════════ */
+
+/* ─── STATE ─── */
+const TM = {
+  funds: [],
+  activeView: 'certifications',  // certifications | test | results | admin
+  selectedFundIdx: null,
+  testHistory: JSON.parse(localStorage.getItem('afl_test_history') || '[]'),
+  currentTest: { fundIdx: null, questions: [], answers: {}, startTime: null },
+  _lastResult: null,
+  _AFL: null,  // Reference to shell's AFL object
+};
+
+const TM_SETTINGS = {
+  passingScore: parseInt(localStorage.getItem('afl_pass_score') || '80'),
+  maxAttempts: 3,
+  randomize: true,
+  showAnswers: true,
+  certExpiry: 365
+};
+
+let tmEmailRecipients = JSON.parse(localStorage.getItem('afl_email_recipients') || '[{"email":"compliance@firm.com","role":"compliance"}]');
+let tmEditingQId = null;
+
+/* ─── FORMATTING HELPERS ─── */
+// Use shell's AFL.fmt if available, otherwise local fallbacks
+function tmFmtPct(n) {
+  if (TM._AFL && TM._AFL.fmt) return TM._AFL.fmt.pct(n);
+  return (n != null && isFinite(n)) ? n.toFixed(2) + '%' : '—';
+}
+function tmFmtMoney(n) {
+  if (TM._AFL && TM._AFL.fmt) return TM._AFL.fmt.money(n);
+  if (n == null) return '—';
+  if (typeof n === 'string' && /\$/.test(n)) return n;
+  const num = typeof n === 'number' ? n : parseFloat(String(n).replace(/[$,\s]/g,''));
+  if (isNaN(num)) return '—';
+  return '$' + num.toLocaleString('en-US');
+}
+function tmShortNum(n) {
+  if (TM._AFL && TM._AFL.fmt) return TM._AFL.fmt.short(n);
+  if (n == null) return '—';
+  const num = typeof n === 'number' ? n : parseFloat(String(n).replace(/[$,\s]/g,''));
+  if (isNaN(num)) return '—';
+  if (num >= 1e9) return (num/1e9).toFixed(1)+'B';
+  if (num >= 1e6) return (num/1e6).toFixed(1)+'M';
+  if (num >= 1e3) return (num/1e3).toFixed(0)+'K';
+  return num.toLocaleString();
+}
+
+/* ─── TOAST (uses shell's if available) ─── */
+function tmToast(msg, type) {
+  if (TM._AFL && TM._AFL.toast) { TM._AFL.toast(msg, type || ''); return; }
+  if (typeof showToast === 'function') { showToast(msg, type || ''); return; }
+  console.log(`[TM Toast] ${type || 'info'}: ${msg}`);
+}
+
+/* ═══════════════════════════════════════════════════
+   QUESTION BANK (31 template questions)
+═══════════════════════════════════════════════════ */
+let tmQuestionBank = JSON.parse(localStorage.getItem('afl_question_bank') || 'null') || [
+  // OFFERING STRUCTURE
+  { id:'Q01',cat:'Offering Structure',type:'MC',text:'What is the minimum investment amount for {{Offering Name}}?',opts:['{{Min Investment}}','$25,000','$250,000','$500,000'],ci:0,expl:'The minimum investment for this offering is set by the sponsor and disclosed in the PPM.',on:true },
+  { id:'Q02',cat:'Offering Structure',type:'MC',text:'What is the total offering size for {{Offering Name}}?',opts:['{{Filed Raise}}','$50,000,000','$200,000,000','$500,000,000'],ci:0,expl:'The total raise amount represents the maximum equity the sponsor is seeking.',on:true },
+  { id:'Q03',cat:'Offering Structure',type:'MC',text:'What is the projected hold period for {{Offering Name}}?',opts:['{{Hold Period}}','1-3 years','3-5 years','15-20 years'],ci:0,expl:'DST hold periods are disclosed in offering documents.',on:true },
+  { id:'Q04',cat:'Offering Structure',type:'TF',text:'{{Offering Name}} is structured as a Delaware Statutory Trust (DST).',ca:'True',expl:'All offerings on the AFL platform are structured as DSTs.',on:true },
+  { id:'Q05',cat:'Offering Structure',type:'MC',text:'What is the loan-to-value (LTV) ratio for {{Offering Name}}?',opts:['{{LTV}}%','25%','70%','85%'],ci:0,expl:'Lower LTV generally means less leverage risk.',on:true },
+  { id:'Q06',cat:'Offering Structure',type:'TF',text:'{{Offering Name}} qualifies for 1031 exchange treatment.',ca:'True',expl:'DSTs qualify under IRS Revenue Ruling 2004-86.',on:true },
+
+  // DISTRIBUTIONS & RETURNS
+  { id:'Q07',cat:'Distributions & Returns',type:'MC',text:'What is the current annualized distribution rate (Year 1 CoC) for {{Offering Name}}?',opts:['{{Y1 CoC}}%','3.00%','7.50%','10.00%'],ci:0,expl:'The annualized distribution rate is the projected Year 1 cash-on-cash return.',on:true },
+  { id:'Q08',cat:'Distributions & Returns',type:'MC',text:'How frequently are distributions paid to investors in {{Offering Name}}?',opts:['{{Dist Frequency}}','Quarterly','Semi-Annually','Annually'],ci:0,expl:'Most DSTs distribute income on a monthly basis.',on:true },
+  { id:'Q09',cat:'Distributions & Returns',type:'TF',text:'Distributions from {{Offering Name}} are guaranteed by the sponsor.',ca:'False',expl:'DST distributions are NEVER guaranteed. They are projected based on property performance.',on:true },
+  { id:'Q10',cat:'Distributions & Returns',type:'TF',text:'Past distribution performance of a DST sponsor guarantees future results.',ca:'False',expl:'Past performance is not indicative of future results.',on:true },
+  { id:'Q11',cat:'Distributions & Returns',type:'MC',text:'DST distributions are typically sourced from:',opts:['Rental income from the underlying property','Sponsor corporate reserves','New investor capital','Government subsidies'],ci:0,expl:'Distributions come from net operating income of the real estate.',on:true },
+
+  // SPONSOR & TRACK RECORD
+  { id:'Q12',cat:'Sponsor & Track Record',type:'MC',text:'Who is the sponsor of {{Offering Name}}?',opts:['{{Sponsor}}','Blackstone','Vanguard','Goldman Sachs'],ci:0,expl:'Knowing the sponsor is fundamental to understanding the management team.',on:true },
+  { id:'Q13',cat:'Sponsor & Track Record',type:'TF',text:'It is important to review a DST sponsor\'s full track record before recommending an offering.',ca:'True',expl:'Track record review is a key part of due diligence.',on:true },
+  { id:'Q14',cat:'Sponsor & Track Record',type:'MC',text:'The MOST important factor when evaluating a DST sponsor is:',opts:['Track record of capital preservation and distributions','Marketing budget size','Number of employees','Office location'],ci:0,expl:'Historical performance in preserving capital and delivering returns is the primary metric.',on:true },
+  { id:'Q15',cat:'Sponsor & Track Record',type:'TF',text:'DST sponsors must register offerings with the SEC or qualify for an exemption.',ca:'True',expl:'DSTs are securities offered typically under Regulation D exemptions.',on:true },
+  { id:'Q16',cat:'Sponsor & Track Record',type:'MC',text:'Day-to-day operations of a DST property are managed by:',opts:['The sponsor or their affiliated management company','The investors collectively','The SEC','The broker-dealer'],ci:0,expl:'DST investors are passive and cannot participate in management decisions.',on:true },
+
+  // PROPERTY & ASSET DETAILS
+  { id:'Q17',cat:'Property & Asset Details',type:'MC',text:'What is the property type / asset class for {{Offering Name}}?',opts:['{{Asset Class}}','Retail Strip Mall','Self Storage','Hospitality'],ci:0,expl:'Property type is critical for assessing market risk and suitability.',on:true },
+  { id:'Q18',cat:'Property & Asset Details',type:'MC',text:'In what state(s) is the underlying property of {{Offering Name}} located?',opts:['{{State}}','California','New York','Illinois'],ci:0,expl:'Location affects market dynamics, taxes, and economic exposure.',on:true },
+  { id:'Q19',cat:'Property & Asset Details',type:'TF',text:'Geographic diversification across properties can reduce concentration risk.',ca:'True',expl:'Multi-property or multi-state DSTs spread risk across markets.',on:true },
+  { id:'Q20',cat:'Property & Asset Details',type:'MC',text:'Tenant quality matters in DST evaluation because:',opts:['It directly impacts rental income stability','It determines the sponsor fee structure','It affects 1031 qualification','It is required by the SEC'],ci:0,expl:'Strong tenants provide more reliable rental income streams.',on:true },
+
+  // FEES & EXPENSES
+  { id:'Q21',cat:'Fees & Expenses',type:'MC',text:'Typical total upfront fees (commissions + dealer manager fees) in a DST range:',opts:['5% - 10%','0% - 2%','15% - 20%','25% - 30%'],ci:0,expl:'Total upfront costs typically range from 5-10%.',on:true },
+  { id:'Q22',cat:'Fees & Expenses',type:'TF',text:'DST upfront fees reduce the amount of capital actually deployed into the property.',ca:'True',expl:'Fees are deducted from the investment, reducing capital at work.',on:true },
+  { id:'Q23',cat:'Fees & Expenses',type:'MC',text:'The ongoing annual fee for DST property management is called:',opts:['Asset management fee','Acquisition fee','Disposition fee','Organization fee'],ci:0,expl:'The asset management fee covers ongoing property oversight.',on:true },
+  { id:'Q24',cat:'Fees & Expenses',type:'TF',text:'An advisor should compare fee structures across similar offerings during due diligence.',ca:'True',expl:'Fee comparison is essential to ensure competitive terms.',on:true },
+
+  // RISK FACTORS & SUITABILITY
+  { id:'Q25',cat:'Risk Factors & Suitability',type:'TF',text:'DST investments are illiquid and investors should expect limited ability to sell.',ca:'True',expl:'There is no guaranteed secondary market for DST interests.',on:true },
+  { id:'Q26',cat:'Risk Factors & Suitability',type:'TF',text:'DST investments are suitable for investors seeking short-term liquidity.',ca:'False',expl:'DSTs are long-term, illiquid investments NOT suitable for short-term liquidity needs.',on:true },
+  { id:'Q27',cat:'Risk Factors & Suitability',type:'MC',text:'The PRIMARY risk factor of DST investments is:',opts:['Illiquidity and lack of secondary market','FDIC insurance limitations','Currency exchange risk','High-frequency trading exposure'],ci:0,expl:'Illiquidity is the most significant risk — no guaranteed exit before hold period ends.',on:true },
+  { id:'Q28',cat:'Risk Factors & Suitability',type:'MC',text:'Before recommending a DST, an advisor must ensure:',opts:['The investment is suitable based on client financials, objectives, risk tolerance, and liquidity needs','The client has net worth over $10M','The client is accredited only','No suitability standard applies'],ci:0,expl:'Comprehensive suitability analysis is required for each individual client.',on:true },
+
+  // TAX & REGULATORY
+  { id:'Q29',cat:'Tax & Regulatory',type:'TF',text:'Investors in a DST can defer capital gains taxes through a 1031 exchange.',ca:'True',expl:'DSTs qualify as replacement property in a 1031 exchange.',on:true },
+  { id:'Q30',cat:'Tax & Regulatory',type:'MC',text:'The IRS Revenue Ruling allowing DSTs for 1031 exchanges is:',opts:['Revenue Ruling 2004-86','Revenue Ruling 1999-42','Revenue Ruling 2010-15','Revenue Ruling 2020-01'],ci:0,expl:'Rev. Ruling 2004-86 established DST interests as like-kind replacement property.',on:true },
+  { id:'Q31',cat:'Tax & Regulatory',type:'TF',text:'DST investors receive depreciation benefits that may shelter distribution income.',ca:'True',expl:'Investors get pro-rata depreciation which can offset taxable income.',on:true },
+];
+
+/* ═══════════════════════════════════════════════════
+   TEMPLATE RESOLVER — uses SHELL field names
+   Shell fund fields (from index.html lines 870-918):
+     f.name, f.sponsor, f.y1CoC, f.ltv, f.minimum,
+     f.equityOffered, f.holdPeriod, f.assetClass,
+     f.location, f.pctLeased, f.structure,
+     f.distributionFreq, f.id
+═══════════════════════════════════════════════════ */
+function resolveTemplate(text, fund) {
+  return text
+    .replace(/\{\{Offering Name\}\}/g, fund.name || '—')
+    .replace(/\{\{Sponsor\}\}/g, fund.sponsor || '—')
+    .replace(/\{\{Distribution Rate\}\}/g, tmFmtPct(fund.y1CoC))
+    .replace(/\{\{Y1 CoC\}\}/g, fund.y1CoC != null ? fund.y1CoC.toFixed(2) : '—')
+    .replace(/\{\{Min Investment\}\}/g, tmFmtMoney(fund.minimum))
+    .replace(/\{\{Filed Raise\}\}/g, tmFmtMoney(fund.equityOffered))
+    .replace(/\{\{Property Type\}\}/g, fund.assetClass || '—')
+    .replace(/\{\{Asset Class\}\}/g, fund.assetClass || '—')
+    .replace(/\{\{Hold Period\}\}/g, fund.holdPeriod || '—')
+    .replace(/\{\{LTV\}\}/g, fund.ltv != null ? fund.ltv.toFixed(0) : '—')
+    .replace(/\{\{State\}\}/g, fund.location || '—')
+    .replace(/\{\{Dist Frequency\}\}/g, fund.distributionFreq || 'Monthly');
+}
+
+/* ═══════════════════════════════════════════════════
+   CERT STATUS HELPERS
+═══════════════════════════════════════════════════ */
+function getCertStatus(fundId) {
+  return TM.testHistory.find(h => h.fundId === fundId && h.passed);
+}
+function getLastAttempt(fundId) {
+  return TM.testHistory.find(h => h.fundId === fundId);
+}
+
+/* ═══════════════════════════════════════════════════
+   RENDER ENGINE
+═══════════════════════════════════════════════════ */
+function tmRender() {
+  const el = document.getElementById('tmRoot');
+  if (!el) return;
+  const v = TM.activeView;
+  if      (v === 'certifications') el.innerHTML = renderCertDashboard();
+  else if (v === 'test')           el.innerHTML = renderTest();
+  else if (v === 'results')        el.innerHTML = renderResults();
+  else if (v === 'admin')          el.innerHTML = renderAdmin();
+  else el.innerHTML = renderCertDashboard();
+}
+
+function tmNavigate(view) {
+  TM.activeView = view;
+  tmRender();
+}
+
+/* ═══════════════════════════════════════════════════
+   VIEW: CERTIFICATION DASHBOARD (main landing)
+═══════════════════════════════════════════════════ */
+function renderCertDashboard() {
+  const funds = TM.funds;
+  const passed = TM.testHistory.filter(h => h.passed);
+  const uniquePassed = [...new Set(passed.map(h => h.fundId))].length;
+
+  let html = `
+    <div class="page-header">
+      <div>
+        <div class="page-title">✎ Certifications</div>
+        <div class="page-subtitle">Knowledge assessments across ${funds.length} offerings · ${uniquePassed} certified</div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-ghost btn-sm" onclick="tmNavigate('admin')">⚙ Admin</button>
+        <button class="btn btn-secondary btn-sm" onclick="tmExportCSV()">↓ Export CSV</button>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;">
+      <div class="stat-card"><div class="stat-val">${funds.length}</div><div class="stat-label">Offerings</div></div>
+      <div class="stat-card"><div class="stat-val" style="color:var(--green)">${uniquePassed}</div><div class="stat-label">Certified</div></div>
+      <div class="stat-card"><div class="stat-val" style="color:var(--amber)">${funds.length - uniquePassed}</div><div class="stat-label">Remaining</div></div>
+      <div class="stat-card"><div class="stat-val">${TM.testHistory.length}</div><div class="stat-label">Total Attempts</div></div>
+    </div>
+  `;
+
+  // Offering grid with cert status
+  html += '<div class="offering-grid">';
+  funds.forEach((f, idx) => {
+    const cert = getCertStatus(f.id);
+    const attempted = getLastAttempt(f.id);
+    const statusBadge = cert
+      ? '<span class="badge badge-green">✓ Certified</span>'
+      : attempted
+        ? '<span class="badge badge-red">✗ Not Passed</span>'
+        : '<span class="badge badge-navy">— Not Taken</span>';
+
+    html += `
+      <div class="offering-card" onclick="tmStartTest(${idx})" style="cursor:pointer;">
+        <div class="offering-card-header">
+          <div>
+            <div class="offering-name">${f.name}</div>
+            <div class="offering-sponsor">${f.sponsor}</div>
+          </div>
+          ${statusBadge}
+        </div>
+        <div class="offering-metrics">
+          <div class="offering-metric-item"><div class="label">Y1 CoC</div><div class="value">${tmFmtPct(f.y1CoC)}</div></div>
+          <div class="offering-metric-item"><div class="label">LTV</div><div class="value">${tmFmtPct(f.ltv)}</div></div>
+        </div>
+        <div class="offering-card-footer">
+          <span style="font-size:11px;color:var(--slate2);">📍 ${f.location || '—'} · ${f.assetClass || '—'}</span>
+          ${cert
+            ? '<button class="btn-take-test certified" onclick="event.stopPropagation();tmStartTest('+idx+')">Retake</button>'
+            : '<button class="btn-take-test" onclick="event.stopPropagation();tmStartTest('+idx+')">Take Test</button>'}
+        </div>
+      </div>`;
+  });
+  html += '</div>';
+
+  // History table
+  if (TM.testHistory.length > 0) {
+    html += `
+      <div style="margin-top:28px;">
+        <div class="panel-title">Recent Attempts</div>
+        <div class="panel" style="padding:0;overflow:hidden;">
+          <div class="hist-row hist-header"><span>Offering</span><span>Advisor</span><span>Score</span><span>Status</span><span>Date</span><span>Actions</span></div>
+          ${TM.testHistory.slice(0, 20).map(h => `
+            <div class="hist-row">
+              <span style="font-weight:500;">${h.offeringName || '—'}</span>
+              <span>${h.advisor || '—'}</span>
+              <span style="font-family:var(--mono);font-weight:600;color:${h.passed ? 'var(--green)' : 'var(--red)'};">${h.score}%</span>
+              <span><span class="badge ${h.passed ? 'badge-green' : 'badge-red'}">${h.passed ? 'Pass' : 'Fail'}</span></span>
+              <span style="color:var(--fog);font-size:12px;">${new Date(h.date).toLocaleDateString()}</span>
+              <span><button class="btn btn-ghost btn-sm" onclick="tmViewResult('${h.id}')">View</button></span>
+            </div>
+          `).join('')}
+        </div>
+      </div>`;
+  }
+
+  return html;
+}
+
+/* ═══════════════════════════════════════════════════
+   TEST ENGINE
+═══════════════════════════════════════════════════ */
+function tmStartTest(fundIdx) {
+  const fund = TM.funds[fundIdx];
+  if (!fund) return;
+
+  TM.currentTest = { fundIdx, questions: [], answers: {}, startTime: new Date() };
+
+  let qs = tmQuestionBank.filter(q => q.on).map(q => {
+    const text = resolveTemplate(q.text, fund);
+    let opts = q.type === 'TF' ? ['True', 'False'] : (q.opts || []).map(o => resolveTemplate(o, fund));
+    let ci = q.type === 'TF' ? (q.ca === 'True' ? 0 : 1) : q.ci;
+    return { ...q, text, opts, ci };
+  });
+
+  if (TM_SETTINGS.randomize) qs.sort(() => Math.random() - 0.5);
+  TM.currentTest.questions = qs;
+  tmNavigate('test');
+}
+
+function renderTest() {
+  const t = TM.currentTest;
+  const fund = TM.funds[t.fundIdx];
+  if (!fund) return '';
+
+  const total = t.questions.length;
+  const answered = Object.keys(t.answers).length;
+  const pct = total > 0 ? (answered / total * 100) : 0;
+
+  let html = `
+    <div class="test-header-bar">
+      <div>
+        <div style="font-size:11px;color:var(--fog);text-transform:uppercase;letter-spacing:0.5px;font-weight:600;margin-bottom:2px;">${fund.sponsor}</div>
+        <div style="font-size:16px;font-weight:700;">${fund.name}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px;">
+        <button class="btn btn-ghost btn-sm" onclick="if(confirm('Abandon test?'))tmNavigate('certifications')">✕ Cancel</button>
+        <div class="test-progress-bar"><div class="test-progress-fill" style="width:${pct}%"></div></div>
+        <span class="progress-text">${answered} / ${total}</span>
+        <button class="btn btn-primary btn-sm" onclick="tmSubmitTest()" ${answered < total ? 'disabled' : ''}>Submit Test</button>
+      </div>
+    </div>
+  `;
+
+  t.questions.forEach((q, idx) => {
+    const typeBadge = q.type === 'MC' ? '<span class="question-type-tag tag-mc">MC</span>' : '<span class="question-type-tag tag-tf">T/F</span>';
+    html += `
+      <div class="question-card ${t.answers[q.id] !== undefined ? 'answered' : ''}" id="qc-${q.id}">
+        <div class="question-number">Question ${idx + 1}<span class="question-category-tag">${q.cat}</span>${typeBadge}</div>
+        <div class="question-text">${q.text}</div>
+        <div class="answer-options">
+          ${q.opts.map((o, oi) => `
+            <div class="answer-option ${t.answers[q.id] === oi ? 'selected' : ''}" onclick="tmSelectAns('${q.id}',${oi},this)" data-q="${q.id}" data-o="${oi}">
+              <div class="radio-dot"></div><span>${o}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>`;
+  });
+
+  return html;
+}
+
+function tmSelectAns(qId, optIdx, el) {
+  document.querySelectorAll(`.answer-option[data-q="${qId}"]`).forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  TM.currentTest.answers[qId] = optIdx;
+  document.getElementById(`qc-${qId}`)?.classList.add('answered');
+  // Update progress bar + submit button
+  const total = TM.currentTest.questions.length;
+  const answered = Object.keys(TM.currentTest.answers).length;
+  const bar = document.querySelector('.test-progress-fill');
+  if (bar) bar.style.width = (answered/total*100) + '%';
+  const pText = document.querySelector('.progress-text');
+  if (pText) pText.textContent = `${answered} / ${total}`;
+  const submit = document.querySelector('.test-header-bar .btn-primary');
+  if (submit) submit.disabled = answered < total;
+}
+
+function tmSubmitTest() {
+  const t = TM.currentTest;
+  if (Object.keys(t.answers).length < t.questions.length) { tmToast('Answer all questions first.', 'error'); return; }
+  if (!confirm('Submit your test? Answers cannot be changed.')) return;
+
+  const fund = TM.funds[t.fundIdx];
+  let correct = 0;
+  const details = [];
+  t.questions.forEach(q => {
+    const ua = t.answers[q.id];
+    const ok = ua === q.ci;
+    if (ok) correct++;
+    details.push({ qId: q.id, cat: q.cat, question: q.text, userAns: q.opts[ua], correctAns: q.opts[q.ci], ok, expl: q.expl });
+  });
+
+  const total = t.questions.length;
+  const score = Math.round((correct / total) * 100);
+  const passed = score >= TM_SETTINGS.passingScore;
+  const elapsed = Math.round((new Date() - new Date(t.startTime)) / 60000);
+
+  const record = {
+    id: 'TH' + Date.now(),
+    fundId: fund.id,
+    fundIdx: t.fundIdx,
+    offeringName: fund.name,
+    sponsor: fund.sponsor,
+    advisor: 'Demo User',  // Replace with real user when auth is wired
+    email: 'advisor@firm.com',
+    score, total, correct, passed,
+    date: new Date().toISOString(),
+    elapsed,
+    details
+  };
+
+  TM.testHistory.unshift(record);
+  localStorage.setItem('afl_test_history', JSON.stringify(TM.testHistory));
+  TM._lastResult = record;
+  tmSendEmailAlerts(record);
+  tmNavigate('results');
+}
+
+/* ═══════════════════════════════════════════════════
+   VIEW: RESULTS
+═══════════════════════════════════════════════════ */
+function renderResults() {
+  const r = TM._lastResult;
+  if (!r) return '<div class="empty-state"><div class="empty-state-icon">📋</div><h3>No results to display</h3></div>';
+
+  const color = r.passed ? 'var(--green)' : 'var(--red)';
+
+  let html = `
+    <div class="results-hero">
+      <div class="score-ring" style="--score-pct:${r.score};--score-color:${color};">
+        <div class="score-number" style="color:${color}">${r.score}%</div>
+        <div class="score-pct">Score</div>
+      </div>
+      <div class="${r.passed ? 'result-pass' : 'result-fail'}">${r.passed ? '✓ PASSED' : '✗ FAILED'}</div>
+      <div class="result-summary">
+        ${r.passed
+          ? `You passed the knowledge assessment for <strong>${r.offeringName}</strong>. Compliance has been notified.`
+          : `Score of ${r.score}% did not meet the ${TM_SETTINGS.passingScore}% threshold for <strong>${r.offeringName}</strong>.`}
+      </div>
+      <div style="margin-top:16px;display:flex;gap:8px;justify-content:center;">
+        <button class="btn btn-secondary btn-sm" onclick="tmNavigate('certifications')">← Back to Certifications</button>
+        ${!r.passed ? `<button class="btn btn-primary btn-sm" onclick="tmStartTest(${r.fundIdx})">↻ Retake Test</button>` : ''}
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-box"><div class="stat-num" style="color:var(--green)">${r.correct}</div><div class="stat-lbl">Correct</div></div>
+      <div class="stat-box"><div class="stat-num" style="color:var(--red)">${r.total - r.correct}</div><div class="stat-lbl">Incorrect</div></div>
+      <div class="stat-box"><div class="stat-num">${r.total}</div><div class="stat-lbl">Total</div></div>
+      <div class="stat-box"><div class="stat-num">${r.elapsed}<span style="font-size:11px;color:var(--fog)">m</span></div><div class="stat-lbl">Time</div></div>
+    </div>
+  `;
+
+  if (TM_SETTINGS.showAnswers && r.details) {
+    html += '<div class="panel"><div class="panel-title">Question Review</div>';
+    r.details.forEach((d, i) => {
+      html += `
+        <div style="padding:12px 0;border-bottom:1px solid var(--surface2);display:flex;gap:12px;align-items:flex-start;">
+          <div style="width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;font-weight:700;background:${d.ok ? 'var(--green-lt)' : 'var(--red-lt)'};color:${d.ok ? 'var(--green)' : 'var(--red)'};">${d.ok ? '✓' : '✗'}</div>
+          <div style="flex:1;">
+            <div style="font-size:13px;font-weight:600;margin-bottom:3px;">${i + 1}. ${d.question}</div>
+            <div style="font-size:12px;color:${d.ok ? 'var(--green)' : 'var(--red)'};">Your answer: ${d.userAns}</div>
+            ${!d.ok ? `<div style="font-size:12px;color:var(--green);margin-top:1px;">Correct: ${d.correctAns}</div>` : ''}
+            <div style="font-size:11px;color:var(--fog);margin-top:4px;font-style:italic;">${d.expl}</div>
+          </div>
+        </div>`;
+    });
+    html += '</div>';
+  }
+
+  return html;
+}
+
+function tmViewResult(id) {
+  const r = TM.testHistory.find(h => h.id === id);
+  if (!r) return;
+  TM._lastResult = r;
+  tmNavigate('results');
+}
+
+/* ═══════════════════════════════════════════════════
+   EMAIL ALERTS
+═══════════════════════════════════════════════════ */
+function tmSendEmailAlerts(record) {
+  const recipients = [...tmEmailRecipients.map(r => r.email), record.email];
+  console.log('📧 [AFL Testing] Sending alerts to:', recipients);
+  console.log('📋 Result:', { advisor: record.advisor, offering: record.offeringName, score: record.score + '%', status: record.passed ? 'PASS' : 'FAIL' });
+  tmToast(`Email alerts queued for ${recipients.length} recipients`, 'success');
+
+  /*
+  ═══ PRODUCTION: Wire EmailJS or Firebase Functions here ═══
+  emailjs.send('afl_service', 'test_result_template', {
+    to_email: recipients.join(','),
+    advisor_name: record.advisor,
+    offering_name: record.offeringName,
+    score: record.score,
+    status: record.passed ? 'PASSED' : 'FAILED',
+    date: new Date(record.date).toLocaleString()
+  });
+  */
+}
+
+/* ═══════════════════════════════════════════════════
+   CSV EXPORT
+═══════════════════════════════════════════════════ */
+function tmExportCSV() {
+  const rows = [['Date','Offering','Sponsor','Advisor','Score','Status','Correct','Total']];
+  TM.testHistory.forEach(h => rows.push([
+    new Date(h.date).toLocaleDateString(), h.offeringName, h.sponsor,
+    h.advisor, h.score+'%', h.passed ? 'PASS' : 'FAIL', h.correct, h.total
+  ]));
+  const csv = rows.map(r => r.map(c => `"${c}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `AFL_Cert_History_${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+  tmToast('CSV exported', 'success');
+}
+
+/* ═══════════════════════════════════════════════════
+   VIEW: ADMIN
+═══════════════════════════════════════════════════ */
+function renderAdmin() {
+  return `
+    <div class="page-header">
+      <div>
+        <div class="page-title">⚙ Test Administration</div>
+        <div class="page-subtitle">Manage questions, settings, and notifications</div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="tmNavigate('certifications')">← Back</button>
+    </div>
+    <div class="tm-sub-tabs">
+      <button class="tm-sub-tab active" onclick="tmShowAdmin('questions',this)">Question Bank</button>
+      <button class="tm-sub-tab" onclick="tmShowAdmin('settings',this)">Settings</button>
+      <button class="tm-sub-tab" onclick="tmShowAdmin('emails',this)">Email Alerts</button>
+    </div>
+    <div id="tmAdminPanel">${renderAdminQuestions()}</div>
+  `;
+}
+
+function tmShowAdmin(panel, btn) {
+  document.querySelectorAll('.tm-sub-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  const el = document.getElementById('tmAdminPanel');
+  if (panel === 'questions') el.innerHTML = renderAdminQuestions();
+  else if (panel === 'settings') el.innerHTML = renderAdminSettings();
+  else if (panel === 'emails') el.innerHTML = renderAdminEmails();
+}
+
+function renderAdminQuestions() {
+  const cats = [...new Set(tmQuestionBank.map(q => q.cat))];
+  let html = `<div class="panel"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;"><div><div class="panel-title" style="margin-bottom:0;">Master Question Bank</div></div><button class="btn btn-primary btn-sm" onclick="tmOpenAddQ()">+ Add Question</button></div>`;
+
+  cats.forEach(cat => {
+    const qs = tmQuestionBank.filter(q => q.cat === cat);
+    const active = qs.filter(q => q.on).length;
+    html += `
+      <div class="cat-group expanded">
+        <div class="cat-group-head" onclick="this.parentElement.classList.toggle('expanded')">
+          <h4>${cat} <span class="cnt">${active}/${qs.length} active</span></h4>
+          <span class="chev">▾</span>
+        </div>
+        <div class="cat-body">
+          <table class="tm-admin-table"><thead><tr><th style="width:36px">On</th><th style="width:44px">Type</th><th>Question</th><th style="width:100px">Actions</th></tr></thead><tbody>
+          ${qs.map(q => `
+            <tr>
+              <td><div class="tm-toggle ${q.on ? 'active' : ''}" onclick="tmToggleQ('${q.id}',this)"></div></td>
+              <td><span class="badge ${q.type === 'MC' ? 'badge-blue' : 'badge-amber'}">${q.type}</span></td>
+              <td style="max-width:350px;white-space:normal;line-height:1.4;font-size:12px;">${q.text.substring(0,100)}${q.text.length>100?'...':''}</td>
+              <td>
+                <button class="btn btn-ghost btn-sm" onclick="tmEditQ('${q.id}')">Edit</button>
+                <button class="btn btn-ghost btn-sm" style="color:var(--red);" onclick="tmDeleteQ('${q.id}')">Del</button>
+              </td>
+            </tr>
+          `).join('')}
+          </tbody></table>
+        </div>
+      </div>`;
+  });
+  html += '</div>';
+  return html;
+}
+
+function renderAdminSettings() {
+  return `
+    <div class="panel"><div class="panel-title">Pass / Fail Configuration</div>
+      <div class="form-grid">
+        <div class="form-group"><label class="form-label">Passing Score (%)</label><input type="number" class="form-input" id="tmSetPass" value="${TM_SETTINGS.passingScore}" min="0" max="100"></div>
+        <div class="form-group"><label class="form-label">Max Attempts</label><input type="number" class="form-input" id="tmSetAttempts" value="${TM_SETTINGS.maxAttempts}" min="1" max="10"></div>
+        <div class="form-group"><label class="form-label">Cert Expiry (Days, 0=never)</label><input type="number" class="form-input" id="tmSetExpiry" value="${TM_SETTINGS.certExpiry}" min="0"></div>
+        <div class="form-group"><label class="form-label">Randomize Questions</label><div class="tm-toggle ${TM_SETTINGS.randomize ? 'active' : ''}" onclick="TM_SETTINGS.randomize=!TM_SETTINGS.randomize;this.classList.toggle('active');"></div></div>
+        <div class="form-group"><label class="form-label">Show Answers After Test</label><div class="tm-toggle ${TM_SETTINGS.showAnswers ? 'active' : ''}" onclick="TM_SETTINGS.showAnswers=!TM_SETTINGS.showAnswers;this.classList.toggle('active');"></div></div>
+      </div>
+      <button class="btn btn-primary btn-sm" style="margin-top:12px;" onclick="tmSaveSettings()">Save Settings</button>
+    </div>`;
+}
+
+function renderAdminEmails() {
+  return `
+    <div class="panel"><div class="panel-title">Email Notification Recipients</div>
+      <div id="tmEmailList">
+        ${tmEmailRecipients.map((r, i) => `
+          <div class="email-row">
+            <span style="font-weight:500;">${r.email}</span>
+            <span class="badge badge-purple">${r.role}</span>
+            <button class="rm-btn" onclick="tmRemoveEmail(${i})">✕</button>
+          </div>
+        `).join('')}
+      </div>
+      <div style="display:flex;gap:6px;margin-top:10px;">
+        <input type="email" class="form-input" placeholder="Add email..." id="tmNewEmail" style="flex:1;">
+        <select class="form-select" id="tmNewRole" style="width:160px;"><option value="compliance">Compliance</option><option value="manager">Manager</option><option value="admin">Admin</option><option value="sponsor">Sponsor</option></select>
+        <button class="btn btn-primary btn-sm" onclick="tmAddEmail()">Add</button>
+      </div>
+    </div>`;
+}
+
+/* ─── ADMIN ACTIONS ─── */
+function tmToggleQ(id, el) {
+  const q = tmQuestionBank.find(q => q.id === id);
+  if (q) { q.on = !q.on; el.classList.toggle('active'); tmSaveQBank(); }
+}
+
+function tmOpenAddQ() {
+  tmEditingQId = null;
+  document.getElementById('tmModalTitle').textContent = 'Add Question';
+  document.getElementById('tmQCat').value = 'Offering Structure';
+  document.getElementById('tmQType').value = 'MC';
+  document.getElementById('tmQText').value = '';
+  document.getElementById('tmQExpl').value = '';
+  document.querySelectorAll('#tmAnsOpts input[type="text"]').forEach(el => el.value = '');
+  document.querySelector('input[name="tmCorrect"][value="0"]').checked = true;
+  TMtoggleAns();
+  TMopenMod();
+}
+
+function tmEditQ(id) {
+  const q = tmQuestionBank.find(q => q.id === id);
+  if (!q) return;
+  tmEditingQId = id;
+  document.getElementById('tmModalTitle').textContent = 'Edit Question';
+  document.getElementById('tmQCat').value = q.cat;
+  document.getElementById('tmQType').value = q.type;
+  document.getElementById('tmQText').value = q.text;
+  document.getElementById('tmQExpl').value = q.expl || '';
+  if (q.type === 'TF') {
+    document.getElementById('tmTfAns').value = q.ca;
+  } else {
+    (q.opts || []).forEach((o, i) => { const inp = document.querySelector(`#tmAnsOpts input[data-opt="${i}"]`); if (inp) inp.value = o; });
+    const r = document.querySelector(`input[name="tmCorrect"][value="${q.ci}"]`); if (r) r.checked = true;
+  }
+  TMtoggleAns();
+  TMopenMod();
+}
+
+function TMsaveQ() {
+  const cat = document.getElementById('tmQCat').value;
+  const type = document.getElementById('tmQType').value;
+  const text = document.getElementById('tmQText').value.trim();
+  const expl = document.getElementById('tmQExpl').value.trim();
+  if (!text) { tmToast('Enter question text.', 'error'); return; }
+
+  const data = { cat, type, text, expl, on: true };
+  if (type === 'TF') { data.ca = document.getElementById('tmTfAns').value; }
+  else {
+    const opts = [];
+    document.querySelectorAll('#tmAnsOpts input[type="text"]').forEach(el => { if (el.value.trim()) opts.push(el.value.trim()); });
+    if (opts.length < 2) { tmToast('Need at least 2 options.', 'error'); return; }
+    data.opts = opts;
+    data.ci = parseInt(document.querySelector('input[name="tmCorrect"]:checked').value);
+  }
+
+  if (tmEditingQId) {
+    const idx = tmQuestionBank.findIndex(q => q.id === tmEditingQId);
+    if (idx >= 0) tmQuestionBank[idx] = { ...tmQuestionBank[idx], ...data };
+    tmToast('Question updated.', 'success');
+  } else {
+    data.id = 'Q' + Date.now();
+    tmQuestionBank.push(data);
+    tmToast('Question added.', 'success');
+  }
+  tmSaveQBank();
+  TMcloseMod();
+  document.getElementById('tmAdminPanel').innerHTML = renderAdminQuestions();
+}
+
+function tmDeleteQ(id) {
+  if (!confirm('Delete this question?')) return;
+  tmQuestionBank = tmQuestionBank.filter(q => q.id !== id);
+  tmSaveQBank();
+  document.getElementById('tmAdminPanel').innerHTML = renderAdminQuestions();
+  tmToast('Question deleted.', '');
+}
+
+function tmSaveQBank() { localStorage.setItem('afl_question_bank', JSON.stringify(tmQuestionBank)); }
+
+function tmSaveSettings() {
+  TM_SETTINGS.passingScore = parseInt(document.getElementById('tmSetPass')?.value || 80);
+  TM_SETTINGS.maxAttempts = parseInt(document.getElementById('tmSetAttempts')?.value || 3);
+  TM_SETTINGS.certExpiry = parseInt(document.getElementById('tmSetExpiry')?.value || 365);
+  localStorage.setItem('afl_pass_score', TM_SETTINGS.passingScore);
+  tmToast('Settings saved.', 'success');
+}
+
+function tmAddEmail() {
+  const email = document.getElementById('tmNewEmail').value.trim();
+  const role = document.getElementById('tmNewRole').value;
+  if (!email || !email.includes('@')) { tmToast('Enter valid email.', 'error'); return; }
+  tmEmailRecipients.push({ email, role });
+  localStorage.setItem('afl_email_recipients', JSON.stringify(tmEmailRecipients));
+  document.getElementById('tmNewEmail').value = '';
+  document.getElementById('tmAdminPanel').innerHTML = renderAdminEmails();
+  tmToast('Recipient added.', 'success');
+}
+
+function tmRemoveEmail(idx) {
+  tmEmailRecipients.splice(idx, 1);
+  localStorage.setItem('afl_email_recipients', JSON.stringify(tmEmailRecipients));
+  document.getElementById('tmAdminPanel').innerHTML = renderAdminEmails();
+}
+
+function TMtoggleAns() {
+  const type = document.getElementById('tmQType').value;
+  document.getElementById('tmMcFields').style.display = type === 'MC' ? '' : 'none';
+  document.getElementById('tmTfFields').style.display = type === 'TF' ? '' : 'none';
+}
+
+function TMopenMod() { document.getElementById('tmQuestionModal').classList.add('show'); }
+function TMcloseMod() { document.getElementById('tmQuestionModal').classList.remove('show'); }
+
+/* ═══════════════════════════════════════════════════
+   MODULE EXPORT — called by shell's loadModule()
+   
+   Shell passes: { funds, client, peer, AFL, params }
+   - funds:  Array of fund objects with shell field names
+   - AFL:    The global AFL bridge object
+   - params: { id: offeringId } if launched from an offering
+═══════════════════════════════════════════════════ */
+window.currentModule = {
+  async init({ funds, client, peer, AFL, params }) {
+    // Store references
+    TM.funds = funds || [];
+    TM._AFL = AFL || null;
+
+    console.log(`[AFL Testing Module] Init — ${TM.funds.length} funds received from shell`);
+
+    // If shell passed a specific offering ID, jump straight to that test
+    if (params && params.id != null) {
+      const fundIdx = TM.funds.findIndex(f => f.id === params.id);
+      if (fundIdx >= 0) {
+        tmStartTest(fundIdx);
+        return;
+      }
+    }
+
+    // Default: show certification dashboard
+    TM.activeView = 'certifications';
+    tmRender();
+  }
+};
+</script>
