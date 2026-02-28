@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<style>
+/* ─── Certification Module Styles ─── */
+.cert-hub { max-width:1100px; padding:28px 32px; }
+.cert-quiz { max-width:800px; padding:28px 32px; }
+
+.cert-stats { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:24px; }
+.cert-stat { background:#fff; border:1px solid var(--mist,#C8D8E8); border-radius:8px; text-align:center; padding:16px; }
+.cert-stat-num { font-size:28px; font-weight:800; }
+.cert-stat-label { font-size:11px; color:var(--fog,#8FA3BA); text-transform:uppercase; letter-spacing:0.06em; margin-top:2px; }
+
+.cert-progress { height:6px; background:var(--mist,#C8D8E8); border-radius:3px; overflow:hidden; margin-bottom:16px; }
+.cert-progress-fill { height:100%; background:var(--green,#1A7A4A); border-radius:3px; transition:width 0.4s ease; }
+
+.cert-filters { display:flex; gap:10px; margin-bottom:20px; align-items:center; flex-wrap:wrap; }
+
+.cert-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:16px; }
+.cert-card {
+  background:#fff; border:1px solid var(--mist,#C8D8E8); border-radius:8px;
+  padding:18px 20px; cursor:pointer; transition:all 0.18s ease;
+}
+.cert-card:hover { box-shadow:0 4px 12px rgba(11,31,59,0.10); transform:translateY(-1px); }
+.cert-card.certified { border-left:3px solid var(--green,#1A7A4A); }
+
+.cert-badge { font-size:11px; font-weight:700; padding:3px 10px; border-radius:12px; display:inline-block; }
+.cert-badge-done { background:var(--green-lt,#E8F7EF); color:var(--green,#1A7A4A); }
+.cert-badge-progress { background:var(--amber-lt,#FEF3C7); color:var(--amber,#B45309); }
+.cert-badge-pending { background:var(--surface2,#EEF3FA); color:var(--fog,#8FA3BA); }
+
+/* Quiz Styles */
+.quiz-hero {
+  background:linear-gradient(135deg,#1E3A5F 0%,#2D5A8E 100%);
+  border:none; border-radius:8px; margin-bottom:20px; padding:24px 28px; color:#fff;
+}
+.quiz-question {
+  margin-bottom:20px; padding:16px; background:var(--surface,#F4F7FB);
+  border-radius:8px; border:1px solid var(--mist,#C8D8E8);
+}
+.quiz-option {
+  display:flex; align-items:flex-start; gap:10px; padding:8px 12px;
+  border-radius:6px; cursor:pointer; margin-bottom:4px;
+  transition:background 0.15s; font-size:13px; color:var(--navy,#0B1F3B);
+}
+.quiz-option:hover { background:var(--ice,#E8F0F8); }
+
+.quiz-result { margin-bottom:20px; border-radius:8px; background:#fff; border:1px solid var(--mist,#C8D8E8); padding:20px; }
+.quiz-result.pass { border-left:4px solid var(--green,#1A7A4A); }
+.quiz-result.fail { border-left:4px solid var(--red,#991B1B); }
+
+.quiz-score-circle {
+  width:80px; height:80px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:28px; font-weight:800;
+}
+
+.answer-row { padding:10px 12px; margin-bottom:6px; border-radius:6px; }
+.answer-correct { background:var(--green-lt,#E8F7EF); }
+.answer-wrong { background:var(--red-lt,#FEE2E2); }
+
+/* Study Panel Metrics */
+.study-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:10px; margin-top:12px; }
+.study-tile {
+  background:var(--surface,#F4F7FB); border:1px solid var(--mist,#C8D8E8);
+  border-radius:8px; padding:10px 12px;
+}
+.study-label { font-size:10px; font-weight:600; color:var(--fog,#8FA3BA); text-transform:uppercase; letter-spacing:0.06em; }
+.study-value { font-size:17px; font-weight:700; color:var(--navy,#0B1F3B); margin-top:2px; }
+.study-value-sm { font-size:14px; }
+
+@media (max-width:768px) {
+  .cert-stats { grid-template-columns:repeat(2,1fr); }
+  .cert-grid { grid-template-columns:1fr; }
+  .study-grid { grid-template-columns:repeat(2,1fr); }
+}
+</style>
+</head>
+<body>
+
+<!-- Module content injected by init() -->
+<div id="testing-root"></div>
+
+<script>
+(function() {
+  'use strict';
+
+  // ── Module State ──
+  let CTX = {};   // { funds, client, peer, AFL, params }
+  let MODE = 'hub'; // 'hub' or 'quiz'
+  let SELECTED_FUND = null;
+
+  // ── Helpers ──
+  const esc = (s) => {
+    if (s == null) return '';
+    const d = document.createElement('div');
+    d.textContent = String(s);
+    return d.innerHTML;
+  };
+
+  const fmtNum = (n) => n == null ? '—' : Number(n).toLocaleString('en-US');
+  const shortNum = (n) => {
+    if (n == null) return '—';
+    n = Number(n);
+    if (n >= 1e9) return (n/1e9).toFixed(1)+'B';
+    if (n >= 1e6) return (n/1e6).toFixed(1)+'M';
+    if (n >= 1e3) return (n/1e3).toFixed(0)+'K';
+    return n.toString();
+  };
+  const parseMoney = (v) => {
+    if (v == null) return null;
+    const n = parseFloat(String(v).replace(/[$,\s]/g, ''));
+    return isNaN(n) ? null : n;
+  };
+
+  // ── Certification Status (localStorage) ──
+  function getCertStatus() {
+    try { return JSON.parse(localStorage.getItem('afl_cert_status') || '{}'); } catch(e) { return {}; }
+  }
+  function saveCertStatus(status) {
+    try { localStorage.setItem('afl_cert_status', JSON.stringify(status)); } catch(e) {}
+  }
+
+  // ── Navigation helpers ──
+  function navTo(view, id) {
+    if (CTX.AFL && CTX.AFL.navigate) {
+      CTX.AFL.navigate(view, id != null ? { id } : undefined);
+    }
+  }
+  function navToQuiz(fundId) {
+    SELECTED_FUND = CTX.funds.find(f => f.id === fundId) || null;
+    MODE = 'quiz';
+    renderModule();
+  }
+  function navToHub() {
+    MODE = 'hub';
+    SELECTED_FUND = null;
+    renderModule();
+  }
+
+  // Expose for onclick handlers
+  window._certNavQuiz = navToQuiz;
+  window._certNavHub = navToHub;
+  window._certNavTo = navTo;
+  window._certGrade = gradeQuiz;
+  window._certFilterCards = filterCards;
+  window._certFilterStatus = filterByStatus;
+
+  // ── RENDER ──
+  function renderModule() {
+    const root = document.getElementById('testing-root');
+    if (!root) return;
+
+    if (MODE === 'quiz' && SELECTED_FUND) {
+      root.innerHTML = renderQuiz(SELECTED_FUND);
+    } else {
+      root.innerHTML = renderHub();
+    }
+    // Scroll to top
+    const main = document.getElementById('main');
+    if (main) main.scrollTop = 0;
+  }
+
+  // ══════════════════════════════════════
+  //  CERTIFICATION HUB
+  // ══════════════════════════════════════
+  function renderHub() {
+    const funds = CTX.funds || [];
+    const certStatus = getCertStatus();
+
+    const total = funds.length;
+    const completed = funds.filter(f => certStatus[f.id]?.passed).length;
+    const inProgress = funds.filter(f => certStatus[f.id] && !certStatus[f.id].passed).length;
+    const pct = total > 0 ? Math.round(completed/total*100) : 0;
+
+    return `
+      <div class="cert-hub">
+        <div style="margin-bottom:20px">
+          <div style="font-size:22px;font-weight:800;color:var(--navy,#0B1F3B)">🎓 Certification Center</div>
+          <div style="font-size:13px;color:var(--slate2,#5C7A99);margin-top:4px">Complete offering training modules to demonstrate product knowledge</div>
+        </div>
+
+        <div class="cert-stats">
+          <div class="cert-stat">
+            <div class="cert-stat-num" style="color:var(--navy,#0B1F3B)">${total}</div>
+            <div class="cert-stat-label">Total Modules</div>
+          </div>
+          <div class="cert-stat">
+            <div class="cert-stat-num" style="color:var(--green,#1A7A4A)">${completed}</div>
+            <div class="cert-stat-label">Completed</div>
+          </div>
+          <div class="cert-stat">
+            <div class="cert-stat-num" style="color:var(--amber,#B45309)">${inProgress}</div>
+            <div class="cert-stat-label">In Progress</div>
+          </div>
+          <div class="cert-stat">
+            <div class="cert-stat-num" style="color:var(--blue,#1D4ED8)">${pct}%</div>
+            <div class="cert-stat-label">Completion</div>
+          </div>
+        </div>
+
+        ${completed > 0 ? `<div class="cert-progress"><div class="cert-progress-fill" style="width:${pct}%"></div></div>` : ''}
+
+        <div class="cert-filters">
+          <input type="text" placeholder="Search offerings…"
+                 style="padding:8px 14px;border:1px solid var(--mist,#C8D8E8);border-radius:6px;font-size:13px;max-width:300px;flex:1;font-family:inherit"
+                 oninput="_certFilterCards(this.value)" />
+          <span class="filter-tag active" onclick="_certFilterStatus('all',this)" data-status="all" style="cursor:pointer">All</span>
+          <span class="filter-tag" onclick="_certFilterStatus('completed',this)" data-status="completed" style="cursor:pointer">✓ Completed</span>
+          <span class="filter-tag" onclick="_certFilterStatus('pending',this)" data-status="pending" style="cursor:pointer">○ Not Started</span>
+        </div>
+
+        <div class="cert-grid">
+          ${funds.map((f, i) => {
+            const st = certStatus[f.id];
+            const passed = st?.passed;
+            const badge = passed
+              ? `<span class="cert-badge cert-badge-done">✓ Certified${st.score?' · '+st.score+'%':''}</span>`
+              : (st
+                ? `<span class="cert-badge cert-badge-progress">⟳ In Progress</span>`
+                : `<span class="cert-badge cert-badge-pending">○ Not Started</span>`);
+            return `
+              <div class="cert-card${passed?' certified':''}" data-name="${esc((f.name||'')+(f.sponsor||''))}" data-status="${passed?'completed':'pending'}"
+                   onclick="_certNavQuiz(${f.id})" style="animation:fadeIn 0.3s ease ${i*0.03}s both">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+                  <div>
+                    <div style="font-size:14px;font-weight:700;color:var(--navy,#0B1F3B)">${esc(f.name)}</div>
+                    <div style="font-size:12px;color:var(--slate2,#5C7A99);margin-top:2px">${esc(f.sponsor || '—')}</div>
+                  </div>
+                  ${badge}
+                </div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+                  ${f.structure ? `<span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;background:var(--navy,#0B1F3B);color:#fff">${esc(f.structure)}</span>` : ''}
+                  ${f.assetClass ? `<span style="font-size:10px;font-weight:500;padding:2px 8px;border-radius:4px;background:var(--surface2,#EEF3FA);color:var(--slate,#3A5270)">${esc(f.assetClass)}</span>` : ''}
+                </div>
+                <div style="display:flex;gap:16px;font-size:12px;color:var(--slate2,#5C7A99);margin-bottom:8px">
+                  <span><strong>Y1 CoC:</strong> ${f.y1CoC != null ? f.y1CoC.toFixed(2)+'%' : '—'}</span>
+                  <span><strong>LTV:</strong> ${f.ltv != null ? f.ltv.toFixed(0)+'%' : '—'}</span>
+                  <span><strong>Min:</strong> ${f.minimum != null ? '$'+shortNum(f.minimum) : '—'}</span>
+                </div>
+                ${passed && st.date ? `<div style="font-size:10px;color:var(--fog,#8FA3BA)">Certified: ${st.date}</div>` : ''}
+                <div style="text-align:right;margin-top:8px">
+                  <button class="btn ${passed?'btn-ghost':'btn-primary'} btn-sm" onclick="event.stopPropagation();_certNavQuiz(${f.id})">
+                    ${passed ? '↻ Retake' : '🎓 Start Training'}
+                  </button>
+                </div>
+              </div>`;
+          }).join('')}
+        </div>
+      </div>`;
+  }
+
+  // ══════════════════════════════════════
+  //  SINGLE OFFERING QUIZ
+  // ══════════════════════════════════════
+  function renderQuiz(fund) {
+    const certStatus = getCertStatus();
+    const prev = certStatus[fund.id];
+    const questions = generateQuestions(fund);
+
+    // Store questions count for grading reference
+    window._certQuestionCount = questions.length;
+
+    return `
+      <div class="cert-quiz">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:20px">
+          <button class="btn btn-ghost btn-sm" onclick="_certNavHub()">← Certification Center</button>
+          <span style="color:var(--fog,#8FA3BA);font-size:12px">Certifications ›</span>
+          <span style="font-size:12px;color:var(--slate,#3A5270)">${esc(fund.name)}</span>
+        </div>
+
+        <div class="quiz-hero">
+          <div style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.4);margin-bottom:4px">${esc(fund.sponsor||'')}</div>
+          <div style="font-size:22px;font-weight:800;margin-bottom:8px">${esc(fund.name)} — Training Module</div>
+          <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+            ${fund.structure ? `<span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;background:rgba(255,255,255,0.15);color:rgba(255,255,255,0.9)">${esc(fund.structure)}</span>` : ''}
+            ${fund.assetClass ? `<span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;background:rgba(255,255,255,0.10);color:rgba(255,255,255,0.7)">${esc(fund.assetClass)}</span>` : ''}
+            <span style="font-size:12px;color:rgba(255,255,255,0.5)">📝 ${questions.length} Questions · Pass: 70%</span>
+            ${prev?.passed ? `<span style="background:rgba(26,122,74,0.5);padding:3px 10px;border-radius:12px;font-size:11px;font-weight:700">✓ Previously Certified${prev.score?' · '+prev.score+'%':''}</span>` : ''}
+          </div>
+        </div>
+
+        <!-- Key Facts Study Panel -->
+        <div style="background:#fff;border:1px solid var(--mist,#C8D8E8);border-radius:8px;padding:18px 20px;margin-bottom:20px">
+          <div style="font-size:14px;font-weight:700;color:var(--navy,#0B1F3B);margin-bottom:4px">📋 Key Facts — Review Before Testing</div>
+          <div class="study-grid">
+            ${fund.y1CoC != null ? `<div class="study-tile"><div class="study-label">Y1 Cash-on-Cash</div><div class="study-value">${fund.y1CoC.toFixed(2)}%</div></div>` : ''}
+            ${fund.ltv != null ? `<div class="study-tile"><div class="study-label">Loan-to-Value</div><div class="study-value">${fund.ltv.toFixed(0)}%</div></div>` : ''}
+            ${fund.minimum != null ? `<div class="study-tile"><div class="study-label">Minimum Invest</div><div class="study-value">$${shortNum(fund.minimum)}</div></div>` : ''}
+            ${fund.holdPeriod ? `<div class="study-tile"><div class="study-label">Hold Period</div><div class="study-value study-value-sm">${esc(fund.holdPeriod.toString())}</div></div>` : ''}
+            ${fund.pctLeased != null ? `<div class="study-tile"><div class="study-label">% Leased</div><div class="study-value">${fund.pctLeased.toFixed(0)}%</div></div>` : ''}
+            ${fund.sponsor ? `<div class="study-tile"><div class="study-label">Sponsor</div><div class="study-value study-value-sm">${esc(fund.sponsor)}</div></div>` : ''}
+            ${fund.assetClass ? `<div class="study-tile"><div class="study-label">Asset Class</div><div class="study-value study-value-sm">${esc(fund.assetClass)}</div></div>` : ''}
+            ${fund.structure ? `<div class="study-tile"><div class="study-label">Structure</div><div class="study-value study-value-sm">${esc(fund.structure)}</div></div>` : ''}
+            ${fund.preferred != null ? `<div class="study-tile"><div class="study-label">Preferred Return</div><div class="study-value">${fund.preferred.toFixed(2)}%</div></div>` : ''}
+            ${fund.repComp != null ? `<div class="study-tile"><div class="study-label">Rep Comp</div><div class="study-value">${fund.repComp.toFixed(2)}%</div></div>` : ''}
+            ${fund.location ? `<div class="study-tile"><div class="study-label">Location</div><div class="study-value study-value-sm">${esc(fund.location)}</div></div>` : ''}
+            ${fund.distributionFreq ? `<div class="study-tile"><div class="study-label">Distribution</div><div class="study-value study-value-sm">${esc(fund.distributionFreq)}</div></div>` : ''}
+            ${fund.tenantCredit ? `<div class="study-tile"><div class="study-label">Tenant Credit</div><div class="study-value study-value-sm">${esc(fund.tenantCredit)}</div></div>` : ''}
+            ${fund.numAssets ? `<div class="study-tile"><div class="study-label"># Properties</div><div class="study-value">${esc(fund.numAssets.toString())}</div></div>` : ''}
+            ${fund.avgLeaseTerm ? `<div class="study-tile"><div class="study-label">Avg Lease Term</div><div class="study-value study-value-sm">${esc(fund.avgLeaseTerm.toString())}</div></div>` : ''}
+            ${fund.equityOffered != null ? `<div class="study-tile"><div class="study-label">Total Equity</div><div class="study-value">$${shortNum(fund.equityOffered)}</div></div>` : ''}
+            ${fund.sponsorYears ? `<div class="study-tile"><div class="study-label">Sponsor Years</div><div class="study-value">${esc(fund.sponsorYears.toString())}</div></div>` : ''}
+            ${fund.sponsorAvgIRR != null ? `<div class="study-tile"><div class="study-label">Sponsor Avg IRR</div><div class="study-value">${fund.sponsorAvgIRR.toFixed(1)}%</div></div>` : ''}
+          </div>
+        </div>
+
+        <!-- Quiz -->
+        <div style="background:#fff;border:1px solid var(--mist,#C8D8E8);border-radius:8px;padding:18px 20px" id="cert-quiz-panel">
+          <div style="font-size:14px;font-weight:700;color:var(--navy,#0B1F3B);margin-bottom:4px">📝 Knowledge Assessment</div>
+          <div style="font-size:12.5px;color:var(--slate2,#5C7A99);margin-bottom:16px">Answer all ${questions.length} questions (offering-specific + industry knowledge). You need 70% to earn certification.</div>
+
+          <form id="cert-quiz-form" onsubmit="return _certGrade(event, ${fund.id})">
+            ${questions.map((q, qi) => `
+              <div class="quiz-question" data-q="${qi}">
+                <div style="font-size:13.5px;font-weight:600;color:var(--navy,#0B1F3B);margin-bottom:12px">
+                  <span style="color:var(--blue,#1D4ED8);font-weight:700">${qi+1}.</span> ${esc(q.question)}
+                  ${q.isGeneral ? '<span style="font-size:9px;padding:1px 6px;border-radius:3px;background:var(--surface2,#EEF3FA);color:var(--fog,#8FA3BA);margin-left:6px;vertical-align:middle">INDUSTRY</span>' : ''}
+                </div>
+                <input type="hidden" name="ans${qi}" value="${q.answer}" />
+                ${q.options.map((opt, oi) => `
+                  <label class="quiz-option">
+                    <input type="radio" name="q${qi}" value="${oi}" style="margin-top:2px" required />
+                    <span>${esc(opt)}</span>
+                  </label>
+                `).join('')}
+              </div>
+            `).join('')}
+
+            <div style="display:flex;gap:12px;align-items:center;padding-top:8px">
+              <button type="submit" class="btn btn-primary">Submit & Grade</button>
+              <button type="button" class="btn btn-ghost" onclick="_certNavHub()">Cancel</button>
+            </div>
+          </form>
+        </div>
+
+        <div id="cert-results" style="display:none"></div>
+      </div>`;
+  }
+
+  // ══════════════════════════════════════
+  //  QUESTION GENERATION
+  // ══════════════════════════════════════
+  function generateQuestions(fund) {
+    const questions = [];
+    const funds = CTX.funds || [];
+    const name = fund.name || 'this offering';
+    const sponsor = fund.sponsor || 'the sponsor';
+
+    // ── OFFERING-SPECIFIC QUESTIONS ──
+
+    // 1 — Sponsor
+    if (fund.sponsor) {
+      const decoys = [...new Set(funds.map(f=>f.sponsor).filter(s=>s && s!==fund.sponsor))].sort(()=>Math.random()-0.5).slice(0,3);
+      if (decoys.length >= 2) {
+        while (decoys.length < 3) decoys.push('Inland Real Estate');
+        const opts = [fund.sponsor, ...decoys].sort(()=>Math.random()-0.5);
+        questions.push({ question: `Who is the sponsor of ${name}?`, options: opts, answer: opts.indexOf(fund.sponsor) });
+      }
+    }
+
+    // 2 — Y1 CoC
+    if (fund.y1CoC != null) {
+      const c = fund.y1CoC.toFixed(2)+'%';
+      const opts = [c, (fund.y1CoC+1.5).toFixed(2)+'%', (Math.max(0,fund.y1CoC-1.2)).toFixed(2)+'%', (fund.y1CoC+3.0).toFixed(2)+'%'].sort(()=>Math.random()-0.5);
+      questions.push({ question: `What is the projected Year 1 Cash-on-Cash return for ${name}?`, options: opts, answer: opts.indexOf(c) });
+    }
+
+    // 3 — LTV
+    if (fund.ltv != null) {
+      const c = fund.ltv.toFixed(0)+'%';
+      const opts = [c, (fund.ltv+15).toFixed(0)+'%', Math.max(0,fund.ltv-20).toFixed(0)+'%', (fund.ltv+30).toFixed(0)+'%'].sort(()=>Math.random()-0.5);
+      questions.push({ question: `What is the Loan-to-Value ratio for ${name}?`, options: opts, answer: opts.indexOf(c) });
+    }
+
+    // 4 — Minimum
+    if (fund.minimum != null) {
+      const c = '$'+fmtNum(fund.minimum);
+      const opts = [c, '$'+fmtNum(fund.minimum*2), '$'+fmtNum(Math.max(25000,fund.minimum/2)), '$'+fmtNum(fund.minimum+50000)].sort(()=>Math.random()-0.5);
+      questions.push({ question: `What is the minimum investment for ${name}?`, options: opts, answer: opts.indexOf(c) });
+    }
+
+    // 5 — Structure
+    if (fund.structure) {
+      const all = [...new Set(funds.map(f=>f.structure).filter(Boolean))];
+      const d = all.filter(s=>s!==fund.structure).sort(()=>Math.random()-0.5).slice(0,3);
+      while (d.length < 3) d.push('Private REIT');
+      const opts = [fund.structure, ...d.slice(0,3)].sort(()=>Math.random()-0.5);
+      questions.push({ question: `What investment structure is ${name}?`, options: opts, answer: opts.indexOf(fund.structure) });
+    }
+
+    // 6 — Asset Class
+    if (fund.assetClass) {
+      const all = [...new Set(funds.map(f=>f.assetClass).filter(Boolean))];
+      const d = all.filter(a=>a!==fund.assetClass).sort(()=>Math.random()-0.5).slice(0,3);
+      while (d.length < 3) d.push('Multi-Family');
+      const opts = [fund.assetClass, ...d.slice(0,3)].sort(()=>Math.random()-0.5);
+      questions.push({ question: `What asset class does ${name} primarily invest in?`, options: opts, answer: opts.indexOf(fund.assetClass) });
+    }
+
+    // 7 — Hold Period
+    if (fund.holdPeriod) {
+      const c = fund.holdPeriod.toString();
+      const d = ['3–5 Years','5–7 Years','7–10 Years','10–12 Years','10–15 Years','15+ Years'].filter(h=>h!==c).sort(()=>Math.random()-0.5).slice(0,3);
+      const opts = [c, ...d].sort(()=>Math.random()-0.5);
+      questions.push({ question: `What is the estimated hold period for ${name}?`, options: opts, answer: opts.indexOf(c) });
+    }
+
+    // 8 — Location
+    if (fund.location) {
+      const all = [...new Set(funds.map(f=>f.location).filter(Boolean))];
+      const d = all.filter(l=>l!==fund.location).sort(()=>Math.random()-0.5).slice(0,3);
+      while (d.length < 3) d.push('Phoenix, AZ');
+      const opts = [fund.location, ...d.slice(0,3)].sort(()=>Math.random()-0.5);
+      questions.push({ question: `Where are the properties located for ${name}?`, options: opts, answer: opts.indexOf(fund.location) });
+    }
+
+    // 9 — 721 UpREIT
+    if (fund.hasUPREIT != null) {
+      questions.push({ question: `Does ${name} offer a 721 UpREIT exchange option?`, options: ['Yes','No','Only for accredited investors','Only at sponsor discretion'], answer: fund.hasUPREIT ? 0 : 1 });
+    }
+
+    // 10 — Preferred return
+    if (fund.preferred != null) {
+      const c = fund.preferred.toFixed(2)+'%';
+      const opts = [c, (fund.preferred+1.5).toFixed(2)+'%', (Math.max(0,fund.preferred-1)).toFixed(2)+'%', (fund.preferred+3).toFixed(2)+'%'].sort(()=>Math.random()-0.5);
+      questions.push({ question: `What is the preferred return for investors in ${name}?`, options: opts, answer: opts.indexOf(c) });
+    }
+
+    // 11 — Rep Compensation
+    if (fund.repComp != null) {
+      const c = fund.repComp.toFixed(2)+'%';
+      const opts = [c, (fund.repComp+1.5).toFixed(2)+'%', (Math.max(0,fund.repComp-1)).toFixed(2)+'%', (fund.repComp+2.5).toFixed(2)+'%'].sort(()=>Math.random()-0.5);
+      questions.push({ question: `What is the broker-dealer compensation rate for ${name}?`, options: opts, answer: opts.indexOf(c) });
+    }
+
+    // 12 — % Leased
+    if (fund.pctLeased != null) {
+      const c = fund.pctLeased.toFixed(0)+'%';
+      const opts = [c, Math.min(100,fund.pctLeased+8).toFixed(0)+'%', Math.max(50,fund.pctLeased-12).toFixed(0)+'%', Math.max(60,fund.pctLeased-25).toFixed(0)+'%'].sort(()=>Math.random()-0.5);
+      questions.push({ question: `What is the current occupancy / percent leased for ${name}?`, options: opts, answer: opts.indexOf(c) });
+    }
+
+    // 13 — # Properties
+    if (fund.numAssets) {
+      const c = fund.numAssets.toString(); const n = parseInt(fund.numAssets)||1;
+      const opts = [c, String(Math.max(1,n+3)), String(Math.max(1,n-2)), String(n+7)].sort(()=>Math.random()-0.5);
+      questions.push({ question: `How many properties/assets are in the ${name} portfolio?`, options: opts, answer: opts.indexOf(c) });
+    }
+
+    // 14 — Distribution Freq
+    if (fund.distributionFreq) {
+      const c = fund.distributionFreq;
+      const d = ['Monthly','Quarterly','Semi-Annually','Annually'].filter(f=>f!==c);
+      const opts = [c, ...d.slice(0,3)].sort(()=>Math.random()-0.5);
+      questions.push({ question: `How often does ${name} distribute income to investors?`, options: opts, answer: opts.indexOf(c) });
+    }
+
+    // 15 — Tenant Credit
+    if (fund.tenantCredit) {
+      const c = fund.tenantCredit;
+      const d = ['Investment Grade','Non-Investment Grade','Mixed','Government / GSE','Unrated'].filter(x=>x!==c);
+      const opts = [c, ...d.slice(0,3)].sort(()=>Math.random()-0.5);
+      questions.push({ question: `What is the tenant credit quality for ${name}?`, options: opts, answer: opts.indexOf(c) });
+    }
+
+    // 16 — Avg Lease Term
+    if (fund.avgLeaseTerm) {
+      const c = fund.avgLeaseTerm.toString();
+      const d = ['3–5 Years','5–7 Years','7–10 Years','10–15 Years','15–20 Years','20+ Years'].filter(t=>t!==c);
+      const opts = [c, ...d.slice(0,3)].sort(()=>Math.random()-0.5);
+      questions.push({ question: `What is the average remaining lease term for ${name}?`, options: opts, answer: opts.indexOf(c) });
+    }
+
+    // 17 — Total Equity
+    if (fund.equityOffered != null) {
+      const c = '$'+shortNum(fund.equityOffered);
+      const opts = [c, '$'+shortNum(fund.equityOffered*1.5), '$'+shortNum(fund.equityOffered*0.5), '$'+shortNum(fund.equityOffered*2.2)].sort(()=>Math.random()-0.5);
+      questions.push({ question: `What is the total equity being offered for ${name}?`, options: opts, answer: opts.indexOf(c) });
+    }
+
+    // 18 — Sector
+    if (fund.sector && fund.sector !== fund.assetClass) {
+      const all = [...new Set(funds.map(f=>f.sector).filter(Boolean))];
+      const d = all.filter(s=>s!==fund.sector).sort(()=>Math.random()-0.5).slice(0,3);
+      while (d.length < 3) d.push('Healthcare');
+      const opts = [fund.sector, ...d.slice(0,3)].sort(()=>Math.random()-0.5);
+      questions.push({ question: `What sector does ${name} operate in?`, options: opts, answer: opts.indexOf(fund.sector) });
+    }
+
+    // 19 — isDST
+    if (fund.isDST != null) {
+      questions.push({ question: `Is ${name} eligible as a replacement property in a 1031 exchange?`, options: ['Yes — it is structured as a DST','No — it is not a DST','Only for exchanges over $1M','Only if the investor is accredited'], answer: fund.isDST ? 0 : 1 });
+    }
+
+    // 20 — Sponsor Years
+    if (fund.sponsorYears) {
+      const c = fund.sponsorYears.toString(); const n = parseInt(fund.sponsorYears)||10;
+      const opts = [c, String(n+8), String(Math.max(1,n-5)), String(n+15)].sort(()=>Math.random()-0.5);
+      questions.push({ question: `How many years has ${sponsor} been in business?`, options: opts, answer: opts.indexOf(c) });
+    }
+
+    // 21 — Sponsor AUM
+    if (fund.sponsorAUM) {
+      const c = '$'+shortNum(fund.sponsorAUM);
+      const opts = [c, '$'+shortNum(fund.sponsorAUM*2.5), '$'+shortNum(fund.sponsorAUM*0.4), '$'+shortNum(fund.sponsorAUM*1.8)].sort(()=>Math.random()-0.5);
+      questions.push({ question: `What is the total Assets Under Management (AUM) for ${sponsor}?`, options: opts, answer: opts.indexOf(c) });
+    }
+
+    // 22 — Sponsor Avg IRR
+    if (fund.sponsorAvgIRR != null) {
+      const c = fund.sponsorAvgIRR.toFixed(1)+'%';
+      const opts = [c, (fund.sponsorAvgIRR+4).toFixed(1)+'%', (Math.max(0,fund.sponsorAvgIRR-3)).toFixed(1)+'%', (fund.sponsorAvgIRR+8).toFixed(1)+'%'].sort(()=>Math.random()-0.5);
+      questions.push({ question: `What is ${sponsor}'s historical average net IRR across realized exits?`, options: opts, answer: opts.indexOf(c) });
+    }
+
+    // 23 — Sponsor Exits
+    if (fund.sponsorExits) {
+      const c = fund.sponsorExits.toString(); const n = parseInt(fund.sponsorExits)||5;
+      const opts = [c, String(n+6), String(Math.max(1,n-3)), String(n+12)].sort(()=>Math.random()-0.5);
+      questions.push({ question: `How many realized exits has ${sponsor} completed?`, options: opts, answer: opts.indexOf(c) });
+    }
+
+    // 24 — Purchase Price vs Appraised
+    if (fund.purchasePrice && fund.appraisedVal) {
+      const pp = parseMoney(fund.purchasePrice), av = parseMoney(fund.appraisedVal);
+      if (pp && av) {
+        const disc = ((av-pp)/av*100);
+        questions.push({ question: `Relative to its appraised value, was ${name} purchased at a discount or premium?`, options: [
+          'Discount of ~'+Math.abs(disc).toFixed(0)+'%', 'Premium of ~'+Math.abs(disc).toFixed(0)+'%',
+          'At par (no discount or premium)', 'Discount of ~'+(Math.abs(disc)+10).toFixed(0)+'%'
+        ], answer: disc >= 0 ? 0 : 1 });
+      }
+    }
+
+    // 25 — DSCR
+    if (fund.dscrBase) {
+      const c = fund.dscrBase.toString();
+      const opts = [c, '0.85x', '1.75x', '2.10x'].filter((v,i,a)=>a.indexOf(v)===i).sort(()=>Math.random()-0.5);
+      questions.push({ question: `What is the base-case Debt Service Coverage Ratio (DSCR) for ${name}?`, options: opts, answer: opts.indexOf(c) });
+    }
+
+    // 26 — Leverage characterization
+    if (fund.ltv != null) {
+      const lvl = fund.ltv===0?'All-cash / debt-free':fund.ltv<=35?'Conservative leverage':fund.ltv<=55?'Moderate leverage':'Higher leverage';
+      const opts = ['All-cash / debt-free','Conservative leverage','Moderate leverage','Higher leverage'];
+      questions.push({ question: `How would you characterize the leverage strategy for ${name} at ${fund.ltv.toFixed(0)}% LTV?`, options: opts, answer: opts.indexOf(lvl) });
+    }
+
+    // 27 — Raise Progress
+    if (fund.equityOffered && fund.currentRaise) {
+      const eq = parseMoney(fund.equityOffered), cr = parseMoney(fund.currentRaise);
+      if (eq && cr) {
+        const pct = Math.min(100, Math.round((cr/eq)*100));
+        const c = pct+'%';
+        const opts = [c, Math.min(100,pct+20)+'%', Math.max(5,pct-25)+'%', Math.min(100,pct+40)+'%'].sort(()=>Math.random()-0.5);
+        questions.push({ question: `Approximately what percentage of the total raise has ${name} completed?`, options: opts, answer: opts.indexOf(c) });
+      }
+    }
+
+    // ── GENERAL INDUSTRY QUESTIONS (pool of 30, pick up to 10) ──
+    const pool = [
+      { question:'What does "DST" stand for in the context of 1031 exchanges?', options:['Delaware Statutory Trust','Deferred Sales Trust','Direct Share Transfer','Diversified Savings Trust'], answer:0 },
+      { question:'Under IRC Section 1031, what is the identification period for replacement properties?', options:['45 days','60 days','90 days','180 days'], answer:0 },
+      { question:'Under IRC Section 1031, what is the total exchange period to close on replacement properties?', options:['45 days','90 days','180 days','365 days'], answer:2 },
+      { question:'How many replacement properties can an exchanger identify under the standard "3-Property Rule"?', options:['Up to 3','Up to 5','Up to 10','Unlimited'], answer:0 },
+      { question:'What does "LTV" stand for in real estate finance?', options:['Loan-to-Value','Long-Term Valuation','Lease-to-Vacancy','Leverage Threshold Volume'], answer:0 },
+      { question:'What does DSCR measure in a real estate investment?', options:['The ratio of net operating income to debt service payments','The discount rate on future cash flows','The debt-to-sponsor-capital ratio','The default scenario coverage requirement'], answer:0 },
+      { question:'In a DST structure, who is the borrower on the mortgage?', options:['The trust (DST entity) itself','Each individual investor','The sponsor personally','The broker-dealer'], answer:0 },
+      { question:'What is "cash-on-cash return"?', options:['Annual pre-tax cash flow divided by total equity invested','Total return including appreciation','Net operating income divided by property value','Gross rent minus expenses'], answer:0 },
+      { question:'What is a "preferred return" in a DST or private placement?', options:['A minimum return paid to investors before the sponsor shares in profits','The return preferred by the advisor','The highest projected return scenario','A guaranteed return backed by insurance'], answer:0 },
+      { question:'Can investors in a DST make major decisions about the property?', options:['No — the "Seven Deadly Sins" restrict beneficial owner activity','Yes — investors vote on all major decisions','Only if they own more than 10% of the trust','Only during the first year of the hold period'], answer:0 },
+      { question:'What is a 721 UpREIT exchange?', options:['A tax-deferred exchange of DST interests into OP units of a REIT','A government tax credit program','An exchange requiring 721 days to complete','A conversion of REIT shares into DST interests'], answer:0 },
+      { question:'What is the typical minimum investment for a DST offering?', options:['$25,000–$100,000','$500–$1,000','$1,000,000+','$5,000–$10,000'], answer:0 },
+      { question:'Who must investors be to participate in most DST offerings?', options:['Accredited investors','Any U.S. citizen over 18','Only institutional investors','Only registered investment advisors'], answer:0 },
+      { question:'What tax form do DST investors typically receive for annual reporting?', options:['Schedule K-1','Form 1099-DIV','Form W-2','Schedule D'], answer:0 },
+      { question:'What does "Cap Rate" (Capitalization Rate) measure?', options:['Net Operating Income divided by property value','Total return including leverage','The interest rate on the mortgage','The maximum appreciation rate'], answer:0 },
+      { question:'What is "boot" in the context of a 1031 exchange?', options:['Taxable gain triggered when exchange proceeds are not fully reinvested','A type of real estate insurance','The initial deposit on a replacement property','A penalty for late identification'], answer:0 },
+      { question:'What is the primary tax benefit of a 1031 exchange?', options:['Deferral of capital gains taxes on the sale of investment property','Elimination of all future property taxes','A federal tax credit equal to 10% of the investment','Conversion of ordinary income to long-term capital gains'], answer:0 },
+      { question:'Which type of property is NOT eligible for a 1031 exchange?', options:['Primary residence','Rental property','Commercial building','Vacant land held for investment'], answer:0 },
+      { question:'What does "NOI" stand for in real estate?', options:['Net Operating Income','National Offering Index','Non-Operating Investment','Net Occupancy Indicator'], answer:0 },
+      { question:'What is the max number of investors typically allowed in a DST (per Rev. Rul. 2004-86)?', options:['499','100','50','Unlimited'], answer:0 },
+      { question:'What is "depreciation recapture" when selling investment real estate?', options:['Taxes owed on previously claimed depreciation deductions','Recovering value lost from wear and tear','A method of accelerating depreciation in year one','Reclaiming depreciation expenses from the IRS'], answer:0 },
+      { question:'What entity type typically holds DST properties?', options:['A Delaware Statutory Trust organized under Delaware law','An LLC organized in the investor\'s home state','A C-Corporation','A sole proprietorship'], answer:0 },
+      { question:'What is the "200% Rule" in a 1031 exchange?', options:['You can identify more than 3 properties if total value doesn\'t exceed 200% of the relinquished property','You must invest at least 200% of your original equity','The replacement property must be worth 200% of the original','Exchange fees cannot exceed 200% of closing costs'], answer:0 },
+      { question:'What does "accredited investor" mean under SEC Regulation D?', options:['An individual with $1M+ net worth (ex primary residence) or $200K+ annual income','Anyone who has taken a securities exam','An investor approved by FINRA','A person with a CPA or CFP designation'], answer:0 },
+      { question:'What is a Qualified Intermediary (QI) in a 1031 exchange?', options:['A third party who holds exchange proceeds to prevent constructive receipt','The real estate broker managing the sale','The tax attorney filing the exchange paperwork','The appraiser who values the replacement property'], answer:0 },
+      { question:'What is a "master lease" in a DST offering?', options:['A lease where the sponsor or affiliate guarantees rent payments to the trust','A lease for the largest tenant in a multi-tenant property','A government-backed lease guarantee program','A short-term lease covering the first 12 months only'], answer:0 },
+      { question:'Which federal securities exemption do most DST offerings rely on?', options:['Regulation D (Rule 506(b) or 506(c))','Regulation A+','Regulation S','Regulation Crowdfunding'], answer:0 },
+      { question:'What is "phantom income" risk in a DST?', options:['Taxable income reported on K-1 without corresponding cash distributions','Income that appears on projections but is never realized','Rental income from vacant units','Income taxed at a phantom (lower) rate'], answer:0 },
+      { question:'What does the "sponsor" of a DST do?', options:['Sources, acquires, and manages the property on behalf of investors','Provides personal guarantees to each investor','Regulates the offering on behalf of the SEC','Sells the property to the highest bidder at the end of the hold period'], answer:0 },
+      { question:'What is "like-kind" property under Section 1031?', options:['Any real property held for investment or business use, regardless of property type','Only properties of the same asset class (office for office)','Only properties in the same state','Properties with the same purchase price'], answer:0 },
+    ];
+
+    const targetTotal = Math.min(25, questions.length + 10);
+    const needed = Math.max(0, targetTotal - questions.length);
+    const general = pool.sort(()=>Math.random()-0.5).slice(0, Math.min(needed, 10));
+    general.forEach(q => { q.isGeneral = true; });
+
+    return [...questions, ...general];
+  }
+
+  // ══════════════════════════════════════
+  //  GRADING
+  // ══════════════════════════════════════
+  function gradeQuiz(event, fundId) {
+    event.preventDefault();
+    const fund = CTX.funds.find(f => f.id === fundId);
+    if (!fund) return false;
+
+    const form = document.getElementById('cert-quiz-form');
+    const answerInputs = form.querySelectorAll('input[name^="ans"]');
+    const totalQ = answerInputs.length;
+    let correct = 0;
+    const results = [];
+
+    for (let qi = 0; qi < totalQ; qi++) {
+      const correctAnswer = parseInt(form.querySelector('input[name="ans'+qi+'"]').value);
+      const selected = form.querySelector('input[name="q'+qi+'"]:checked');
+      const userAnswer = selected ? parseInt(selected.value) : -1;
+      const isCorrect = userAnswer === correctAnswer;
+      if (isCorrect) correct++;
+
+      const qDiv = form.querySelector('[data-q="'+qi+'"]');
+      const questionText = qDiv?.querySelector('div')?.textContent?.replace(/^\d+\.\s*/, '').replace(/INDUSTRY$/, '').trim() || '';
+      const optionLabels = [...qDiv.querySelectorAll('label span')].map(s => s.textContent);
+      results.push({ question: questionText, userAnswer, correctAnswer, options: optionLabels, isCorrect });
+    }
+
+    const score = Math.round(correct / totalQ * 100);
+    const passed = score >= 70;
+
+    // Save
+    const certStatus = getCertStatus();
+    certStatus[fundId] = {
+      passed, score,
+      date: new Date().toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' }),
+      attempts: (certStatus[fundId]?.attempts || 0) + 1
+    };
+    saveCertStatus(certStatus);
+
+    // Show results
+    const resultsEl = document.getElementById('cert-results');
+    const quizPanel = document.getElementById('cert-quiz-panel');
+    quizPanel.style.display = 'none';
+    resultsEl.style.display = '';
+
+    resultsEl.innerHTML = `
+      <div class="quiz-result ${passed?'pass':'fail'}">
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px">
+          <div class="quiz-score-circle" style="${passed?'background:var(--green-lt,#E8F7EF);color:var(--green,#1A7A4A)':'background:var(--red-lt,#FEE2E2);color:var(--red,#991B1B)'}">
+            ${score}%
+          </div>
+          <div>
+            <div style="font-size:20px;font-weight:800;color:${passed?'var(--green,#1A7A4A)':'var(--red,#991B1B)'}">${passed ? '🎓 Certified!' : '✗ Not Yet Passed'}</div>
+            <div style="font-size:13px;color:var(--slate2,#5C7A99)">${correct} of ${totalQ} correct · ${passed?'You have earned certification for this offering':'You need 70% to pass — review the key facts and try again'}</div>
+          </div>
+        </div>
+
+        <div style="border-top:1px solid var(--mist,#C8D8E8);padding-top:16px">
+          <div style="font-size:13px;font-weight:600;color:var(--navy,#0B1F3B);margin-bottom:12px">Answer Review</div>
+          ${results.map((r, i) => `
+            <div class="answer-row ${r.isCorrect?'answer-correct':'answer-wrong'}">
+              <div style="font-size:12.5px;font-weight:600;color:${r.isCorrect?'var(--green,#1A7A4A)':'var(--red,#991B1B)'}">
+                ${r.isCorrect ? '✓' : '✗'} Q${i+1}: ${esc(r.question)}
+              </div>
+              ${!r.isCorrect ? '<div style="font-size:12px;color:var(--slate2,#5C7A99);margin-top:4px">Your answer: '+esc(r.options[r.userAnswer]||'—')+' · Correct: <strong>'+esc(r.options[r.correctAnswer])+'</strong></div>' : ''}
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px">
+        ${!passed ? '<button class="btn btn-primary" onclick="_certNavQuiz('+fundId+')">↻ Retake Training</button>' : ''}
+        <button class="btn btn-secondary" onclick="_certNavHub()">← Back to Certification Center</button>
+        <button class="btn btn-ghost" onclick="_certNavTo(\'offering_detail\','+fundId+')">View Offering Detail</button>
+      </div>`;
+
+    const main = document.getElementById('main');
+    if (main) main.scrollTop = 0;
+    return false;
+  }
+
+  // ── Filter helpers ──
+  function filterCards(query) {
+    const q = query.toLowerCase();
+    document.querySelectorAll('.cert-card').forEach(card => {
+      card.style.display = (card.dataset.name||'').toLowerCase().includes(q) ? '' : 'none';
+    });
+  }
+
+  function filterByStatus(status, btn) {
+    document.querySelectorAll('.cert-filters [data-status]').forEach(t => t.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    document.querySelectorAll('.cert-card').forEach(card => {
+      if (status === 'all') { card.style.display = ''; return; }
+      card.style.display = card.dataset.status === status ? '' : 'none';
+    });
+  }
+
+  // ══════════════════════════════════════
+  //  MODULE EXPORT
+  // ══════════════════════════════════════
+  window.currentModule = {
+    async init(ctx) {
+      CTX = ctx;
+
+      // Determine mode from params
+      const subView = ctx.params?.subView || '';
+      const offeringId = ctx.params?.id;
+
+      if (subView === 'testing_offering' && offeringId != null) {
+        SELECTED_FUND = CTX.funds.find(f => f.id === offeringId) || null;
+        MODE = SELECTED_FUND ? 'quiz' : 'hub';
+      } else {
+        MODE = 'hub';
+        SELECTED_FUND = null;
+      }
+
+      renderModule();
+    }
+  };
+
+})();
+</script>
+</body>
+</html>
