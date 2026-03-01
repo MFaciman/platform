@@ -1,0 +1,778 @@
+<style>
+/* ═══════════════════════════════════════════
+   CLIENT REPORT MODULE — Presentation-ready
+═══════════════════════════════════════════ */
+
+/* ── Gate Screen ── */
+.cr-gate {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  min-height: 70vh; text-align: center; padding: 40px 20px;
+}
+.cr-gate-icon {
+  width: 72px; height: 72px; border-radius: 50%;
+  background: linear-gradient(135deg, #ECFEFF, #CFFAFE);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 30px; margin-bottom: 18px;
+}
+.cr-gate h2 { font-size: 20px; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
+.cr-gate p { font-size: 13.5px; color: var(--slate2); max-width: 380px; line-height: 1.55; margin-bottom: 22px; }
+.cr-gate-btn {
+  padding: 10px 24px; border-radius: 8px; border: none;
+  background: var(--navy); color: #fff; font-size: 13px; font-weight: 600;
+  font-family: var(--font); cursor: pointer; transition: all 0.18s;
+}
+.cr-gate-btn:hover { background: var(--navy2); transform: translateY(-1px); }
+
+/* ── Report Shell ── */
+.cr-wrap { padding: 28px 32px 60px; max-width: 1100px; margin: 0 auto; }
+
+/* ── Header / Title Bar ── */
+.cr-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  margin-bottom: 28px; gap: 16px;
+}
+.cr-header-left { flex: 1; }
+.cr-report-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--report-accent); margin-bottom: 6px;
+  display: flex; align-items: center; gap: 6px;
+}
+.cr-report-label::before {
+  content: ''; width: 18px; height: 2px; background: var(--report-accent); border-radius: 1px;
+}
+.cr-client-name { font-size: 26px; font-weight: 800; color: var(--navy); letter-spacing: -0.03em; line-height: 1.15; }
+.cr-client-sub { font-size: 13px; color: var(--slate2); margin-top: 4px; }
+.cr-header-right { display: flex; gap: 8px; flex-shrink: 0; margin-top: 6px; }
+.cr-btn {
+  padding: 7px 16px; border-radius: 7px; border: 1.5px solid var(--mist);
+  background: var(--white); font-size: 12px; font-weight: 600; color: var(--slate);
+  font-family: var(--font); cursor: pointer; transition: all 0.18s;
+  display: flex; align-items: center; gap: 5px;
+}
+.cr-btn:hover { border-color: var(--navy2); color: var(--navy); background: var(--ice); }
+.cr-btn-primary { background: var(--navy); color: #fff; border-color: var(--navy); }
+.cr-btn-primary:hover { background: var(--navy2); }
+
+/* ── Print-specific header ── */
+.cr-print-header { display: none; }
+
+/* ── Section Containers ── */
+.cr-section {
+  background: var(--white); border: 1px solid var(--mist); border-radius: var(--radius-lg);
+  margin-bottom: 20px; overflow: hidden;
+}
+.cr-section-head {
+  display: flex; align-items: center; gap: 10px;
+  padding: 16px 22px; border-bottom: 1px solid var(--surface2);
+}
+.cr-section-icon {
+  width: 30px; height: 30px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; flex-shrink: 0;
+}
+.cr-section-head h3 {
+  font-size: 13.5px; font-weight: 700; color: var(--navy); letter-spacing: 0.01em;
+}
+.cr-section-head .cr-section-sub {
+  font-size: 11.5px; color: var(--fog); margin-left: auto; font-weight: 500;
+}
+.cr-section-body { padding: 20px 22px; }
+
+/* ── KPI Strip (top-level stats) ── */
+.cr-kpis {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+  gap: 14px; margin-bottom: 24px;
+}
+.cr-kpi {
+  background: var(--surface); border: 1px solid var(--surface2); border-radius: var(--radius);
+  padding: 16px 18px; text-align: center; position: relative; overflow: hidden;
+}
+.cr-kpi::after {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+}
+.cr-kpi.kpi-income::after { background: linear-gradient(90deg, #059669, #34D399); }
+.cr-kpi.kpi-leverage::after { background: linear-gradient(90deg, #D97706, #FBBF24); }
+.cr-kpi.kpi-invested::after { background: linear-gradient(90deg, var(--navy2), var(--navy3)); }
+.cr-kpi.kpi-holdings::after { background: linear-gradient(90deg, #7C3AED, #A78BFA); }
+.cr-kpi.kpi-suit::after { background: linear-gradient(90deg, #0D7490, #22D3EE); }
+.cr-kpi.kpi-exchange::after { background: linear-gradient(90deg, #2563EB, #60A5FA); }
+.cr-kpi-val {
+  font-size: 26px; font-weight: 800; color: var(--navy); letter-spacing: -0.03em;
+  line-height: 1; margin-bottom: 4px;
+}
+.cr-kpi-label {
+  font-size: 10.5px; font-weight: 600; color: var(--slate2); text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.cr-kpi-sub { font-size: 11px; color: var(--fog); margin-top: 3px; }
+
+/* ── Profile Grid ── */
+.cr-profile-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+}
+.cr-profile-col { }
+.cr-profile-col:first-child { border-right: 1px solid var(--surface2); padding-right: 22px; }
+.cr-profile-col:last-child { padding-left: 22px; }
+.cr-profile-row {
+  display: flex; justify-content: space-between; align-items: baseline;
+  padding: 8px 0; border-bottom: 1px solid var(--surface2); font-size: 13px;
+}
+.cr-profile-row:last-child { border-bottom: none; }
+.cr-profile-key { color: var(--slate2); font-weight: 500; }
+.cr-profile-val { color: var(--navy); font-weight: 600; text-align: right; }
+
+/* ── Holdings Table ── */
+.cr-holdings-table { width: 100%; border-collapse: collapse; }
+.cr-holdings-table thead th {
+  text-align: left; padding: 10px 14px; font-size: 10px; font-weight: 700;
+  color: var(--fog); text-transform: uppercase; letter-spacing: 0.08em;
+  border-bottom: 1.5px solid var(--mist); white-space: nowrap;
+}
+.cr-holdings-table tbody tr { border-bottom: 1px solid var(--surface2); transition: background 0.15s; }
+.cr-holdings-table tbody tr:hover { background: var(--surface); }
+.cr-holdings-table tbody td {
+  padding: 12px 14px; font-size: 13px; color: var(--slate); white-space: nowrap;
+}
+.cr-holdings-table tbody td:first-child { color: var(--navy); font-weight: 600; }
+.cr-holdings-table tfoot td {
+  padding: 12px 14px; font-size: 13px; font-weight: 700; color: var(--navy);
+  border-top: 2px solid var(--navy); background: var(--surface);
+}
+
+/* Score chip */
+.cr-score {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 9px; border-radius: 12px; font-size: 11.5px; font-weight: 700;
+}
+.cr-score.high { background: var(--green-lt); color: var(--green); }
+.cr-score.mid  { background: var(--amber-lt); color: var(--amber); }
+.cr-score.low  { background: var(--red-lt);   color: var(--red); }
+
+/* Property type tag */
+.cr-tag {
+  display: inline-block; padding: 2px 8px; border-radius: 4px;
+  font-size: 11px; font-weight: 600; background: var(--ice); color: var(--navy2);
+}
+
+/* ── Diversification Charts ── */
+.cr-div-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.cr-div-card { text-align: center; }
+.cr-div-card h4 {
+  font-size: 11px; font-weight: 700; color: var(--slate2); text-transform: uppercase;
+  letter-spacing: 0.06em; margin-bottom: 14px;
+}
+.cr-div-bar-wrap { display: flex; flex-direction: column; gap: 8px; }
+.cr-div-row { display: flex; align-items: center; gap: 10px; }
+.cr-div-label { font-size: 12px; color: var(--slate); font-weight: 500; min-width: 90px; text-align: left; }
+.cr-div-bar {
+  flex: 1; height: 20px; background: var(--surface); border-radius: 4px; overflow: hidden; position: relative;
+}
+.cr-div-fill {
+  height: 100%; border-radius: 4px; transition: width 0.5s ease;
+  display: flex; align-items: center; justify-content: flex-end; padding-right: 6px;
+  font-size: 10px; font-weight: 700; color: #fff; min-width: 28px;
+}
+
+/* Div bar color palette */
+.cr-div-fill.c0 { background: var(--navy); }
+.cr-div-fill.c1 { background: var(--navy2); }
+.cr-div-fill.c2 { background: var(--navy3); }
+.cr-div-fill.c3 { background: var(--slate); }
+.cr-div-fill.c4 { background: var(--slate2); }
+.cr-div-fill.c5 { background: #7C3AED; }
+.cr-div-fill.c6 { background: #0D7490; }
+.cr-div-fill.c7 { background: #D97706; }
+
+/* ── Suitability Detail ── */
+.cr-suit-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
+.cr-suit-card {
+  border: 1px solid var(--surface2); border-radius: var(--radius); padding: 14px 16px;
+  position: relative; overflow: hidden;
+}
+.cr-suit-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+}
+.cr-suit-card.suit-high::before { background: var(--green); }
+.cr-suit-card.suit-mid::before  { background: var(--amber); }
+.cr-suit-card.suit-low::before  { background: var(--red); }
+.cr-suit-name { font-size: 13px; font-weight: 700; color: var(--navy); margin-bottom: 2px; }
+.cr-suit-sponsor { font-size: 11px; color: var(--fog); margin-bottom: 8px; }
+.cr-suit-score-row { display: flex; align-items: center; gap: 8px; }
+.cr-suit-bar { flex: 1; height: 6px; background: var(--surface); border-radius: 3px; overflow: hidden; }
+.cr-suit-bar-fill { height: 100%; border-radius: 3px; transition: width 0.5s; }
+.cr-suit-bar-fill.high { background: var(--green); }
+.cr-suit-bar-fill.mid  { background: var(--amber); }
+.cr-suit-bar-fill.low  { background: var(--red); }
+.cr-suit-pct { font-size: 13px; font-weight: 700; min-width: 34px; text-align: right; }
+
+/* ── Activity Timeline ── */
+.cr-timeline { position: relative; padding-left: 22px; }
+.cr-timeline::before {
+  content: ''; position: absolute; left: 7px; top: 4px; bottom: 4px;
+  width: 2px; background: var(--surface2); border-radius: 1px;
+}
+.cr-tl-item { position: relative; padding-bottom: 16px; }
+.cr-tl-item:last-child { padding-bottom: 0; }
+.cr-tl-dot {
+  position: absolute; left: -19px; top: 3px;
+  width: 10px; height: 10px; border-radius: 50%; border: 2px solid var(--white);
+}
+.cr-tl-dot.saved   { background: var(--green); }
+.cr-tl-dot.viewed  { background: var(--navy2); }
+.cr-tl-dot.report  { background: #7C3AED; }
+.cr-tl-dot.loaded  { background: var(--slate2); }
+.cr-tl-dot.default { background: var(--fog); }
+.cr-tl-action { font-size: 12.5px; font-weight: 600; color: var(--navy); }
+.cr-tl-detail { font-size: 12px; color: var(--slate2); margin-top: 1px; }
+.cr-tl-time { font-size: 11px; color: var(--fog); margin-top: 2px; }
+
+/* ── Exchange Progress ── */
+.cr-exchange-bars { display: flex; flex-direction: column; gap: 14px; }
+.cr-exch-row label { display: block; font-size: 11px; font-weight: 600; color: var(--slate2); margin-bottom: 4px; }
+.cr-exch-track { height: 22px; background: var(--surface); border-radius: 6px; overflow: hidden; position: relative; }
+.cr-exch-fill {
+  height: 100%; border-radius: 6px; display: flex; align-items: center;
+  padding: 0 8px; font-size: 10.5px; font-weight: 700; color: #fff; transition: width 0.6s ease;
+}
+.cr-exch-fill.equity { background: linear-gradient(90deg, var(--navy2), var(--navy3)); }
+.cr-exch-fill.debt   { background: linear-gradient(90deg, #D97706, #F59E0B); }
+.cr-exch-vals {
+  display: flex; justify-content: space-between; font-size: 11px; color: var(--fog);
+  margin-top: 3px;
+}
+
+/* ── Empty state in sections ── */
+.cr-empty {
+  text-align: center; padding: 28px 16px; color: var(--fog); font-size: 13px; font-style: italic;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .cr-wrap { padding: 16px; }
+  .cr-header { flex-direction: column; }
+  .cr-profile-grid { grid-template-columns: 1fr; }
+  .cr-profile-col:first-child { border-right: none; padding-right: 0; border-bottom: 1px solid var(--surface2); padding-bottom: 12px; margin-bottom: 12px; }
+  .cr-profile-col:last-child { padding-left: 0; }
+  .cr-div-grid { grid-template-columns: 1fr; }
+  .cr-kpis { grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); }
+}
+
+/* ── Print ── */
+@media print {
+  .cr-header-right, .cr-btn { display: none !important; }
+  .cr-print-header { display: block !important; margin-bottom: 20px; }
+  .cr-section { break-inside: avoid; border: 1px solid #ddd; }
+  .cr-wrap { padding: 0; max-width: none; }
+}
+</style>
+
+<div id="cr-root"></div>
+
+<script>
+(function() {
+  'use strict';
+
+  let AFL, funds, client, peer, crmClient, db, currentUser;
+  let activities = [];
+
+  /* ── Helpers ── */
+  function esc(s) { return AFL ? AFL.escapeHTML(s) : String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  function fmtMoney(v) {
+    if (v == null || v === '' || isNaN(Number(v))) return '—';
+    const n = Number(v);
+    if (n >= 1e6) return '$' + (n / 1e6).toFixed(1) + 'M';
+    if (n >= 1e3) return '$' + (n / 1e3).toFixed(0) + 'K';
+    return '$' + n.toLocaleString();
+  }
+  function fmtPct(v, dec) {
+    if (v == null || isNaN(Number(v))) return '—';
+    const n = Number(v);
+    // Auto-detect: if < 1, assume decimal form
+    const pct = n < 1 && n > 0 ? n * 100 : n;
+    return pct.toFixed(dec != null ? dec : 1) + '%';
+  }
+  function fmtDate(d) {
+    if (!d) return '—';
+    try { return new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }); }
+    catch(e) { return String(d); }
+  }
+  function scoreClass(s) { return s >= 75 ? 'high' : s >= 50 ? 'mid' : 'low'; }
+
+  /* ── Get enriched holdings (match CRM holdings → live fund data) ── */
+  function getEnrichedHoldings() {
+    if (!crmClient || !crmClient.portfolio || !crmClient.portfolio.holdings) return [];
+    return crmClient.portfolio.holdings.map(h => {
+      const fund = (funds || []).find(f => f.id === h.offeringId || f.id === Number(h.offeringId));
+      const score = fund && AFL && AFL.suitScore ? AFL.suitScore(fund, client, peer) : null;
+      return { ...h, fund, score };
+    });
+  }
+
+  /* ── Render Gate (no client loaded) ── */
+  function renderGate() {
+    return `
+      <div class="cr-gate">
+        <div class="cr-gate-icon">&#128203;</div>
+        <h2>Client Report View</h2>
+        <p>Load a client from the CRM to generate a personalized portfolio report. This view pulls holdings, suitability scores, and activity history for the selected client.</p>
+        <button class="cr-gate-btn" onclick="if(AFL&&AFL.navigate)AFL.navigate('crm')">Open CRM →</button>
+      </div>`;
+  }
+
+  /* ── Main Report ── */
+  function renderReport() {
+    const c = crmClient;
+    const name = ((c.firstName || '') + ' ' + (c.lastName || '')).trim() || 'Client';
+    const holdings = getEnrichedHoldings();
+    const hasHoldings = holdings.length > 0;
+
+    return `
+      <div class="cr-wrap">
+        ${renderReportHeader(name, c)}
+        ${renderKPIs(holdings, c)}
+        ${renderClientProfile(c)}
+        ${hasHoldings ? renderHoldingsTable(holdings) : ''}
+        ${hasHoldings ? renderDiversification(holdings) : ''}
+        ${hasHoldings ? renderExchangeProgress(holdings, c) : ''}
+        ${hasHoldings ? renderSuitability(holdings) : ''}
+        <div id="cr-timeline-section">
+          ${renderTimelineSection()}
+        </div>
+      </div>`;
+  }
+
+  function renderReportHeader(name, c) {
+    const accBadge = c.accreditation === 'Accredited' ? '<span style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:10.5px;font-weight:700;background:var(--green-lt);color:var(--green);margin-left:10px;">Accredited Investor</span>'
+      : c.accreditation === 'Qualified Purchaser' ? '<span style="display:inline-block;padding:2px 8px;border-radius:4px;font-size:10.5px;font-weight:700;background:var(--blue-lt);color:var(--blue);margin-left:10px;">Qualified Purchaser</span>'
+      : '';
+    const entity = c.entity ? ` · ${esc(c.entity)}` : '';
+    const today = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+
+    return `
+      <div class="cr-header">
+        <div class="cr-header-left">
+          <div class="cr-report-label">Client Portfolio Report</div>
+          <div class="cr-client-name">${esc(name)}${accBadge}</div>
+          <div class="cr-client-sub">Prepared ${today}${entity}</div>
+        </div>
+        <div class="cr-header-right">
+          <button class="cr-btn" onclick="window.print()">&#128424; Print</button>
+          <button class="cr-btn" onclick="if(AFL&&AFL.navigate)AFL.navigate('crm')">&#128203; CRM</button>
+        </div>
+      </div>`;
+  }
+
+  /* ── KPI Strip ── */
+  function renderKPIs(holdings, c) {
+    const enriched = holdings.filter(h => h.fund);
+
+    // Weighted Y1 CoC (equal weight for now since we don't track allocation amounts)
+    let wY1 = null;
+    const cocVals = enriched.map(h => h.fund.y1coc ?? h.fund.y1CoC).filter(v => v != null);
+    if (cocVals.length) wY1 = cocVals.reduce((a, b) => a + b, 0) / cocVals.length;
+
+    // Weighted LTV
+    let wLTV = null;
+    const ltvVals = enriched.map(h => h.fund.ltv).filter(v => v != null);
+    if (ltvVals.length) wLTV = ltvVals.reduce((a, b) => a + b, 0) / ltvVals.length;
+
+    // Average suit score
+    const scores = holdings.map(h => h.score).filter(s => s != null);
+    const avgScore = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : null;
+
+    // Exchange equity
+    const exEq = c.exchangeAmount || c.investableAssets || null;
+
+    // Estimated annual income (Y1 CoC × equity, rough)
+    let estIncome = null;
+    if (wY1 != null && exEq != null) {
+      const cocPct = wY1 < 1 ? wY1 : wY1 / 100;
+      estIncome = cocPct * Number(exEq);
+    }
+
+    return `
+      <div class="cr-kpis">
+        <div class="cr-kpi kpi-income">
+          <div class="cr-kpi-val">${wY1 != null ? fmtPct(wY1) : '—'}</div>
+          <div class="cr-kpi-label">Blended Y1 CoC</div>
+          ${estIncome ? `<div class="cr-kpi-sub">≈ ${fmtMoney(estIncome)}/yr est. income</div>` : ''}
+        </div>
+        <div class="cr-kpi kpi-leverage">
+          <div class="cr-kpi-val">${wLTV != null ? fmtPct(wLTV, 0) : '—'}</div>
+          <div class="cr-kpi-label">Blended LTV</div>
+          <div class="cr-kpi-sub">${wLTV != null ? (wLTV < 1 ? wLTV * 100 : wLTV) <= 50 ? 'Conservative' : (wLTV < 1 ? wLTV * 100 : wLTV) <= 65 ? 'Moderate' : 'Aggressive' : ''} leverage</div>
+        </div>
+        <div class="cr-kpi kpi-exchange">
+          <div class="cr-kpi-val">${fmtMoney(exEq)}</div>
+          <div class="cr-kpi-label">Exchange Equity</div>
+          ${c.is1031 === 'Yes' ? '<div class="cr-kpi-sub">1031 Exchange</div>' : ''}
+        </div>
+        <div class="cr-kpi kpi-holdings">
+          <div class="cr-kpi-val">${holdings.length}</div>
+          <div class="cr-kpi-label">Holdings</div>
+          <div class="cr-kpi-sub">${enriched.length} matched to live data</div>
+        </div>
+        <div class="cr-kpi kpi-suit">
+          <div class="cr-kpi-val">${avgScore != null ? avgScore + '%' : '—'}</div>
+          <div class="cr-kpi-label">Avg Suitability</div>
+          ${avgScore != null ? `<div class="cr-kpi-sub">${avgScore >= 75 ? 'Strong' : avgScore >= 50 ? 'Moderate' : 'Needs review'} fit</div>` : ''}
+        </div>
+      </div>`;
+  }
+
+  /* ── Client Profile Section ── */
+  function renderClientProfile(c) {
+    const objectives = c.objectives ? (Array.isArray(c.objectives) ? c.objectives.join(', ') : c.objectives) : '—';
+    const propTypes = c.propTypes ? (Array.isArray(c.propTypes) ? c.propTypes.join(', ') : c.propTypes) : '—';
+
+    return `
+      <div class="cr-section">
+        <div class="cr-section-head">
+          <div class="cr-section-icon" style="background:var(--ice);color:var(--navy2);">&#128100;</div>
+          <h3>Client Profile</h3>
+        </div>
+        <div class="cr-section-body">
+          <div class="cr-profile-grid">
+            <div class="cr-profile-col">
+              <div class="cr-profile-row"><span class="cr-profile-key">Entity</span><span class="cr-profile-val">${esc(c.entity) || '—'}</span></div>
+              <div class="cr-profile-row"><span class="cr-profile-key">State</span><span class="cr-profile-val">${esc(c.state) || '—'}</span></div>
+              <div class="cr-profile-row"><span class="cr-profile-key">Risk Tolerance</span><span class="cr-profile-val">${esc(c.riskTolerance) || '—'}</span></div>
+              <div class="cr-profile-row"><span class="cr-profile-key">Investment Horizon</span><span class="cr-profile-val">${esc(c.investmentHorizon) || '—'}</span></div>
+              <div class="cr-profile-row"><span class="cr-profile-key">Objectives</span><span class="cr-profile-val">${esc(objectives)}</span></div>
+              <div class="cr-profile-row"><span class="cr-profile-key">Property Prefs</span><span class="cr-profile-val">${esc(propTypes)}</span></div>
+            </div>
+            <div class="cr-profile-col">
+              <div class="cr-profile-row"><span class="cr-profile-key">Net Worth</span><span class="cr-profile-val">${fmtMoney(c.netWorth)}</span></div>
+              <div class="cr-profile-row"><span class="cr-profile-key">Liquid Net Worth</span><span class="cr-profile-val">${fmtMoney(c.liquidNetWorth)}</span></div>
+              <div class="cr-profile-row"><span class="cr-profile-key">Annual Income</span><span class="cr-profile-val">${fmtMoney(c.annualIncome)}</span></div>
+              <div class="cr-profile-row"><span class="cr-profile-key">Investable Assets</span><span class="cr-profile-val">${fmtMoney(c.investableAssets)}</span></div>
+              <div class="cr-profile-row"><span class="cr-profile-key">Tax Bracket</span><span class="cr-profile-val">${esc(c.taxBracket) || '—'}</span></div>
+              <div class="cr-profile-row"><span class="cr-profile-key">Accreditation</span><span class="cr-profile-val">${esc(c.accreditation) || '—'}</span></div>
+            </div>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  /* ── Holdings Table ── */
+  function renderHoldingsTable(holdings) {
+    let rows = '';
+    holdings.forEach(h => {
+      const f = h.fund;
+      const y1 = f ? (f.y1coc ?? f.y1CoC) : null;
+      const ltv = f ? f.ltv : null;
+      const occ = f ? (f.occupancy ?? f.pctLeased) : null;
+      const propType = f ? (f.assetClass || f.propertyType || '') : (h.structure || '');
+      const sc = h.score;
+      const scCls = sc != null ? scoreClass(sc) : '';
+
+      rows += `<tr>
+        <td>${esc(h.name)}</td>
+        <td>${esc(h.sponsor)}</td>
+        <td><span class="cr-tag">${esc(propType) || '—'}</span></td>
+        <td>${y1 != null ? fmtPct(y1) : '—'}</td>
+        <td>${ltv != null ? fmtPct(ltv, 0) : '—'}</td>
+        <td>${occ != null ? fmtPct(occ, 0) : '—'}</td>
+        <td>${sc != null ? `<span class="cr-score ${scCls}">${sc}%</span>` : '—'}</td>
+      </tr>`;
+    });
+
+    // Averages for footer
+    const enriched = holdings.filter(h => h.fund);
+    const cocVals = enriched.map(h => h.fund.y1coc ?? h.fund.y1CoC).filter(v => v != null);
+    const ltvVals = enriched.map(h => h.fund.ltv).filter(v => v != null);
+    const occVals = enriched.map(h => h.fund.occupancy ?? h.fund.pctLeased).filter(v => v != null);
+    const scores = holdings.map(h => h.score).filter(s => s != null);
+    const avgCoC = cocVals.length ? cocVals.reduce((a, b) => a + b, 0) / cocVals.length : null;
+    const avgLTV = ltvVals.length ? ltvVals.reduce((a, b) => a + b, 0) / ltvVals.length : null;
+    const avgOcc = occVals.length ? occVals.reduce((a, b) => a + b, 0) / occVals.length : null;
+    const avgSuit = scores.length ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : null;
+
+    return `
+      <div class="cr-section">
+        <div class="cr-section-head">
+          <div class="cr-section-icon" style="background:var(--green-lt);color:var(--green);">&#128200;</div>
+          <h3>Portfolio Holdings</h3>
+          <span class="cr-section-sub">${holdings.length} position${holdings.length !== 1 ? 's' : ''}</span>
+        </div>
+        <div class="cr-section-body" style="padding:0;">
+          <table class="cr-holdings-table">
+            <thead>
+              <tr>
+                <th>Offering</th>
+                <th>Sponsor</th>
+                <th>Type</th>
+                <th>Y1 CoC</th>
+                <th>LTV</th>
+                <th>Occupancy</th>
+                <th>Suitability</th>
+              </tr>
+            </thead>
+            <tbody>${rows}</tbody>
+            <tfoot>
+              <tr>
+                <td colspan="3" style="text-align:right;">Portfolio Average</td>
+                <td>${avgCoC != null ? fmtPct(avgCoC) : '—'}</td>
+                <td>${avgLTV != null ? fmtPct(avgLTV, 0) : '—'}</td>
+                <td>${avgOcc != null ? fmtPct(avgOcc, 0) : '—'}</td>
+                <td>${avgSuit != null ? `<span class="cr-score ${scoreClass(avgSuit)}">${avgSuit}%</span>` : '—'}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>`;
+  }
+
+  /* ── Diversification ── */
+  function renderDiversification(holdings) {
+    const enriched = holdings.filter(h => h.fund);
+    if (!enriched.length) return '';
+
+    // By property type
+    const byType = {};
+    enriched.forEach(h => {
+      const t = h.fund.assetClass || h.fund.propertyType || h.structure || 'Other';
+      byType[t] = (byType[t] || 0) + 1;
+    });
+
+    // By sponsor
+    const bySponsor = {};
+    enriched.forEach(h => {
+      const s = h.fund.sponsor || h.sponsor || 'Unknown';
+      bySponsor[s] = (bySponsor[s] || 0) + 1;
+    });
+
+    function makeBarChart(data, total) {
+      const sorted = Object.entries(data).sort((a, b) => b[1] - a[1]);
+      return sorted.map(([ label, count ], i) => {
+        const pct = Math.round((count / total) * 100);
+        return `<div class="cr-div-row">
+          <span class="cr-div-label">${esc(label)}</span>
+          <div class="cr-div-bar"><div class="cr-div-fill c${i % 8}" style="width:${Math.max(pct, 8)}%">${pct}%</div></div>
+        </div>`;
+      }).join('');
+    }
+
+    return `
+      <div class="cr-section">
+        <div class="cr-section-head">
+          <div class="cr-section-icon" style="background:#F5F3FF;color:#7C3AED;">&#9673;</div>
+          <h3>Diversification</h3>
+        </div>
+        <div class="cr-section-body">
+          <div class="cr-div-grid">
+            <div class="cr-div-card">
+              <h4>By Property Type</h4>
+              <div class="cr-div-bar-wrap">${makeBarChart(byType, enriched.length)}</div>
+            </div>
+            <div class="cr-div-card">
+              <h4>By Sponsor</h4>
+              <div class="cr-div-bar-wrap">${makeBarChart(bySponsor, enriched.length)}</div>
+            </div>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  /* ── Exchange Progress Bars ── */
+  function renderExchangeProgress(holdings, c) {
+    const exEq = Number(c.exchangeAmount || c.investableAssets || 0);
+    if (!exEq) return '';
+
+    // Sum minimum investments of holdings
+    const enriched = holdings.filter(h => h.fund);
+    let allocatedEquity = 0;
+    let allocatedDebt = 0;
+    enriched.forEach(h => {
+      const f = h.fund;
+      // Use minimum investment as proxy for equity allocated per holding
+      const min = f.minimum || f.minInvest || 0;
+      const minVal = typeof min === 'string' ? parseFloat(min.replace(/[$,]/g, '')) : Number(min);
+      if (!isNaN(minVal)) allocatedEquity += minVal;
+      // Estimate debt per holding from LTV + purchase price
+      const pp = f.purchasePrice || f.totalPurchasePrice || 0;
+      const ppVal = typeof pp === 'string' ? parseFloat(pp.replace(/[$,]/g, '')) : Number(pp);
+      const ltv = f.ltv || 0;
+      const ltvPct = ltv < 1 ? ltv : ltv / 100;
+      if (ppVal && ltvPct) allocatedDebt += ppVal * ltvPct;
+    });
+
+    const eqPct = Math.min(100, Math.round((allocatedEquity / exEq) * 100));
+    // Debt replacement target = rough estimate from exchange equity + leverage
+    const avgLTVvals = enriched.map(h => h.fund.ltv).filter(v => v != null);
+    const avgLTV = avgLTVvals.length ? avgLTVvals.reduce((a, b) => a + b, 0) / avgLTVvals.length : 0;
+    const avgLTVpct = avgLTV < 1 ? avgLTV : avgLTV / 100;
+    const estDebtTarget = avgLTVpct > 0 ? exEq * (avgLTVpct / (1 - avgLTVpct)) : 0;
+    const debtPct = estDebtTarget > 0 ? Math.min(100, Math.round((allocatedDebt / estDebtTarget) * 100)) : 0;
+
+    return `
+      <div class="cr-section">
+        <div class="cr-section-head">
+          <div class="cr-section-icon" style="background:var(--blue-lt);color:var(--blue);">&#128178;</div>
+          <h3>Exchange Allocation</h3>
+          ${c.is1031 === 'Yes' ? `<span class="cr-section-sub">1031 Exchange</span>` : ''}
+        </div>
+        <div class="cr-section-body">
+          <div class="cr-exchange-bars">
+            <div class="cr-exch-row">
+              <label>Equity Deployed</label>
+              <div class="cr-exch-track">
+                <div class="cr-exch-fill equity" style="width:${Math.max(eqPct, 3)}%">${eqPct}%</div>
+              </div>
+              <div class="cr-exch-vals">
+                <span>${fmtMoney(allocatedEquity)} allocated</span>
+                <span>${fmtMoney(exEq)} target</span>
+              </div>
+            </div>
+            ${estDebtTarget > 0 ? `
+            <div class="cr-exch-row">
+              <label>Estimated Debt Replacement</label>
+              <div class="cr-exch-track">
+                <div class="cr-exch-fill debt" style="width:${Math.max(debtPct, 3)}%">${debtPct}%</div>
+              </div>
+              <div class="cr-exch-vals">
+                <span>${fmtMoney(allocatedDebt)} est. debt</span>
+                <span>${fmtMoney(estDebtTarget)} est. target</span>
+              </div>
+            </div>` : ''}
+          </div>
+        </div>
+      </div>`;
+  }
+
+  /* ── Suitability Cards ── */
+  function renderSuitability(holdings) {
+    const withScores = holdings.filter(h => h.score != null);
+    if (!withScores.length) return '';
+
+    const cards = withScores.map(h => {
+      const cls = scoreClass(h.score);
+      return `
+        <div class="cr-suit-card suit-${cls}">
+          <div class="cr-suit-name">${esc(h.name)}</div>
+          <div class="cr-suit-sponsor">${esc(h.sponsor)}</div>
+          <div class="cr-suit-score-row">
+            <div class="cr-suit-bar"><div class="cr-suit-bar-fill ${cls}" style="width:${h.score}%"></div></div>
+            <div class="cr-suit-pct" style="color:var(--${cls === 'high' ? 'green' : cls === 'mid' ? 'amber' : 'red'})">${h.score}%</div>
+          </div>
+        </div>`;
+    }).join('');
+
+    return `
+      <div class="cr-section">
+        <div class="cr-section-head">
+          <div class="cr-section-icon" style="background:var(--report-lt);color:var(--report-accent);">&#9989;</div>
+          <h3>Suitability Analysis</h3>
+        </div>
+        <div class="cr-section-body">
+          <div class="cr-suit-grid">${cards}</div>
+        </div>
+      </div>`;
+  }
+
+  /* ── Activity Timeline ── */
+  function renderTimelineSection() {
+    if (!activities.length) {
+      return `
+        <div class="cr-section">
+          <div class="cr-section-head">
+            <div class="cr-section-icon" style="background:var(--surface);color:var(--slate2);">&#128337;</div>
+            <h3>Activity History</h3>
+          </div>
+          <div class="cr-section-body">
+            <div class="cr-empty">No activity recorded yet for this client.</div>
+          </div>
+        </div>`;
+    }
+
+    const ACTION_MAP = {
+      'saved-portfolio':           { dot: 'saved',  label: 'Saved to Portfolio' },
+      'removed-portfolio':         { dot: 'saved',  label: 'Removed from Portfolio' },
+      'viewed-offering':           { dot: 'viewed', label: 'Viewed Offering' },
+      'generated-comparison':      { dot: 'report', label: 'Generated Comparison' },
+      'generated-tearsheet':       { dot: 'report', label: 'Generated Tear Sheet' },
+      'generated-portfolio-report':{ dot: 'report', label: 'Generated Portfolio Report' },
+      'loaded-client':             { dot: 'loaded', label: 'Client Loaded' },
+    };
+
+    const items = activities.slice(0, 20).map(a => {
+      const map = ACTION_MAP[a.action] || { dot: 'default', label: a.action };
+      const ts = a.timestamp ? (a.timestamp.toDate ? a.timestamp.toDate() : new Date(a.timestamp)) : null;
+      const offering = a.offeringName ? `<div class="cr-tl-detail">${esc(a.offeringName)}${a.sponsor ? ' · ' + esc(a.sponsor) : ''}</div>` : '';
+      return `
+        <div class="cr-tl-item">
+          <div class="cr-tl-dot ${map.dot}"></div>
+          <div class="cr-tl-action">${map.label}</div>
+          ${offering}
+          <div class="cr-tl-time">${ts ? fmtDate(ts) + ' at ' + ts.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' }) : ''}</div>
+        </div>`;
+    }).join('');
+
+    return `
+      <div class="cr-section">
+        <div class="cr-section-head">
+          <div class="cr-section-icon" style="background:var(--surface);color:var(--slate2);">&#128337;</div>
+          <h3>Activity History</h3>
+          <span class="cr-section-sub">${activities.length} event${activities.length !== 1 ? 's' : ''}</span>
+        </div>
+        <div class="cr-section-body">
+          <div class="cr-timeline">${items}</div>
+          ${activities.length > 20 ? '<div style="text-align:center;margin-top:12px;font-size:12px;color:var(--fog);">Showing 20 of ' + activities.length + ' events</div>' : ''}
+        </div>
+      </div>`;
+  }
+
+  /* ── Load Activity from Firestore ── */
+  async function loadActivity() {
+    if (!crmClient || !crmClient.id || !db || !currentUser) return;
+    try {
+      const snap = await db.collection('users').doc(currentUser.uid)
+        .collection('clients').doc(crmClient.id)
+        .collection('activity')
+        .orderBy('timestamp', 'desc')
+        .limit(50)
+        .get();
+      activities = [];
+      snap.forEach(doc => activities.push({ id: doc.id, ...doc.data() }));
+
+      // Re-render just the timeline section
+      const el = document.getElementById('cr-timeline-section');
+      if (el) el.innerHTML = renderTimelineSection();
+    } catch(err) {
+      console.warn('[ClientReport] Activity load error:', err);
+    }
+  }
+
+  /* ── Mount ── */
+  function mount() {
+    const root = document.getElementById('cr-root');
+    if (!root) return;
+
+    // Check if a CRM client is loaded
+    crmClient = (window.AFL && window.AFL.getLoadedClient) ? window.AFL.getLoadedClient() : null;
+    if (!crmClient || !crmClient.id) {
+      root.innerHTML = renderGate();
+      return;
+    }
+
+    root.innerHTML = renderReport();
+
+    // Load activity async (timeline renders as empty first, then populates)
+    loadActivity();
+  }
+
+  /* ── Module Export ── */
+  window.currentModule = {
+    init(params) {
+      AFL         = params.AFL    || window.AFL;
+      funds       = params.funds  || (AFL ? AFL.state.funds : []);
+      client      = params.client || (AFL ? AFL.client : null);
+      peer        = params.peer   || (AFL ? AFL.peerStats() : {});
+      db          = (AFL && AFL.db) ? AFL.db : (window.firebase ? firebase.firestore() : null);
+      currentUser = (AFL && AFL.currentUser) ? AFL.currentUser : (window.firebase ? firebase.auth().currentUser : null);
+
+      mount();
+    }
+  };
+})();
+</script>
