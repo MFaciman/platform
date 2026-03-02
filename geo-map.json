@@ -1,0 +1,562 @@
+{
+  "_meta": {
+    "version": "1.0",
+    "description": "AFL Market Intelligence geo-mapping. Maps city/state to CBSA, FIPS, and API series IDs.",
+    "updated": "2026-03-01"
+  },
+  "cbsa": {
+    "12060": {
+      "name": "Atlanta-Sandy Springs-Alpharetta, GA",
+      "aliases": ["atlanta","sandy springs","alpharetta","marietta"],
+      "state": "GA",
+      "fips_state": "13",
+      "fips_county": "121",
+      "fred": {
+        "hpi": "ATNHPIUS12060Q",
+        "pop": "ATLA013POP",
+        "permits": "ATLA013BPPRIVSA",
+        "income": "MEHOIUS12060A052NCEN",
+        "unemployment": "ATLA013URN"
+      },
+      "bls_area": "C1206"
+    },
+    "12420": {
+      "name": "Austin-Round Rock-Georgetown, TX",
+      "aliases": ["austin","round rock","georgetown tx"],
+      "state": "TX",
+      "fips_state": "48",
+      "fips_county": "453",
+      "fred": {
+        "hpi": "ATNHPIUS12420Q",
+        "unemployment": "AUST448URN"
+      },
+      "bls_area": "C1242"
+    },
+    "12580": {
+      "name": "Baltimore-Columbia-Towson, MD",
+      "aliases": ["baltimore","columbia md","towson"],
+      "state": "MD",
+      "fips_state": "24",
+      "fips_county": "510",
+      "fred": {
+        "hpi": "ATNHPIUS12580Q",
+        "unemployment": "BALT124URN"
+      },
+      "bls_area": "C1258"
+    },
+    "13820": {
+      "name": "Birmingham-Hoover, AL",
+      "aliases": ["birmingham","hoover al"],
+      "state": "AL",
+      "fips_state": "01",
+      "fips_county": "073",
+      "fred": {
+        "hpi": "ATNHPIUS13820Q",
+        "unemployment": "BIRM101URN"
+      },
+      "bls_area": "C1382"
+    },
+    "14460": {
+      "name": "Boston-Cambridge-Newton, MA-NH",
+      "aliases": ["boston","cambridge ma","newton ma"],
+      "state": "MA",
+      "fips_state": "25",
+      "fips_county": "025",
+      "fred": {
+        "hpi": "ATNHPIUS14460Q",
+        "unemployment": "BOST625URN"
+      },
+      "bls_area": "C1446"
+    },
+    "16740": {
+      "name": "Charlotte-Concord-Gastonia, NC-SC",
+      "aliases": ["charlotte","concord nc","gastonia"],
+      "state": "NC",
+      "fips_state": "37",
+      "fips_county": "119",
+      "fred": {
+        "hpi": "ATNHPIUS16740Q",
+        "unemployment": "CHAR737URN"
+      },
+      "bls_area": "C1674"
+    },
+    "16980": {
+      "name": "Chicago-Naperville-Elgin, IL-IN-WI",
+      "aliases": ["chicago","naperville","elgin il"],
+      "state": "IL",
+      "fips_state": "17",
+      "fips_county": "031",
+      "fred": {
+        "hpi": "ATNHPIUS16980Q",
+        "unemployment": "CHIC917URN"
+      },
+      "bls_area": "C1698"
+    },
+    "17460": {
+      "name": "Cleveland-Elyria, OH",
+      "aliases": ["cleveland","elyria"],
+      "state": "OH",
+      "fips_state": "39",
+      "fips_county": "035",
+      "fred": {
+        "hpi": "ATNHPIUS17460Q",
+        "unemployment": "CLEV339URN"
+      },
+      "bls_area": "C1746"
+    },
+    "17900": {
+      "name": "Columbia, SC",
+      "aliases": ["columbia sc"],
+      "state": "SC",
+      "fips_state": "45",
+      "fips_county": "079",
+      "fred": {
+        "hpi": "ATNHPIUS17900Q"
+      },
+      "bls_area": "C1790"
+    },
+    "18140": {
+      "name": "Columbus, OH",
+      "aliases": ["columbus oh","columbus ohio"],
+      "state": "OH",
+      "fips_state": "39",
+      "fips_county": "049",
+      "fred": {
+        "hpi": "ATNHPIUS18140Q",
+        "unemployment": "COLU139URN"
+      },
+      "bls_area": "C1814"
+    },
+    "19100": {
+      "name": "Dallas-Fort Worth-Arlington, TX",
+      "aliases": ["dallas","fort worth","arlington tx","dfw"],
+      "state": "TX",
+      "fips_state": "48",
+      "fips_county": "113",
+      "fred": {
+        "hpi": "ATNHPIUS19100Q",
+        "unemployment": "DALL148URN"
+      },
+      "bls_area": "C1910"
+    },
+    "19740": {
+      "name": "Denver-Aurora-Lakewood, CO",
+      "aliases": ["denver","aurora co","lakewood co"],
+      "state": "CO",
+      "fips_state": "08",
+      "fips_county": "031",
+      "fred": {
+        "hpi": "ATNHPIUS19740Q",
+        "unemployment": "DENV208URN"
+      },
+      "bls_area": "C1974"
+    },
+    "19820": {
+      "name": "Detroit-Warren-Dearborn, MI",
+      "aliases": ["detroit","warren mi","dearborn"],
+      "state": "MI",
+      "fips_state": "26",
+      "fips_county": "163",
+      "fred": {
+        "hpi": "ATNHPIUS19820Q",
+        "unemployment": "DETR026URN"
+      },
+      "bls_area": "C1982"
+    },
+    "26420": {
+      "name": "Houston-The Woodlands-Sugar Land, TX",
+      "aliases": ["houston","the woodlands","sugar land"],
+      "state": "TX",
+      "fips_state": "48",
+      "fips_county": "201",
+      "fred": {
+        "hpi": "ATNHPIUS26420Q",
+        "unemployment": "HOUS448URN"
+      },
+      "bls_area": "C2642"
+    },
+    "26900": {
+      "name": "Indianapolis-Carmel-Anderson, IN",
+      "aliases": ["indianapolis","carmel in","anderson in"],
+      "state": "IN",
+      "fips_state": "18",
+      "fips_county": "097",
+      "fred": {
+        "hpi": "ATNHPIUS26900Q",
+        "unemployment": "INDI218URN"
+      },
+      "bls_area": "C2690"
+    },
+    "27260": {
+      "name": "Jacksonville, FL",
+      "aliases": ["jacksonville","jacksonville fl"],
+      "state": "FL",
+      "fips_state": "12",
+      "fips_county": "031",
+      "fred": {
+        "hpi": "ATNHPIUS27260Q",
+        "unemployment": "JACK112URN"
+      },
+      "bls_area": "C2726"
+    },
+    "28140": {
+      "name": "Kansas City, MO-KS",
+      "aliases": ["kansas city","kc","kc mo"],
+      "state": "MO",
+      "fips_state": "29",
+      "fips_county": "095",
+      "fred": {
+        "hpi": "ATNHPIUS28140Q",
+        "unemployment": "KANS229URN"
+      },
+      "bls_area": "C2814"
+    },
+    "29820": {
+      "name": "Las Vegas-Henderson-Paradise, NV",
+      "aliases": ["las vegas","henderson nv","paradise nv"],
+      "state": "NV",
+      "fips_state": "32",
+      "fips_county": "003",
+      "fred": {
+        "hpi": "ATNHPIUS29820Q",
+        "unemployment": "LASV032URN"
+      },
+      "bls_area": "C2982"
+    },
+    "31080": {
+      "name": "Los Angeles-Long Beach-Anaheim, CA",
+      "aliases": ["los angeles","long beach","anaheim","la"],
+      "state": "CA",
+      "fips_state": "06",
+      "fips_county": "037",
+      "fred": {
+        "hpi": "ATNHPIUS31080Q",
+        "unemployment": "LOSA106URN"
+      },
+      "bls_area": "C3108"
+    },
+    "32820": {
+      "name": "Memphis, TN-MS-AR",
+      "aliases": ["memphis"],
+      "state": "TN",
+      "fips_state": "47",
+      "fips_county": "157",
+      "fred": {
+        "hpi": "ATNHPIUS32820Q",
+        "unemployment": "MEMP247URN"
+      },
+      "bls_area": "C3282"
+    },
+    "33100": {
+      "name": "Miami-Fort Lauderdale-Pompano Beach, FL",
+      "aliases": ["miami","fort lauderdale","pompano beach"],
+      "state": "FL",
+      "fips_state": "12",
+      "fips_county": "086",
+      "fred": {
+        "hpi": "ATNHPIUS33100Q",
+        "unemployment": "MIAM112URN"
+      },
+      "bls_area": "C3310"
+    },
+    "33340": {
+      "name": "Milwaukee-Waukesha, WI",
+      "aliases": ["milwaukee","waukesha"],
+      "state": "WI",
+      "fips_state": "55",
+      "fips_county": "079",
+      "fred": {
+        "hpi": "ATNHPIUS33340Q"
+      },
+      "bls_area": "C3334"
+    },
+    "33460": {
+      "name": "Minneapolis-St. Paul-Bloomington, MN-WI",
+      "aliases": ["minneapolis","st paul","bloomington mn"],
+      "state": "MN",
+      "fips_state": "27",
+      "fips_county": "053",
+      "fred": {
+        "hpi": "ATNHPIUS33460Q",
+        "unemployment": "MINN227URN"
+      },
+      "bls_area": "C3346"
+    },
+    "34980": {
+      "name": "Nashville-Davidson-Murfreesboro-Franklin, TN",
+      "aliases": ["nashville","murfreesboro","franklin tn"],
+      "state": "TN",
+      "fips_state": "47",
+      "fips_county": "037",
+      "fred": {
+        "hpi": "ATNHPIUS34980Q",
+        "unemployment": "NASH247URN"
+      },
+      "bls_area": "C3498"
+    },
+    "35380": {
+      "name": "New Orleans-Metairie, LA",
+      "aliases": ["new orleans","metairie"],
+      "state": "LA",
+      "fips_state": "22",
+      "fips_county": "071",
+      "fred": {
+        "hpi": "ATNHPIUS35380Q"
+      },
+      "bls_area": "C3538"
+    },
+    "35620": {
+      "name": "New York-Newark-Jersey City, NY-NJ-PA",
+      "aliases": ["new york","newark","jersey city","nyc","manhattan"],
+      "state": "NY",
+      "fips_state": "36",
+      "fips_county": "061",
+      "fred": {
+        "hpi": "ATNHPIUS35620Q",
+        "unemployment": "NEWY636URN"
+      },
+      "bls_area": "C3562"
+    },
+    "36420": {
+      "name": "Oklahoma City, OK",
+      "aliases": ["oklahoma city","okc"],
+      "state": "OK",
+      "fips_state": "40",
+      "fips_county": "109",
+      "fred": {
+        "hpi": "ATNHPIUS36420Q",
+        "unemployment": "OKLA240URN"
+      },
+      "bls_area": "C3642"
+    },
+    "36740": {
+      "name": "Orlando-Kissimmee-Sanford, FL",
+      "aliases": ["orlando","kissimmee","sanford fl"],
+      "state": "FL",
+      "fips_state": "12",
+      "fips_county": "095",
+      "fred": {
+        "hpi": "ATNHPIUS36740Q",
+        "unemployment": "ORLA012URN"
+      },
+      "bls_area": "C3674"
+    },
+    "37980": {
+      "name": "Philadelphia-Camden-Wilmington, PA-NJ-DE-MD",
+      "aliases": ["philadelphia","camden nj","wilmington de","philly"],
+      "state": "PA",
+      "fips_state": "42",
+      "fips_county": "101",
+      "fred": {
+        "hpi": "ATNHPIUS37980Q",
+        "unemployment": "PHIL142URN"
+      },
+      "bls_area": "C3798"
+    },
+    "38060": {
+      "name": "Phoenix-Mesa-Chandler, AZ",
+      "aliases": ["phoenix","mesa az","chandler","scottsdale","tempe"],
+      "state": "AZ",
+      "fips_state": "04",
+      "fips_county": "013",
+      "fred": {
+        "hpi": "ATNHPIUS38060Q",
+        "unemployment": "PHOE904URN"
+      },
+      "bls_area": "C3806"
+    },
+    "38300": {
+      "name": "Pittsburgh, PA",
+      "aliases": ["pittsburgh"],
+      "state": "PA",
+      "fips_state": "42",
+      "fips_county": "003",
+      "fred": {
+        "hpi": "ATNHPIUS38300Q",
+        "unemployment": "PITT242URN"
+      },
+      "bls_area": "C3830"
+    },
+    "38900": {
+      "name": "Portland-Vancouver-Hillsboro, OR-WA",
+      "aliases": ["portland","vancouver wa","hillsboro"],
+      "state": "OR",
+      "fips_state": "41",
+      "fips_county": "051",
+      "fred": {
+        "hpi": "ATNHPIUS38900Q",
+        "unemployment": "PORT041URN"
+      },
+      "bls_area": "C3890"
+    },
+    "39580": {
+      "name": "Raleigh-Cary, NC",
+      "aliases": ["raleigh","cary nc"],
+      "state": "NC",
+      "fips_state": "37",
+      "fips_county": "183",
+      "fred": {
+        "hpi": "ATNHPIUS39580Q"
+      },
+      "bls_area": "C3958"
+    },
+    "40060": {
+      "name": "Richmond, VA",
+      "aliases": ["richmond","richmond va"],
+      "state": "VA",
+      "fips_state": "51",
+      "fips_county": "760",
+      "fred": {
+        "hpi": "ATNHPIUS40060Q"
+      },
+      "bls_area": "C4006"
+    },
+    "40140": {
+      "name": "Riverside-San Bernardino-Ontario, CA",
+      "aliases": ["riverside","san bernardino","ontario ca","inland empire"],
+      "state": "CA",
+      "fips_state": "06",
+      "fips_county": "065",
+      "fred": {
+        "hpi": "ATNHPIUS40140Q"
+      },
+      "bls_area": "C4014"
+    },
+    "40900": {
+      "name": "Sacramento-Roseville-Folsom, CA",
+      "aliases": ["sacramento","roseville ca","folsom"],
+      "state": "CA",
+      "fips_state": "06",
+      "fips_county": "067",
+      "fred": {
+        "hpi": "ATNHPIUS40900Q"
+      },
+      "bls_area": "C4090"
+    },
+    "41180": {
+      "name": "St. Louis, MO-IL",
+      "aliases": ["st louis","saint louis","st. louis"],
+      "state": "MO",
+      "fips_state": "29",
+      "fips_county": "510",
+      "fred": {
+        "hpi": "ATNHPIUS41180Q",
+        "unemployment": "STLO229URN"
+      },
+      "bls_area": "C4118"
+    },
+    "41620": {
+      "name": "Salt Lake City, UT",
+      "aliases": ["salt lake city","slc"],
+      "state": "UT",
+      "fips_state": "49",
+      "fips_county": "035",
+      "fred": {
+        "hpi": "ATNHPIUS41620Q"
+      },
+      "bls_area": "C4162"
+    },
+    "41700": {
+      "name": "San Antonio-New Braunfels, TX",
+      "aliases": ["san antonio","new braunfels"],
+      "state": "TX",
+      "fips_state": "48",
+      "fips_county": "029",
+      "fred": {
+        "hpi": "ATNHPIUS41700Q",
+        "unemployment": "SANA048URN"
+      },
+      "bls_area": "C4170"
+    },
+    "41740": {
+      "name": "San Diego-Chula Vista-Carlsbad, CA",
+      "aliases": ["san diego","chula vista","carlsbad ca"],
+      "state": "CA",
+      "fips_state": "06",
+      "fips_county": "073",
+      "fred": {
+        "hpi": "ATNHPIUS41740Q",
+        "unemployment": "SAND106URN"
+      },
+      "bls_area": "C4174"
+    },
+    "41860": {
+      "name": "San Francisco-Oakland-Berkeley, CA",
+      "aliases": ["san francisco","oakland","berkeley","sf"],
+      "state": "CA",
+      "fips_state": "06",
+      "fips_county": "075",
+      "fred": {
+        "hpi": "ATNHPIUS41860Q",
+        "unemployment": "SANF106URN"
+      },
+      "bls_area": "C4186"
+    },
+    "42660": {
+      "name": "Seattle-Tacoma-Bellevue, WA",
+      "aliases": ["seattle","tacoma","bellevue wa"],
+      "state": "WA",
+      "fips_state": "53",
+      "fips_county": "033",
+      "fred": {
+        "hpi": "ATNHPIUS42660Q",
+        "unemployment": "SEAT153URN"
+      },
+      "bls_area": "C4266"
+    },
+    "45300": {
+      "name": "Tampa-St. Petersburg-Clearwater, FL",
+      "aliases": ["tampa","st petersburg fl","clearwater"],
+      "state": "FL",
+      "fips_state": "12",
+      "fips_county": "057",
+      "fred": {
+        "hpi": "ATNHPIUS45300Q",
+        "unemployment": "TAMP112URN"
+      },
+      "bls_area": "C4530"
+    },
+    "47900": {
+      "name": "Washington-Arlington-Alexandria, DC-VA-MD-WV",
+      "aliases": ["washington dc","arlington va","alexandria va","dc"],
+      "state": "DC",
+      "fips_state": "11",
+      "fips_county": "001",
+      "fred": {
+        "hpi": "ATNHPIUS47900Q",
+        "unemployment": "WASH111URN"
+      },
+      "bls_area": "C4790"
+    }
+  },
+  "propertyTypeMap": {
+    "multifamily": { "cremiType": "Multifamily", "fredSeries": ["HOUST5F","PERMIT5"], "naicsCode": "531110" },
+    "industrial": { "cremiType": "Industrial", "fredSeries": ["INDPRO","TCU"], "naicsCode": "531120" },
+    "office": { "cremiType": "Office", "fredSeries": [], "naicsCode": "531120" },
+    "retail": { "cremiType": "Retail", "fredSeries": ["RSAFS","ECOMSA"], "naicsCode": "531120" },
+    "net lease": { "cremiType": "Retail", "fredSeries": ["RSAFS"], "naicsCode": "531120" },
+    "hospitality": { "cremiType": "Hospitality", "fredSeries": [], "naicsCode": "721110" },
+    "self storage": { "cremiType": "Industrial", "fredSeries": [], "naicsCode": "531130" },
+    "medical office": { "cremiType": "Office", "fredSeries": [], "naicsCode": "621111" },
+    "senior living": { "cremiType": "Multifamily", "fredSeries": [], "naicsCode": "623110" },
+    "student housing": { "cremiType": "Multifamily", "fredSeries": [], "naicsCode": "531110" }
+  },
+  "nationalSeries": {
+    "fedFundsRate": "FEDFUNDS",
+    "treasury10Y": "GS10",
+    "treasury30Y": "GS30",
+    "mortgage30Y": "MORTGAGE30US",
+    "cpi": "CPIAUCSL",
+    "gdp": "GDP",
+    "housingStarts": "HOUST",
+    "buildingPermits": "PERMIT",
+    "crePriceIndex": "BOGZ1FL075035503Q",
+    "creLoanDelinquency": "DRCRELEXFACBS",
+    "retailSales": "RSAFS",
+    "ecommercePct": "ECOMSA",
+    "industrialProduction": "INDPRO",
+    "unemploymentRate": "UNRATE",
+    "personalIncome": "PI",
+    "populationUS": "POPTHM"
+  }
+}
