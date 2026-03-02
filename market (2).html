@@ -1,0 +1,1448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AFL Market Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+/* ═══════════════════════════════════════════
+   AFL DESIGN SYSTEM
+═══════════════════════════════════════════ */
+:root {
+  --navy:    #1C3A63;
+  --navy2:   #2A6496;
+  --green:   #1A7A4A;
+  --gold:    #B45309;
+  --red:     #DC2626;
+  --slate:   #475569;
+  --slate2:  #94A3B8;
+  --ice:     #F0F5FF;
+  --surface: #F8FAFC;
+  --surface2:#EEF3FA;
+  --white:   #FFFFFF;
+  --border:  #E2E8F0;
+  --radius:  8px;
+  --shadow:  0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow2: 0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'DM Sans', -apple-system, sans-serif;
+  background: var(--surface);
+  color: var(--slate);
+  line-height: 1.5;
+}
+
+/* ═══════════════════════════════════════════
+   STANDALONE HEADER (removed when in shell)
+═══════════════════════════════════════════ */
+.standalone-header {
+  background: linear-gradient(135deg, var(--navy) 0%, #243B6A 100%);
+  color: white;
+  padding: 20px 32px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.standalone-header h1 { font-size: 20px; font-weight: 600; }
+.standalone-header .subtitle { font-size: 13px; opacity: 0.7; font-weight: 400; }
+
+/* ═══════════════════════════════════════════
+   CONTROL BAR
+═══════════════════════════════════════════ */
+.control-bar {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 32px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.control-bar label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--navy);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.control-bar select, .control-bar input {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--white);
+  color: var(--slate);
+  outline: none;
+  min-width: 200px;
+}
+.control-bar select:focus, .control-bar input:focus {
+  border-color: var(--navy2);
+  box-shadow: 0 0 0 3px rgba(42,100,150,0.1);
+}
+.btn-analyze {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 9px 24px;
+  background: var(--navy);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-analyze:hover { background: var(--navy2); transform: translateY(-1px); box-shadow: var(--shadow2); }
+.btn-analyze:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+.btn-analyze .spinner {
+  width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  display: none;
+}
+.btn-analyze.loading .spinner { display: block; }
+.btn-analyze.loading .btn-text { display: none; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ═══════════════════════════════════════════
+   MAIN CONTENT AREA
+═══════════════════════════════════════════ */
+.mi-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 24px 32px;
+}
+
+/* Score Hero */
+.score-hero {
+  background: linear-gradient(135deg, var(--navy) 0%, #1e4976 50%, var(--navy2) 100%);
+  border-radius: 12px;
+  padding: 32px;
+  color: white;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 32px;
+  align-items: center;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow2);
+  position: relative;
+  overflow: hidden;
+}
+.score-hero::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -20%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(255,255,255,0.04) 0%, transparent 70%);
+  pointer-events: none;
+}
+.score-circle {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.score-circle .score-value {
+  font-family: 'DM Mono', monospace;
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1;
+}
+.score-circle .score-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.8;
+  margin-top: 4px;
+}
+.score-circle svg {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  transform: rotate(-90deg);
+}
+.score-circle svg circle {
+  fill: none;
+  stroke-width: 4;
+}
+.score-circle svg .track { stroke: rgba(255,255,255,0.15); }
+.score-circle svg .fill { stroke-linecap: round; transition: stroke-dashoffset 1.5s ease; }
+
+.score-meta h2 { font-size: 22px; font-weight: 600; margin-bottom: 4px; }
+.score-meta .market-subtitle { font-size: 14px; opacity: 0.7; margin-bottom: 12px; }
+.score-meta .score-tags { display: flex; gap: 8px; flex-wrap: wrap; }
+.score-tag {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 100px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.score-tag.positive { background: rgba(26,122,74,0.25); color: #6EE7A0; }
+.score-tag.negative { background: rgba(220,38,38,0.25); color: #FCA5A5; }
+.score-tag.neutral  { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.8); }
+
+.score-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.score-stat {
+  text-align: center;
+  padding: 12px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 8px;
+}
+.score-stat .stat-val {
+  font-family: 'DM Mono', monospace;
+  font-size: 20px;
+  font-weight: 600;
+}
+.score-stat .stat-lbl {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  opacity: 0.6;
+  margin-top: 2px;
+}
+
+/* Panel Grid */
+.panel-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+  gap: 20px;
+  margin-bottom: 24px;
+}
+.panel-grid.tri { grid-template-columns: repeat(3, 1fr); }
+
+.panel {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: box-shadow 0.2s;
+}
+.panel:hover { box-shadow: var(--shadow2); }
+
+.panel-header {
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.panel-header h3 {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--navy);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.panel-header h3 .icon { font-size: 16px; }
+.panel-header .source-tag {
+  font-size: 10px;
+  color: var(--slate2);
+  font-weight: 500;
+  background: var(--surface);
+  padding: 2px 8px;
+  border-radius: 100px;
+}
+
+.panel-body { padding: 20px; }
+
+/* Metric Rows */
+.metric-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--surface2);
+}
+.metric-row:last-child { border-bottom: none; }
+.metric-label {
+  font-size: 13px;
+  color: var(--slate);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.metric-value {
+  font-family: 'DM Mono', monospace;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--navy);
+}
+.metric-delta {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 8px;
+}
+.metric-delta.up { color: var(--green); background: rgba(26,122,74,0.08); }
+.metric-delta.down { color: var(--red); background: rgba(220,38,38,0.08); }
+.metric-delta.flat { color: var(--slate2); background: var(--surface2); }
+
+/* Chart Container */
+.chart-container {
+  position: relative;
+  width: 100%;
+  height: 220px;
+}
+.chart-container canvas { width: 100% !important; height: 100% !important; }
+
+/* Narrative Box */
+.narrative-box {
+  background: linear-gradient(135deg, var(--ice) 0%, var(--surface2) 100%);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--navy2);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  margin-bottom: 24px;
+}
+.narrative-box h3 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.narrative-box p {
+  font-size: 14px;
+  color: var(--slate);
+  line-height: 1.7;
+}
+
+/* Loading & Empty States */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  text-align: center;
+}
+.loading-pulse {
+  width: 60px; height: 60px;
+  border: 3px solid var(--border);
+  border-top-color: var(--navy2);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+.loading-state h3 { color: var(--navy); font-size: 16px; margin-bottom: 4px; }
+.loading-state p { color: var(--slate2); font-size: 13px; }
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  text-align: center;
+}
+.empty-state .empty-icon { font-size: 48px; margin-bottom: 16px; }
+.empty-state h3 { font-size: 18px; color: var(--navy); margin-bottom: 8px; }
+.empty-state p { color: var(--slate2); font-size: 14px; max-width: 400px; }
+
+/* Data Source Footer */
+.source-footer {
+  padding: 16px 32px;
+  background: var(--surface2);
+  border-top: 1px solid var(--border);
+  font-size: 11px;
+  color: var(--slate2);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+}
+.source-footer .src-badge {
+  background: var(--white);
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  font-weight: 500;
+}
+
+/* Comparison Bar */
+.compare-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+}
+.compare-fill {
+  height: 6px;
+  border-radius: 3px;
+  transition: width 0.8s ease;
+}
+.compare-fill.local { background: var(--navy2); }
+.compare-fill.national { background: var(--slate2); opacity: 0.4; }
+.compare-text {
+  font-size: 10px;
+  color: var(--slate2);
+  white-space: nowrap;
+  margin-left: 4px;
+}
+
+/* Responsive */
+@media (max-width: 1100px) {
+  .panel-grid.tri { grid-template-columns: 1fr 1fr; }
+  .score-hero { grid-template-columns: auto 1fr; }
+  .score-stats { grid-column: 1 / -1; grid-template-columns: repeat(4, 1fr); }
+}
+@media (max-width: 768px) {
+  .panel-grid, .panel-grid.tri { grid-template-columns: 1fr; }
+  .score-hero { grid-template-columns: 1fr; text-align: center; }
+  .score-circle { margin: 0 auto; }
+  .score-meta .score-tags { justify-content: center; }
+  .score-stats { grid-template-columns: repeat(2, 1fr); }
+  .mi-container { padding: 16px; }
+  .control-bar { padding: 12px 16px; }
+}
+
+/* Toast */
+.mi-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--navy);
+  color: white;
+  padding: 12px 20px;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-weight: 500;
+  box-shadow: var(--shadow2);
+  z-index: 9999;
+  transform: translateY(100px);
+  opacity: 0;
+  transition: all 0.3s;
+}
+.mi-toast.show { transform: translateY(0); opacity: 1; }
+</style>
+</head>
+<body>
+
+<!-- Standalone header (hidden when running inside AFL shell) -->
+<div class="standalone-header" id="standaloneHeader">
+  <div>
+    <h1>AFL Market Intelligence</h1>
+    <div class="subtitle">Real-Time CRE Analytics & Economic Data Engine</div>
+  </div>
+</div>
+
+<!-- Control Bar -->
+<div class="control-bar" id="controlBar">
+  <div>
+    <label>Market</label><br>
+    <select id="selMarket">
+      <option value="">Select a Market...</option>
+    </select>
+  </div>
+  <div>
+    <label>Property Type</label><br>
+    <select id="selPropertyType">
+      <option value="">Select Type...</option>
+      <option value="multifamily">Multifamily</option>
+      <option value="industrial">Industrial</option>
+      <option value="office">Office</option>
+      <option value="retail">Retail</option>
+      <option value="net lease">Net Lease</option>
+      <option value="hospitality">Hospitality</option>
+      <option value="self storage">Self Storage</option>
+      <option value="medical office">Medical Office</option>
+      <option value="senior living">Senior Living</option>
+      <option value="student housing">Student Housing</option>
+    </select>
+  </div>
+  <div style="align-self:flex-end">
+    <button class="btn-analyze" id="btnAnalyze" onclick="runAnalysis()">
+      <div class="spinner"></div>
+      <span class="btn-text">Analyze Market</span>
+    </button>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="mi-container" id="mainContent">
+  <div class="empty-state" id="emptyState">
+    <div class="empty-icon">📊</div>
+    <h3>Select a Market & Property Type</h3>
+    <p>Choose a metro area and CRE sector above to generate a live market intelligence brief powered by FRED, Census, BLS, and Atlanta Fed data.</p>
+  </div>
+</div>
+
+<!-- Data Source Footer -->
+<div class="source-footer" id="sourceFooter" style="display:none">
+  <span>Data Sources:</span>
+  <span class="src-badge">FRED API</span>
+  <span class="src-badge">U.S. Census ACS</span>
+  <span class="src-badge">Bureau of Labor Statistics</span>
+  <span class="src-badge">Atlanta Fed CREMI</span>
+  <span class="src-badge">HUD</span>
+  <span class="src-badge">FHFA</span>
+  <span style="margin-left:auto">Last updated: <span id="lastUpdated">—</span></span>
+</div>
+
+<!-- Toast -->
+<div class="mi-toast" id="miToast"></div>
+
+<script>
+/* ═══════════════════════════════════════════
+   AFL MARKET INTELLIGENCE ENGINE
+   Version 1.0 — Real-Time CRE Analytics
+═══════════════════════════════════════════ */
+(function() {
+'use strict';
+
+// ─── GEO MAP (embedded for standalone, loaded from geo-map.json in production) ───
+const GEO_MAP = /* PASTE_GEO_MAP_START */ null /* PASTE_GEO_MAP_END */;
+let geoData = null;
+
+// ─── API KEYS (free public APIs) ───
+// Users must register for free keys:
+const API_KEYS = {
+  fred: 'a459ffc6c22102b32e427d783d9147ed',
+  census: '67b3786efc3a71bfe55ff3d9fba0c4db0c40aef7',
+  bls: null              // V1 needs no key; V2 free: https://data.bls.gov/registrationEngine/
+};
+
+// ─── CACHE ───
+const CACHE = {};
+const CACHE_TTL = 6 * 60 * 60 * 1000; // 6 hours
+
+function cacheGet(key) {
+  const c = CACHE[key];
+  if (!c) return null;
+  if (Date.now() - c.ts > CACHE_TTL) { delete CACHE[key]; return null; }
+  return c.data;
+}
+function cacheSet(key, data) { CACHE[key] = { data, ts: Date.now() }; }
+
+// ─── FRED API ───
+async function fredFetch(seriesId, opts = {}) {
+  const cacheKey = `fred_${seriesId}_${JSON.stringify(opts)}`;
+  const cached = cacheGet(cacheKey);
+  if (cached) return cached;
+
+  const params = new URLSearchParams({
+    series_id: seriesId,
+    api_key: API_KEYS.fred,
+    file_type: 'json',
+    sort_order: 'desc',
+    limit: opts.limit || 60,
+    ...(opts.start ? { observation_start: opts.start } : {}),
+    ...(opts.end ? { observation_end: opts.end } : {}),
+    ...(opts.frequency ? { frequency: opts.frequency } : {})
+  });
+
+  try {
+    const r = await fetch(`https://api.stlouisfed.org/fred/series/observations?${params}`);
+    const j = await r.json();
+    const observations = (j.observations || [])
+      .filter(o => o.value !== '.')
+      .map(o => ({ date: o.date, value: parseFloat(o.value) }));
+    cacheSet(cacheKey, observations);
+    return observations;
+  } catch (e) {
+    console.warn(`FRED fetch failed for ${seriesId}:`, e);
+    return [];
+  }
+}
+
+async function fredLatest(seriesId) {
+  const obs = await fredFetch(seriesId, { limit: 5 });
+  return obs.length ? obs[0].value : null;
+}
+
+async function fredSeries(seriesId, count = 24) {
+  return fredFetch(seriesId, { limit: count });
+}
+
+// ─── CENSUS ACS API ───
+async function censusFetch(stateCode, variables) {
+  const cacheKey = `census_${stateCode}_${variables}`;
+  const cached = cacheGet(cacheKey);
+  if (cached) return cached;
+
+  // ACS 5-year most recent
+  const url = `https://api.census.gov/data/2023/acs/acs5/profile?get=${variables}&for=state:${stateCode}&key=${API_KEYS.census}`;
+  try {
+    const r = await fetch(url);
+    const j = await r.json();
+    // First row is headers, second row is data
+    const headers = j[0];
+    const values = j[1];
+    const result = {};
+    headers.forEach((h, i) => { result[h] = values[i]; });
+    cacheSet(cacheKey, result);
+    return result;
+  } catch (e) {
+    console.warn('Census fetch failed:', e);
+    return {};
+  }
+}
+
+// ─── BLS API ───
+async function blsFetch(seriesIds) {
+  const cacheKey = `bls_${seriesIds.join(',')}`;
+  const cached = cacheGet(cacheKey);
+  if (cached) return cached;
+
+  const currentYear = new Date().getFullYear();
+  const url = 'https://api.bls.gov/publicAPI/v1/timeseries/data/';
+  try {
+    const r = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        seriesid: seriesIds,
+        startyear: String(currentYear - 2),
+        endyear: String(currentYear)
+      })
+    });
+    const j = await r.json();
+    const result = {};
+    (j.Results?.series || []).forEach(s => {
+      result[s.seriesID] = s.data.map(d => ({
+        year: d.year,
+        period: d.period,
+        value: parseFloat(d.value)
+      }));
+    });
+    cacheSet(cacheKey, result);
+    return result;
+  } catch (e) {
+    console.warn('BLS fetch failed:', e);
+    return {};
+  }
+}
+
+// ─── DATA ASSEMBLY ENGINE ───
+async function assembleMarketData(cbsaCode, propertyType) {
+  const metro = geoData.cbsa[cbsaCode];
+  const propConfig = geoData.propertyTypeMap[propertyType] || {};
+  const national = geoData.nationalSeries;
+
+  // Fire all API calls in parallel
+  const [
+    fedFunds, treasury10, mortgage30, cpi, gdp,
+    crePriceIdx, creDelinquency,
+    hpiLocal, unrateNational, unrateLocal,
+    housingStarts, buildingPermits
+  ] = await Promise.all([
+    fredSeries(national.fedFundsRate, 36),
+    fredSeries(national.treasury10Y, 36),
+    fredSeries(national.mortgage30Y, 36),
+    fredSeries(national.cpi, 24),
+    fredSeries(national.gdp, 12),
+    fredSeries(national.crePriceIndex, 20),
+    fredSeries(national.creLoanDelinquency, 20),
+    metro.fred?.hpi ? fredSeries(metro.fred.hpi, 20) : Promise.resolve([]),
+    fredSeries(national.unemploymentRate, 24),
+    metro.fred?.unemployment ? fredSeries(metro.fred.unemployment, 24) : Promise.resolve([]),
+    fredSeries(national.housingStarts, 24),
+    fredSeries(national.buildingPermits, 24)
+  ]);
+
+  // Census demographics (state level as baseline)
+  const censusVars = 'DP03_0062E,DP05_0001E,DP03_0004PE,DP04_0089E,DP04_0047PE,DP05_0018E';
+  // DP03_0062E = Median household income
+  // DP05_0001E = Total population
+  // DP03_0004PE = Employment rate (% employed)
+  // DP04_0089E = Median home value
+  // DP04_0047PE = Vacancy rate
+  // DP05_0018E = Median age
+  const census = await censusFetch(metro.fips_state, censusVars);
+
+  // Compute derived metrics
+  const latestTreasury = treasury10.length ? treasury10[0].value : null;
+  const latestFedFunds = fedFunds.length ? fedFunds[0].value : null;
+  const latestMortgage = mortgage30.length ? mortgage30[0].value : null;
+  const latestCPI = cpi.length ? cpi[0].value : null;
+  const prevCPI = cpi.length > 12 ? cpi[12].value : null;
+  const inflationRate = (latestCPI && prevCPI) ? ((latestCPI - prevCPI) / prevCPI * 100) : null;
+  const latestUnrateNat = unrateNational.length ? unrateNational[0].value : null;
+  const latestUnrateLocal = unrateLocal.length ? unrateLocal[0].value : null;
+  const prevUnrateLocal = unrateLocal.length > 12 ? unrateLocal[12].value : null;
+  const latestHPI = hpiLocal.length ? hpiLocal[0].value : null;
+  const prevHPI = hpiLocal.length > 4 ? hpiLocal[4].value : null;
+  const hpiGrowth = (latestHPI && prevHPI) ? ((latestHPI - prevHPI) / prevHPI * 100) : null;
+  const latestDelinquency = creDelinquency.length ? creDelinquency[0].value : null;
+  const prevDelinquency = creDelinquency.length > 4 ? creDelinquency[4].value : null;
+
+  return {
+    metro, propertyType, propConfig, cbsaCode,
+    capitalMarkets: {
+      fedFunds: { current: latestFedFunds, series: fedFunds },
+      treasury10: { current: latestTreasury, series: treasury10 },
+      mortgage30: { current: latestMortgage, series: mortgage30 },
+      crePriceIndex: { series: crePriceIdx },
+      creDelinquency: { current: latestDelinquency, prev: prevDelinquency, series: creDelinquency },
+      inflationRate
+    },
+    localEconomy: {
+      unemployment: { local: latestUnrateLocal, national: latestUnrateNat, prev: prevUnrateLocal, series: unrateLocal },
+      hpi: { current: latestHPI, growth: hpiGrowth, series: hpiLocal },
+      housingStarts: { series: housingStarts },
+      buildingPermits: { series: buildingPermits }
+    },
+    demographics: {
+      population: census['DP05_0001E'] ? parseInt(census['DP05_0001E']) : null,
+      medianIncome: census['DP03_0062E'] ? parseInt(census['DP03_0062E']) : null,
+      employmentRate: census['DP03_0004PE'] ? parseFloat(census['DP03_0004PE']) : null,
+      medianHomeValue: census['DP04_0089E'] ? parseInt(census['DP04_0089E']) : null,
+      vacancyRate: census['DP04_0047PE'] ? parseFloat(census['DP04_0047PE']) : null,
+      medianAge: census['DP05_0018E'] ? parseFloat(census['DP05_0018E']) : null
+    }
+  };
+}
+
+// ─── NARRATIVE GENERATOR ───
+function generateNarrative(data) {
+  const metro = data.metro.name.split('-')[0].split(',')[0];
+  const prop = data.propertyType.charAt(0).toUpperCase() + data.propertyType.slice(1);
+  const cm = data.capitalMarkets;
+  const le = data.localEconomy;
+  const demo = data.demographics;
+
+  let parts = [];
+
+  // Rate environment
+  if (cm.treasury10.current !== null) {
+    const rateDesc = cm.treasury10.current < 3.5 ? 'low' : cm.treasury10.current < 4.5 ? 'moderate' : 'elevated';
+    parts.push(`The current interest rate environment is ${rateDesc} with the 10-Year Treasury at ${cm.treasury10.current.toFixed(2)}% and 30-year mortgage rates at ${cm.mortgage30.current?.toFixed(2) || 'N/A'}%.`);
+  }
+
+  // CRE delinquency
+  if (cm.creDelinquency.current !== null) {
+    const trend = (cm.creDelinquency.prev && cm.creDelinquency.current > cm.creDelinquency.prev) ? 'rising' : 'stable or declining';
+    parts.push(`CRE loan delinquency rates are ${trend} at ${cm.creDelinquency.current.toFixed(2)}%, a key indicator of sector stress.`);
+  }
+
+  // Local employment
+  if (le.unemployment.local !== null) {
+    const vsNat = le.unemployment.local < le.unemployment.national ? 'below' : 'above';
+    parts.push(`${metro}'s unemployment rate of ${le.unemployment.local.toFixed(1)}% is ${vsNat} the national average of ${le.unemployment.national?.toFixed(1) || 'N/A'}%, ${vsNat === 'below' ? 'signaling relative economic strength' : 'indicating some local economic headwinds'}.`);
+  }
+
+  // HPI
+  if (le.hpi.growth !== null) {
+    const hpiDir = le.hpi.growth > 0 ? 'appreciated' : 'declined';
+    parts.push(`Local home prices have ${hpiDir} ${Math.abs(le.hpi.growth).toFixed(1)}% year-over-year, ${le.hpi.growth > 0 ? 'supporting property valuations' : 'which may pressure asset values'}.`);
+  }
+
+  // Demographics
+  if (demo.medianIncome) {
+    parts.push(`The state median household income is $${demo.medianIncome.toLocaleString()}, ${demo.medianIncome > 70000 ? 'above' : 'near'} the national median, providing a ${demo.medianIncome > 70000 ? 'strong' : 'moderate'} tenant income base for ${prop.toLowerCase()} assets.`);
+  }
+
+  // Property type specific
+  if (data.propertyType === 'multifamily' || data.propertyType === 'student housing' || data.propertyType === 'senior living') {
+    if (demo.vacancyRate !== null) {
+      parts.push(`The state housing vacancy rate is ${demo.vacancyRate.toFixed(1)}%, ${demo.vacancyRate < 6 ? 'indicating tight supply conditions favorable for multifamily operators' : 'suggesting adequate supply in the housing market'}.`);
+    }
+  }
+
+  if (data.propertyType === 'industrial') {
+    parts.push(`Industrial demand remains linked to e-commerce penetration and supply chain reshoring trends. Monitor local building permit activity for supply pipeline risk.`);
+  }
+
+  if (data.propertyType === 'retail' || data.propertyType === 'net lease') {
+    parts.push(`Retail/net lease performance is closely tied to consumer spending patterns and e-commerce competition. Essential retail and service-oriented tenants continue to show resilience.`);
+  }
+
+  return parts.join(' ');
+}
+
+// ─── MARKET HEALTH SCORE (composite) ───
+function computeHealthScore(data) {
+  let score = 50; // baseline
+  const le = data.localEconomy;
+  const cm = data.capitalMarkets;
+  const demo = data.demographics;
+
+  // Unemployment vs national (±10)
+  if (le.unemployment.local !== null && le.unemployment.national !== null) {
+    const diff = le.unemployment.national - le.unemployment.local;
+    score += Math.max(-10, Math.min(10, diff * 5));
+  }
+
+  // Unemployment trend (±5)
+  if (le.unemployment.local !== null && le.unemployment.prev !== null) {
+    score += le.unemployment.local < le.unemployment.prev ? 5 : -5;
+  }
+
+  // HPI growth (±10)
+  if (le.hpi.growth !== null) {
+    score += Math.max(-10, Math.min(10, le.hpi.growth * 2));
+  }
+
+  // CRE delinquency (±8)
+  if (cm.creDelinquency.current !== null) {
+    score += cm.creDelinquency.current < 1.5 ? 8 : cm.creDelinquency.current < 3 ? 3 : -5;
+  }
+
+  // Rate environment (±7)
+  if (cm.treasury10.current !== null) {
+    score += cm.treasury10.current < 3.5 ? 7 : cm.treasury10.current < 4.5 ? 2 : -5;
+  }
+
+  // Income (±5)
+  if (demo.medianIncome) {
+    score += demo.medianIncome > 75000 ? 5 : demo.medianIncome > 60000 ? 2 : -3;
+  }
+
+  // Vacancy (±5)
+  if (demo.vacancyRate !== null) {
+    score += demo.vacancyRate < 5 ? 5 : demo.vacancyRate < 8 ? 2 : -3;
+  }
+
+  return Math.max(0, Math.min(100, Math.round(score)));
+}
+
+// ─── CHART BUILDERS ───
+const chartInstances = {};
+
+function destroyCharts() {
+  Object.values(chartInstances).forEach(c => c.destroy());
+  Object.keys(chartInstances).forEach(k => delete chartInstances[k]);
+}
+
+function buildLineChart(canvasId, label, series, color, opts = {}) {
+  const ctx = document.getElementById(canvasId);
+  if (!ctx) return;
+  const data = series.slice().reverse();
+  chartInstances[canvasId] = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: data.map(d => {
+        const dt = new Date(d.date);
+        return dt.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
+      }),
+      datasets: [{
+        label,
+        data: data.map(d => d.value),
+        borderColor: color,
+        backgroundColor: color + '18',
+        fill: true,
+        tension: 0.3,
+        pointRadius: 0,
+        pointHoverRadius: 4,
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1C3A63',
+          titleFont: { family: 'DM Sans', size: 11 },
+          bodyFont: { family: 'DM Mono', size: 12 },
+          cornerRadius: 6,
+          padding: 10,
+          callbacks: {
+            label: (ctx) => `${label}: ${opts.pct ? ctx.parsed.y.toFixed(2) + '%' : opts.dollar ? '$' + ctx.parsed.y.toLocaleString() : ctx.parsed.y.toFixed(2)}`
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: { font: { family: 'DM Sans', size: 10 }, color: '#94A3B8', maxTicksLimit: 8 }
+        },
+        y: {
+          grid: { color: '#F0F5FF' },
+          ticks: {
+            font: { family: 'DM Mono', size: 10 }, color: '#94A3B8',
+            callback: (v) => opts.pct ? v.toFixed(1) + '%' : opts.dollar ? '$' + v.toLocaleString() : v.toFixed(1)
+          }
+        }
+      },
+      interaction: { intersect: false, mode: 'index' }
+    }
+  });
+}
+
+function buildDualLineChart(canvasId, label1, series1, color1, label2, series2, color2, opts = {}) {
+  const ctx = document.getElementById(canvasId);
+  if (!ctx) return;
+  const d1 = series1.slice().reverse();
+  const d2 = series2.slice().reverse();
+  // Align by date
+  const allDates = [...new Set([...d1.map(d=>d.date), ...d2.map(d=>d.date)])].sort();
+  const map1 = Object.fromEntries(d1.map(d=>[d.date, d.value]));
+  const map2 = Object.fromEntries(d2.map(d=>[d.date, d.value]));
+
+  chartInstances[canvasId] = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: allDates.map(d => new Date(d).toLocaleDateString('en-US', { month: 'short', year: '2-digit' })),
+      datasets: [
+        {
+          label: label1, data: allDates.map(d => map1[d] ?? null),
+          borderColor: color1, backgroundColor: color1 + '10', fill: false,
+          tension: 0.3, pointRadius: 0, borderWidth: 2
+        },
+        {
+          label: label2, data: allDates.map(d => map2[d] ?? null),
+          borderColor: color2, backgroundColor: color2 + '10', fill: false,
+          tension: 0.3, pointRadius: 0, borderWidth: 2, borderDash: [5, 3]
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: true, position: 'top', labels: { font: { family: 'DM Sans', size: 11 }, boxWidth: 20, padding: 12 } },
+        tooltip: {
+          backgroundColor: '#1C3A63',
+          titleFont: { family: 'DM Sans', size: 11 },
+          bodyFont: { family: 'DM Mono', size: 12 },
+          cornerRadius: 6,
+          callbacks: { label: (ctx) => `${ctx.dataset.label}: ${ctx.parsed.y?.toFixed(2) || 'N/A'}%` }
+        }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { family: 'DM Sans', size: 10 }, color: '#94A3B8', maxTicksLimit: 8 } },
+        y: { grid: { color: '#F0F5FF' }, ticks: { font: { family: 'DM Mono', size: 10 }, color: '#94A3B8', callback: v => v.toFixed(1) + '%' } }
+      },
+      interaction: { intersect: false, mode: 'index' }
+    }
+  });
+}
+
+// ─── RENDER ENGINE ───
+function renderDashboard(data) {
+  destroyCharts();
+  const score = computeHealthScore(data);
+  const narrative = generateNarrative(data);
+  const cm = data.capitalMarkets;
+  const le = data.localEconomy;
+  const demo = data.demographics;
+  const metroShort = data.metro.name.split('-')[0].split(',')[0];
+  const propLabel = data.propertyType.charAt(0).toUpperCase() + data.propertyType.slice(1);
+  const scoreColor = score >= 65 ? '#1A7A4A' : score >= 45 ? '#B45309' : '#DC2626';
+  const scorePct = score / 100;
+  const circumference = 2 * Math.PI * 52;
+  const dashOffset = circumference * (1 - scorePct);
+
+  const fmtPct = (v, dec=2) => v !== null && v !== undefined ? v.toFixed(dec) + '%' : '—';
+  const fmtNum = (v) => v !== null && v !== undefined ? v.toLocaleString() : '—';
+  const fmtMoney = (v) => v !== null && v !== undefined ? '$' + v.toLocaleString() : '—';
+  const deltaHtml = (curr, prev, invert=false) => {
+    if (curr === null || curr === undefined || prev === null || prev === undefined) return '';
+    const diff = curr - prev;
+    const pct = ((diff / Math.abs(prev)) * 100);
+    let cls = Math.abs(pct) < 0.5 ? 'flat' : (diff > 0 ? (invert ? 'down' : 'up') : (invert ? 'up' : 'down'));
+    const arrow = diff > 0 ? '▲' : diff < 0 ? '▼' : '—';
+    return `<span class="metric-delta ${cls}">${arrow} ${Math.abs(pct).toFixed(1)}%</span>`;
+  };
+  const compareBar = (local, national, label) => {
+    if (!local || !national) return '';
+    const max = Math.max(local, national) * 1.2;
+    const lw = (local / max) * 100;
+    const nw = (national / max) * 100;
+    return `<div class="compare-bar">
+      <div class="compare-fill local" style="width:${lw}%"></div>
+      <div class="compare-fill national" style="width:${nw}%"></div>
+      <span class="compare-text">vs ${national.toFixed(1)}% nat'l</span>
+    </div>`;
+  };
+
+  const html = `
+    <!-- Score Hero -->
+    <div class="score-hero">
+      <div class="score-circle">
+        <svg viewBox="0 0 120 120">
+          <circle class="track" cx="60" cy="60" r="52"/>
+          <circle class="fill" cx="60" cy="60" r="52"
+            stroke="${scoreColor}"
+            stroke-dasharray="${circumference}"
+            stroke-dashoffset="${dashOffset}"/>
+        </svg>
+        <div class="score-value">${score}</div>
+        <div class="score-label">Score</div>
+      </div>
+      <div class="score-meta">
+        <h2>${metroShort} — ${propLabel}</h2>
+        <div class="market-subtitle">Composite Market Health Score based on ${Object.keys(data).length > 3 ? '12+' : 'multiple'} economic indicators</div>
+        <div class="score-tags">
+          ${score >= 65 ? '<span class="score-tag positive">Above Average</span>' : score >= 45 ? '<span class="score-tag neutral">Near Average</span>' : '<span class="score-tag negative">Below Average</span>'}
+          ${le.unemployment.local !== null && le.unemployment.national !== null
+            ? (le.unemployment.local < le.unemployment.national
+              ? '<span class="score-tag positive">Low Local Unemployment</span>'
+              : '<span class="score-tag negative">Elevated Unemployment</span>')
+            : ''}
+          ${le.hpi.growth !== null
+            ? (le.hpi.growth > 3
+              ? '<span class="score-tag positive">Strong Price Growth</span>'
+              : le.hpi.growth > 0
+                ? '<span class="score-tag neutral">Moderate Price Growth</span>'
+                : '<span class="score-tag negative">Declining Prices</span>')
+            : ''}
+          ${cm.treasury10.current !== null
+            ? (cm.treasury10.current < 4
+              ? '<span class="score-tag positive">Favorable Rates</span>'
+              : '<span class="score-tag neutral">Elevated Rates</span>')
+            : ''}
+        </div>
+      </div>
+      <div class="score-stats">
+        <div class="score-stat">
+          <div class="stat-val">${fmtPct(cm.treasury10.current)}</div>
+          <div class="stat-lbl">10Y Treasury</div>
+        </div>
+        <div class="score-stat">
+          <div class="stat-val">${fmtPct(le.unemployment.local, 1)}</div>
+          <div class="stat-lbl">Local Unemp.</div>
+        </div>
+        <div class="score-stat">
+          <div class="stat-val">${le.hpi.growth !== null ? (le.hpi.growth > 0 ? '+' : '') + le.hpi.growth.toFixed(1) + '%' : '—'}</div>
+          <div class="stat-lbl">HPI YoY</div>
+        </div>
+        <div class="score-stat">
+          <div class="stat-val">${fmtPct(cm.creDelinquency.current)}</div>
+          <div class="stat-lbl">CRE Delinq.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI Narrative -->
+    <div class="narrative-box">
+      <h3>✦ Market Intelligence Brief</h3>
+      <p>${narrative}</p>
+    </div>
+
+    <!-- Capital Markets Panel Row -->
+    <div class="panel-grid tri">
+      <!-- Interest Rates -->
+      <div class="panel">
+        <div class="panel-header">
+          <h3><span class="icon">📈</span> Interest Rates</h3>
+          <span class="source-tag">FRED</span>
+        </div>
+        <div class="panel-body">
+          <div class="metric-row">
+            <span class="metric-label">Fed Funds Rate</span>
+            <span class="metric-value">${fmtPct(cm.fedFunds.current)}</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">10-Year Treasury</span>
+            <span class="metric-value">${fmtPct(cm.treasury10.current)}</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">30-Year Mortgage</span>
+            <span class="metric-value">${fmtPct(cm.mortgage30.current)}</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">Inflation (CPI YoY)</span>
+            <span class="metric-value">${cm.inflationRate !== null ? cm.inflationRate.toFixed(1) + '%' : '—'}</span>
+          </div>
+          <div class="chart-container" style="margin-top:12px">
+            <canvas id="chartRates"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- CRE Risk -->
+      <div class="panel">
+        <div class="panel-header">
+          <h3><span class="icon">🏢</span> CRE Market Risk</h3>
+          <span class="source-tag">FRED / Fed</span>
+        </div>
+        <div class="panel-body">
+          <div class="metric-row">
+            <span class="metric-label">CRE Loan Delinquency</span>
+            <span class="metric-value">${fmtPct(cm.creDelinquency.current)} ${deltaHtml(cm.creDelinquency.current, cm.creDelinquency.prev, true)}</span>
+          </div>
+          <div class="chart-container" style="margin-top:12px">
+            <canvas id="chartDelinquency"></canvas>
+          </div>
+          <div class="chart-container" style="margin-top:16px">
+            <canvas id="chartCREPrice"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Local Employment -->
+      <div class="panel">
+        <div class="panel-header">
+          <h3><span class="icon">👷</span> Employment — ${metroShort}</h3>
+          <span class="source-tag">FRED / BLS</span>
+        </div>
+        <div class="panel-body">
+          <div class="metric-row">
+            <span class="metric-label">Local Unemployment</span>
+            <span class="metric-value">${fmtPct(le.unemployment.local, 1)} ${deltaHtml(le.unemployment.local, le.unemployment.prev, true)}</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">National Unemployment</span>
+            <span class="metric-value">${fmtPct(le.unemployment.national, 1)}</span>
+          </div>
+          ${compareBar(le.unemployment.local, le.unemployment.national, 'unemployment')}
+          <div class="chart-container" style="margin-top:16px">
+            <canvas id="chartUnemployment"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Local Market + Demographics -->
+    <div class="panel-grid">
+      <!-- Home Price Index -->
+      <div class="panel">
+        <div class="panel-header">
+          <h3><span class="icon">🏠</span> Home Price Index — ${metroShort}</h3>
+          <span class="source-tag">FHFA / FRED</span>
+        </div>
+        <div class="panel-body">
+          <div class="metric-row">
+            <span class="metric-label">Current HPI</span>
+            <span class="metric-value">${le.hpi.current !== null ? le.hpi.current.toFixed(1) : '—'}</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">YoY Growth</span>
+            <span class="metric-value">${le.hpi.growth !== null ? (le.hpi.growth > 0 ? '+' : '') + le.hpi.growth.toFixed(1) + '%' : '—'}</span>
+          </div>
+          <div class="chart-container" style="margin-top:12px">
+            <canvas id="chartHPI"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Demographics -->
+      <div class="panel">
+        <div class="panel-header">
+          <h3><span class="icon">👥</span> Demographics — ${data.metro.state}</h3>
+          <span class="source-tag">Census ACS</span>
+        </div>
+        <div class="panel-body">
+          <div class="metric-row">
+            <span class="metric-label">State Population</span>
+            <span class="metric-value">${fmtNum(demo.population)}</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">Median Household Income</span>
+            <span class="metric-value">${fmtMoney(demo.medianIncome)}</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">Employment Rate</span>
+            <span class="metric-value">${fmtPct(demo.employmentRate, 1)}</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">Median Home Value</span>
+            <span class="metric-value">${fmtMoney(demo.medianHomeValue)}</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">Housing Vacancy Rate</span>
+            <span class="metric-value">${fmtPct(demo.vacancyRate, 1)}</span>
+          </div>
+          <div class="metric-row">
+            <span class="metric-label">Median Age</span>
+            <span class="metric-value">${demo.medianAge ? demo.medianAge.toFixed(1) + ' yrs' : '—'}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Housing Supply -->
+    <div class="panel-grid">
+      <div class="panel">
+        <div class="panel-header">
+          <h3><span class="icon">🏗️</span> Housing Starts (National)</h3>
+          <span class="source-tag">Census / FRED</span>
+        </div>
+        <div class="panel-body">
+          <div class="chart-container">
+            <canvas id="chartStarts"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-header">
+          <h3><span class="icon">📋</span> Building Permits (National)</h3>
+          <span class="source-tag">Census / FRED</span>
+        </div>
+        <div class="panel-body">
+          <div class="chart-container">
+            <canvas id="chartPermits"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('mainContent').innerHTML = html;
+  document.getElementById('sourceFooter').style.display = 'flex';
+  document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
+
+  // Build Charts (after DOM is ready)
+  requestAnimationFrame(() => {
+    // Rates chart - dual line: 10Y Treasury + 30Y Mortgage
+    if (cm.treasury10.series.length && cm.mortgage30.series.length) {
+      buildDualLineChart('chartRates', '10Y Treasury', cm.treasury10.series, '#1C3A63', '30Y Mortgage', cm.mortgage30.series, '#B45309', { pct: true });
+    }
+
+    // Delinquency
+    if (cm.creDelinquency.series.length) {
+      buildLineChart('chartDelinquency', 'CRE Delinquency Rate', cm.creDelinquency.series, '#DC2626', { pct: true });
+    }
+
+    // CRE Price Index
+    if (cm.crePriceIndex.series.length) {
+      buildLineChart('chartCREPrice', 'CRE Price Index', cm.crePriceIndex.series, '#2A6496');
+    }
+
+    // Unemployment - local vs national
+    if (le.unemployment.series.length) {
+      buildDualLineChart('chartUnemployment',
+        data.metro.name.split('-')[0], le.unemployment.series, '#1C3A63',
+        'National', data.capitalMarkets.fedFunds.series.length ? [] : [], '#94A3B8',
+        { pct: true }
+      );
+      // Rebuild with actual national data
+      if (le.unemployment.series.length) {
+        if (chartInstances['chartUnemployment']) chartInstances['chartUnemployment'].destroy();
+        // Use local unemployment series and overlay with national
+        fredSeries('UNRATE', 24).then(natSeries => {
+          buildDualLineChart('chartUnemployment',
+            metroShort, le.unemployment.series, '#1C3A63',
+            'National', natSeries, '#94A3B8'
+          );
+        });
+      }
+    }
+
+    // HPI
+    if (le.hpi.series.length) {
+      buildLineChart('chartHPI', 'Home Price Index', le.hpi.series, '#1A7A4A');
+    }
+
+    // Housing Starts
+    if (le.housingStarts.series.length) {
+      buildLineChart('chartStarts', 'Housing Starts (thousands)', le.housingStarts.series, '#2A6496');
+    }
+
+    // Building Permits
+    if (le.buildingPermits.series.length) {
+      buildLineChart('chartPermits', 'Building Permits (thousands)', le.buildingPermits.series, '#B45309');
+    }
+  });
+}
+
+// ─── TOAST ───
+function toast(msg) {
+  const el = document.getElementById('miToast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3000);
+}
+
+// ─── INITIALIZATION ───
+async function loadGeoMap() {
+  // In production, load from geo-map.json. For standalone, use embedded data or fetch.
+  if (GEO_MAP) {
+    geoData = GEO_MAP;
+  } else {
+    try {
+      const r = await fetch('geo-map.json');
+      geoData = await r.json();
+    } catch {
+      // Fallback: build minimal inline map
+      console.warn('geo-map.json not found, using embedded fallback');
+      geoData = await buildFallbackGeoMap();
+    }
+  }
+  populateMarketSelector();
+}
+
+function buildFallbackGeoMap() {
+  // Minimal fallback with key markets
+  return {
+    cbsa: {
+      "28140": { name: "Kansas City, MO-KS", aliases: ["kansas city"], state: "MO", fips_state: "29", fips_county: "095", fred: { hpi: "ATNHPIUS28140Q", unemployment: "KANS229URN" }, bls_area: "C2814" },
+      "19100": { name: "Dallas-Fort Worth-Arlington, TX", aliases: ["dallas","dfw"], state: "TX", fips_state: "48", fips_county: "113", fred: { hpi: "ATNHPIUS19100Q", unemployment: "DALL148URN" }, bls_area: "C1910" },
+      "12060": { name: "Atlanta-Sandy Springs-Alpharetta, GA", aliases: ["atlanta"], state: "GA", fips_state: "13", fips_county: "121", fred: { hpi: "ATNHPIUS12060Q", unemployment: "ATLA013URN" }, bls_area: "C1206" },
+      "38060": { name: "Phoenix-Mesa-Chandler, AZ", aliases: ["phoenix"], state: "AZ", fips_state: "04", fips_county: "013", fred: { hpi: "ATNHPIUS38060Q", unemployment: "PHOE904URN" }, bls_area: "C3806" },
+      "34980": { name: "Nashville-Davidson-Murfreesboro-Franklin, TN", aliases: ["nashville"], state: "TN", fips_state: "47", fips_county: "037", fred: { hpi: "ATNHPIUS34980Q", unemployment: "NASH247URN" }, bls_area: "C3498" },
+      "33100": { name: "Miami-Fort Lauderdale-Pompano Beach, FL", aliases: ["miami"], state: "FL", fips_state: "12", fips_county: "086", fred: { hpi: "ATNHPIUS33100Q", unemployment: "MIAM112URN" }, bls_area: "C3310" },
+      "26420": { name: "Houston-The Woodlands-Sugar Land, TX", aliases: ["houston"], state: "TX", fips_state: "48", fips_county: "201", fred: { hpi: "ATNHPIUS26420Q", unemployment: "HOUS448URN" }, bls_area: "C2642" },
+      "16980": { name: "Chicago-Naperville-Elgin, IL-IN-WI", aliases: ["chicago"], state: "IL", fips_state: "17", fips_county: "031", fred: { hpi: "ATNHPIUS16980Q", unemployment: "CHIC917URN" }, bls_area: "C1698" },
+      "42660": { name: "Seattle-Tacoma-Bellevue, WA", aliases: ["seattle"], state: "WA", fips_state: "53", fips_county: "033", fred: { hpi: "ATNHPIUS42660Q", unemployment: "SEAT153URN" }, bls_area: "C4266" },
+      "45300": { name: "Tampa-St. Petersburg-Clearwater, FL", aliases: ["tampa"], state: "FL", fips_state: "12", fips_county: "057", fred: { hpi: "ATNHPIUS45300Q", unemployment: "TAMP112URN" }, bls_area: "C4530" }
+    },
+    propertyTypeMap: {
+      "multifamily": { cremiType: "Multifamily", fredSeries: [], naicsCode: "531110" },
+      "industrial": { cremiType: "Industrial", fredSeries: [], naicsCode: "531120" },
+      "office": { cremiType: "Office", fredSeries: [], naicsCode: "531120" },
+      "retail": { cremiType: "Retail", fredSeries: [], naicsCode: "531120" },
+      "net lease": { cremiType: "Retail", fredSeries: [], naicsCode: "531120" },
+      "hospitality": { cremiType: "Hospitality", fredSeries: [], naicsCode: "721110" },
+      "self storage": { cremiType: "Industrial", fredSeries: [], naicsCode: "531130" },
+      "medical office": { cremiType: "Office", fredSeries: [], naicsCode: "621111" },
+      "senior living": { cremiType: "Multifamily", fredSeries: [], naicsCode: "623110" },
+      "student housing": { cremiType: "Multifamily", fredSeries: [], naicsCode: "531110" }
+    },
+    nationalSeries: {
+      fedFundsRate: "FEDFUNDS", treasury10Y: "GS10", treasury30Y: "GS30",
+      mortgage30Y: "MORTGAGE30US", cpi: "CPIAUCSL", gdp: "GDP",
+      housingStarts: "HOUST", buildingPermits: "PERMIT",
+      crePriceIndex: "BOGZ1FL075035503Q", creLoanDelinquency: "DRCRELEXFACBS",
+      unemploymentRate: "UNRATE"
+    }
+  };
+}
+
+function populateMarketSelector() {
+  const sel = document.getElementById('selMarket');
+  const markets = Object.entries(geoData.cbsa)
+    .map(([code, m]) => ({ code, name: m.name }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+  markets.forEach(m => {
+    const opt = document.createElement('option');
+    opt.value = m.code;
+    opt.textContent = m.name;
+    sel.appendChild(opt);
+  });
+}
+
+// ─── MAIN ANALYSIS TRIGGER ───
+async function runAnalysis() {
+  const cbsa = document.getElementById('selMarket').value;
+  const propType = document.getElementById('selPropertyType').value;
+
+  if (!cbsa || !propType) {
+    toast('Please select both a market and property type');
+    return;
+  }
+
+  const btn = document.getElementById('btnAnalyze');
+  btn.classList.add('loading');
+  btn.disabled = true;
+
+  document.getElementById('mainContent').innerHTML = `
+    <div class="loading-state">
+      <div class="loading-pulse"></div>
+      <h3>Pulling Live Market Data...</h3>
+      <p>Querying FRED, Census Bureau, BLS & more — this takes a few seconds</p>
+    </div>
+  `;
+
+  try {
+    const data = await assembleMarketData(cbsa, propType);
+    renderDashboard(data);
+    toast(`Market brief generated for ${data.metro.name.split('-')[0]} ${propType}`);
+  } catch (e) {
+    console.error('Analysis failed:', e);
+    document.getElementById('mainContent').innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">⚠️</div>
+        <h3>Data Retrieval Error</h3>
+        <p>Some API calls failed. This may be due to rate limits or API keys. Check the console for details. Make sure you've registered for free API keys (see instructions in source code).</p>
+      </div>
+    `;
+  } finally {
+    btn.classList.remove('loading');
+    btn.disabled = false;
+  }
+}
+
+// ─── SHELL INTEGRATION ───
+// When loaded inside AFL shell, export as currentModule
+// The shell can call init({ cbsa: '28140', propertyType: 'multifamily' }) to auto-run
+window.currentModule = {
+  init(params) {
+    // Hide standalone header when in shell
+    const header = document.getElementById('standaloneHeader');
+    if (header) header.style.display = 'none';
+
+    loadGeoMap().then(() => {
+      if (params?.cbsa && params?.propertyType) {
+        document.getElementById('selMarket').value = params.cbsa;
+        document.getElementById('selPropertyType').value = params.propertyType;
+        runAnalysis();
+      }
+    });
+  }
+};
+
+// ─── OFFERING INTEGRATION API ───
+// Other modules can call this to get market data for an offering
+window.AFL_MarketIntel = {
+  // Resolve a city/state string to CBSA code
+  resolveCBSA(cityState) {
+    if (!geoData) return null;
+    const normalized = cityState.toLowerCase().trim();
+    for (const [code, metro] of Object.entries(geoData.cbsa)) {
+      if (metro.aliases.some(a => normalized.includes(a))) return code;
+      if (metro.name.toLowerCase().includes(normalized)) return code;
+    }
+    return null;
+  },
+
+  // Get full market data for an offering
+  async getMarketData(cityState, propertyType) {
+    if (!geoData) await loadGeoMap();
+    const cbsa = this.resolveCBSA(cityState);
+    if (!cbsa) return null;
+    return assembleMarketData(cbsa, propertyType);
+  },
+
+  // Get just the health score
+  async getHealthScore(cityState, propertyType) {
+    const data = await this.getMarketData(cityState, propertyType);
+    if (!data) return null;
+    return computeHealthScore(data);
+  },
+
+  // Get the narrative
+  async getNarrative(cityState, propertyType) {
+    const data = await this.getMarketData(cityState, propertyType);
+    if (!data) return null;
+    return generateNarrative(data);
+  }
+};
+
+// ─── AUTO-INIT (standalone mode) ───
+if (!window.AFL) {
+  // Running standalone, not inside shell
+  loadGeoMap();
+}
+
+// Expose to global scope for HTML onclick and shell loadModule
+window.runAnalysis = runAnalysis;
+window.loadGeoMap = loadGeoMap;
+
+})(); // end IIFE
+</script>
+</body>
+</html>
