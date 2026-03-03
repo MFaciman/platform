@@ -1,0 +1,1684 @@
+{
+  "cbsa": {
+    "12060": {
+      "name": "Atlanta-Sandy Springs-Alpharetta, GA",
+      "aliases": [
+        "atlanta",
+        "sandy springs",
+        "alpharetta"
+      ],
+      "state": "GA",
+      "fips_state": "13",
+      "fips_county": "121",
+      "fred": {
+        "hpi": "ATNHPIUS12060Q",
+        "unemployment": "ATLA013URN"
+      },
+      "bls_area": "C1206"
+    },
+    "12420": {
+      "name": "Austin-Round Rock-Georgetown, TX",
+      "aliases": [
+        "austin",
+        "round rock"
+      ],
+      "state": "TX",
+      "fips_state": "48",
+      "fips_county": "453",
+      "fred": {
+        "hpi": "ATNHPIUS12420Q",
+        "unemployment": "AUST448URN"
+      },
+      "bls_area": "C1242"
+    },
+    "12580": {
+      "name": "Baltimore-Columbia-Towson, MD",
+      "aliases": [
+        "baltimore",
+        "columbia md",
+        "towson"
+      ],
+      "state": "MD",
+      "fips_state": "24",
+      "fips_county": "510",
+      "fred": {
+        "hpi": "ATNHPIUS12580Q",
+        "unemployment": "BALT124URN"
+      },
+      "bls_area": "C1258"
+    },
+    "13820": {
+      "name": "Birmingham-Hoover, AL",
+      "aliases": [
+        "birmingham",
+        "hoover al"
+      ],
+      "state": "AL",
+      "fips_state": "01",
+      "fips_county": "073",
+      "fred": {
+        "hpi": "ATNHPIUS13820Q",
+        "unemployment": "BIRM101URN"
+      },
+      "bls_area": "C1382"
+    },
+    "14460": {
+      "name": "Boston-Cambridge-Newton, MA-NH",
+      "aliases": [
+        "boston",
+        "cambridge ma"
+      ],
+      "state": "MA",
+      "fips_state": "25",
+      "fips_county": "025",
+      "fred": {
+        "hpi": "ATNHPIUS14460Q",
+        "unemployment": "BOST625URN"
+      },
+      "bls_area": "C1446"
+    },
+    "16740": {
+      "name": "Charlotte-Concord-Gastonia, NC-SC",
+      "aliases": [
+        "charlotte",
+        "concord nc",
+        "gastonia"
+      ],
+      "state": "NC",
+      "fips_state": "37",
+      "fips_county": "119",
+      "fred": {
+        "hpi": "ATNHPIUS16740Q",
+        "unemployment": "CHAR737URN"
+      },
+      "bls_area": "C1674"
+    },
+    "16980": {
+      "name": "Chicago-Naperville-Elgin, IL-IN-WI",
+      "aliases": [
+        "chicago",
+        "naperville",
+        "elgin il"
+      ],
+      "state": "IL",
+      "fips_state": "17",
+      "fips_county": "031",
+      "fred": {
+        "hpi": "ATNHPIUS16980Q",
+        "unemployment": "CHIC917URN"
+      },
+      "bls_area": "C1698"
+    },
+    "17460": {
+      "name": "Cleveland-Elyria, OH",
+      "aliases": [
+        "cleveland",
+        "elyria"
+      ],
+      "state": "OH",
+      "fips_state": "39",
+      "fips_county": "035",
+      "fred": {
+        "hpi": "ATNHPIUS17460Q",
+        "unemployment": "CLEV339URN"
+      },
+      "bls_area": "C1746"
+    },
+    "18140": {
+      "name": "Columbus, OH",
+      "aliases": [
+        "columbus oh",
+        "columbus ohio"
+      ],
+      "state": "OH",
+      "fips_state": "39",
+      "fips_county": "049",
+      "fred": {
+        "hpi": "ATNHPIUS18140Q",
+        "unemployment": "COLU139URN"
+      },
+      "bls_area": "C1814"
+    },
+    "19100": {
+      "name": "Dallas-Fort Worth-Arlington, TX",
+      "aliases": [
+        "dallas",
+        "fort worth",
+        "dfw",
+        "arlington tx"
+      ],
+      "state": "TX",
+      "fips_state": "48",
+      "fips_county": "113",
+      "fred": {
+        "hpi": "ATNHPIUS19100Q",
+        "unemployment": "DALL148URN"
+      },
+      "bls_area": "C1910"
+    },
+    "19740": {
+      "name": "Denver-Aurora-Lakewood, CO",
+      "aliases": [
+        "denver",
+        "aurora co",
+        "lakewood co"
+      ],
+      "state": "CO",
+      "fips_state": "08",
+      "fips_county": "031",
+      "fred": {
+        "hpi": "ATNHPIUS19740Q",
+        "unemployment": "DENV208URN"
+      },
+      "bls_area": "C1974"
+    },
+    "19820": {
+      "name": "Detroit-Warren-Dearborn, MI",
+      "aliases": [
+        "detroit",
+        "warren mi",
+        "dearborn"
+      ],
+      "state": "MI",
+      "fips_state": "26",
+      "fips_county": "163",
+      "fred": {
+        "hpi": "ATNHPIUS19820Q",
+        "unemployment": "DETR026URN"
+      },
+      "bls_area": "C1982"
+    },
+    "26420": {
+      "name": "Houston-The Woodlands-Sugar Land, TX",
+      "aliases": [
+        "houston",
+        "woodlands",
+        "sugar land"
+      ],
+      "state": "TX",
+      "fips_state": "48",
+      "fips_county": "201",
+      "fred": {
+        "hpi": "ATNHPIUS26420Q",
+        "unemployment": "HOUS448URN"
+      },
+      "bls_area": "C2642"
+    },
+    "26900": {
+      "name": "Indianapolis-Carmel-Anderson, IN",
+      "aliases": [
+        "indianapolis",
+        "carmel in",
+        "anderson in"
+      ],
+      "state": "IN",
+      "fips_state": "18",
+      "fips_county": "097",
+      "fred": {
+        "hpi": "ATNHPIUS26900Q",
+        "unemployment": "INDI218URN"
+      },
+      "bls_area": "C2690"
+    },
+    "27260": {
+      "name": "Jacksonville, FL",
+      "aliases": [
+        "jacksonville"
+      ],
+      "state": "FL",
+      "fips_state": "12",
+      "fips_county": "031",
+      "fred": {
+        "hpi": "ATNHPIUS27260Q",
+        "unemployment": "JACK112URN"
+      },
+      "bls_area": "C2726"
+    },
+    "28140": {
+      "name": "Kansas City, MO-KS",
+      "aliases": [
+        "kansas city",
+        "kc"
+      ],
+      "state": "MO",
+      "fips_state": "29",
+      "fips_county": "095",
+      "fred": {
+        "hpi": "ATNHPIUS28140Q",
+        "unemployment": "KANS229URN"
+      },
+      "bls_area": "C2814"
+    },
+    "29820": {
+      "name": "Las Vegas-Henderson-Paradise, NV",
+      "aliases": [
+        "las vegas",
+        "henderson nv",
+        "paradise nv"
+      ],
+      "state": "NV",
+      "fips_state": "32",
+      "fips_county": "003",
+      "fred": {
+        "hpi": "ATNHPIUS29820Q",
+        "unemployment": "LASV032URN"
+      },
+      "bls_area": "C2982"
+    },
+    "31080": {
+      "name": "Los Angeles-Long Beach-Anaheim, CA",
+      "aliases": [
+        "los angeles",
+        "la",
+        "long beach",
+        "anaheim"
+      ],
+      "state": "CA",
+      "fips_state": "06",
+      "fips_county": "037",
+      "fred": {
+        "hpi": "ATNHPIUS31080Q",
+        "unemployment": "LOSA106URN"
+      },
+      "bls_area": "C3108"
+    },
+    "32820": {
+      "name": "Memphis, TN-MS-AR",
+      "aliases": [
+        "memphis"
+      ],
+      "state": "TN",
+      "fips_state": "47",
+      "fips_county": "157",
+      "fred": {
+        "hpi": "ATNHPIUS32820Q",
+        "unemployment": "MEMP247URN"
+      },
+      "bls_area": "C3282"
+    },
+    "33100": {
+      "name": "Miami-Fort Lauderdale-Pompano Beach, FL",
+      "aliases": [
+        "miami",
+        "fort lauderdale",
+        "pompano beach",
+        "boca raton"
+      ],
+      "state": "FL",
+      "fips_state": "12",
+      "fips_county": "086",
+      "fred": {
+        "hpi": "ATNHPIUS33100Q",
+        "unemployment": "MIAM112URN"
+      },
+      "bls_area": "C3310"
+    },
+    "33340": {
+      "name": "Milwaukee-Waukesha, WI",
+      "aliases": [
+        "milwaukee",
+        "waukesha"
+      ],
+      "state": "WI",
+      "fips_state": "55",
+      "fips_county": "079",
+      "fred": {
+        "hpi": "ATNHPIUS33340Q",
+        "unemployment": "MILW255URN"
+      },
+      "bls_area": "C3334"
+    },
+    "33460": {
+      "name": "Minneapolis-St. Paul-Bloomington, MN-WI",
+      "aliases": [
+        "minneapolis",
+        "st paul",
+        "twin cities"
+      ],
+      "state": "MN",
+      "fips_state": "27",
+      "fips_county": "053",
+      "fred": {
+        "hpi": "ATNHPIUS33460Q",
+        "unemployment": "MINN227URN"
+      },
+      "bls_area": "C3346"
+    },
+    "34980": {
+      "name": "Nashville-Davidson-Murfreesboro-Franklin, TN",
+      "aliases": [
+        "nashville",
+        "murfreesboro",
+        "franklin tn"
+      ],
+      "state": "TN",
+      "fips_state": "47",
+      "fips_county": "037",
+      "fred": {
+        "hpi": "ATNHPIUS34980Q",
+        "unemployment": "NASH247URN"
+      },
+      "bls_area": "C3498"
+    },
+    "35620": {
+      "name": "New York-Newark-Jersey City, NY-NJ-PA",
+      "aliases": [
+        "new york",
+        "nyc",
+        "newark",
+        "jersey city",
+        "manhattan",
+        "brooklyn"
+      ],
+      "state": "NY",
+      "fips_state": "36",
+      "fips_county": "061",
+      "fred": {
+        "hpi": "ATNHPIUS35620Q",
+        "unemployment": "NEWY636URN"
+      },
+      "bls_area": "C3562"
+    },
+    "36420": {
+      "name": "Oklahoma City, OK",
+      "aliases": [
+        "oklahoma city",
+        "okc"
+      ],
+      "state": "OK",
+      "fips_state": "40",
+      "fips_county": "109",
+      "fred": {
+        "hpi": "ATNHPIUS36420Q",
+        "unemployment": "OKLA240URN"
+      },
+      "bls_area": "C3642"
+    },
+    "36740": {
+      "name": "Orlando-Kissimmee-Sanford, FL",
+      "aliases": [
+        "orlando",
+        "kissimmee",
+        "sanford fl"
+      ],
+      "state": "FL",
+      "fips_state": "12",
+      "fips_county": "095",
+      "fred": {
+        "hpi": "ATNHPIUS36740Q",
+        "unemployment": "ORLA012URN"
+      },
+      "bls_area": "C3674"
+    },
+    "37980": {
+      "name": "Philadelphia-Camden-Wilmington, PA-NJ-DE-MD",
+      "aliases": [
+        "philadelphia",
+        "philly",
+        "camden nj"
+      ],
+      "state": "PA",
+      "fips_state": "42",
+      "fips_county": "101",
+      "fred": {
+        "hpi": "ATNHPIUS37980Q",
+        "unemployment": "PHIL142URN"
+      },
+      "bls_area": "C3798"
+    },
+    "38060": {
+      "name": "Phoenix-Mesa-Chandler, AZ",
+      "aliases": [
+        "phoenix",
+        "mesa az",
+        "chandler",
+        "scottsdale",
+        "tempe",
+        "glendale az"
+      ],
+      "state": "AZ",
+      "fips_state": "04",
+      "fips_county": "013",
+      "fred": {
+        "hpi": "ATNHPIUS38060Q",
+        "unemployment": "PHOE904URN"
+      },
+      "bls_area": "C3806"
+    },
+    "38300": {
+      "name": "Pittsburgh, PA",
+      "aliases": [
+        "pittsburgh"
+      ],
+      "state": "PA",
+      "fips_state": "42",
+      "fips_county": "003",
+      "fred": {
+        "hpi": "ATNHPIUS38300Q",
+        "unemployment": "PITT242URN"
+      },
+      "bls_area": "C3830"
+    },
+    "38900": {
+      "name": "Portland-Vancouver-Hillsboro, OR-WA",
+      "aliases": [
+        "portland",
+        "vancouver wa",
+        "hillsboro"
+      ],
+      "state": "OR",
+      "fips_state": "41",
+      "fips_county": "051",
+      "fred": {
+        "hpi": "ATNHPIUS38900Q",
+        "unemployment": "PORT041URN"
+      },
+      "bls_area": "C3890"
+    },
+    "39580": {
+      "name": "Raleigh-Cary, NC",
+      "aliases": [
+        "raleigh",
+        "cary nc",
+        "durham",
+        "research triangle"
+      ],
+      "state": "NC",
+      "fips_state": "37",
+      "fips_county": "183",
+      "fred": {
+        "hpi": "ATNHPIUS39580Q",
+        "unemployment": "RALE237URN"
+      },
+      "bls_area": "C3958"
+    },
+    "40060": {
+      "name": "Richmond, VA",
+      "aliases": [
+        "richmond"
+      ],
+      "state": "VA",
+      "fips_state": "51",
+      "fips_county": "760",
+      "fred": {
+        "hpi": "ATNHPIUS40060Q",
+        "unemployment": "RICH151URN"
+      },
+      "bls_area": "C4006"
+    },
+    "40140": {
+      "name": "Riverside-San Bernardino-Ontario, CA",
+      "aliases": [
+        "riverside",
+        "san bernardino",
+        "inland empire",
+        "ontario ca"
+      ],
+      "state": "CA",
+      "fips_state": "06",
+      "fips_county": "065",
+      "fred": {
+        "hpi": "ATNHPIUS40140Q",
+        "unemployment": "RIVE106URN"
+      },
+      "bls_area": "C4014"
+    },
+    "40900": {
+      "name": "Sacramento-Roseville-Folsom, CA",
+      "aliases": [
+        "sacramento",
+        "roseville ca",
+        "folsom"
+      ],
+      "state": "CA",
+      "fips_state": "06",
+      "fips_county": "067",
+      "fred": {
+        "hpi": "ATNHPIUS40900Q",
+        "unemployment": "SACR106URN"
+      },
+      "bls_area": "C4090"
+    },
+    "41180": {
+      "name": "St. Louis, MO-IL",
+      "aliases": [
+        "st louis",
+        "saint louis",
+        "stl"
+      ],
+      "state": "MO",
+      "fips_state": "29",
+      "fips_county": "510",
+      "fred": {
+        "hpi": "ATNHPIUS41180Q",
+        "unemployment": "STLO229URN"
+      },
+      "bls_area": "C4118"
+    },
+    "41620": {
+      "name": "Salt Lake City, UT",
+      "aliases": [
+        "salt lake city",
+        "slc",
+        "salt lake"
+      ],
+      "state": "UT",
+      "fips_state": "49",
+      "fips_county": "035",
+      "fred": {
+        "hpi": "ATNHPIUS41620Q",
+        "unemployment": "SALT149URN"
+      },
+      "bls_area": "C4162"
+    },
+    "41700": {
+      "name": "San Antonio-New Braunfels, TX",
+      "aliases": [
+        "san antonio",
+        "new braunfels"
+      ],
+      "state": "TX",
+      "fips_state": "48",
+      "fips_county": "029",
+      "fred": {
+        "hpi": "ATNHPIUS41700Q",
+        "unemployment": "SANA048URN"
+      },
+      "bls_area": "C4170"
+    },
+    "41740": {
+      "name": "San Diego-Chula Vista-Carlsbad, CA",
+      "aliases": [
+        "san diego",
+        "chula vista",
+        "carlsbad"
+      ],
+      "state": "CA",
+      "fips_state": "06",
+      "fips_county": "073",
+      "fred": {
+        "hpi": "ATNHPIUS41740Q",
+        "unemployment": "SAND106URN"
+      },
+      "bls_area": "C4174"
+    },
+    "41860": {
+      "name": "San Francisco-Oakland-Berkeley, CA",
+      "aliases": [
+        "san francisco",
+        "sf",
+        "oakland",
+        "berkeley"
+      ],
+      "state": "CA",
+      "fips_state": "06",
+      "fips_county": "075",
+      "fred": {
+        "hpi": "ATNHPIUS41860Q",
+        "unemployment": "SANF106URN"
+      },
+      "bls_area": "C4186"
+    },
+    "42660": {
+      "name": "Seattle-Tacoma-Bellevue, WA",
+      "aliases": [
+        "seattle",
+        "tacoma",
+        "bellevue wa"
+      ],
+      "state": "WA",
+      "fips_state": "53",
+      "fips_county": "033",
+      "fred": {
+        "hpi": "ATNHPIUS42660Q",
+        "unemployment": "SEAT153URN"
+      },
+      "bls_area": "C4266"
+    },
+    "45300": {
+      "name": "Tampa-St. Petersburg-Clearwater, FL",
+      "aliases": [
+        "tampa",
+        "st petersburg",
+        "clearwater"
+      ],
+      "state": "FL",
+      "fips_state": "12",
+      "fips_county": "057",
+      "fred": {
+        "hpi": "ATNHPIUS45300Q",
+        "unemployment": "TAMP112URN"
+      },
+      "bls_area": "C4530"
+    },
+    "47900": {
+      "name": "Washington-Arlington-Alexandria, DC-VA-MD-WV",
+      "aliases": [
+        "washington",
+        "dc",
+        "arlington va",
+        "alexandria va"
+      ],
+      "state": "DC",
+      "fips_state": "11",
+      "fips_county": "001",
+      "fred": {
+        "hpi": "ATNHPIUS47900Q",
+        "unemployment": "WASH111URN"
+      },
+      "bls_area": "C4790"
+    },
+    "12260": {
+      "name": "Augusta-Richmond County, GA-SC",
+      "aliases": [
+        "augusta ga",
+        "richmond county ga"
+      ],
+      "state": "GA",
+      "fips_state": "13",
+      "fips_county": "245",
+      "fred": {
+        "hpi": "ATNHPIUS12260Q",
+        "unemployment": null
+      },
+      "bls_area": "C1226"
+    },
+    "16860": {
+      "name": "Chattanooga, TN-GA",
+      "aliases": [
+        "chattanooga"
+      ],
+      "state": "TN",
+      "fips_state": "47",
+      "fips_county": "065",
+      "fred": {
+        "hpi": "ATNHPIUS16860Q",
+        "unemployment": "CHAT247URN"
+      },
+      "bls_area": "C1686"
+    },
+    "16020": {
+      "name": "Cape Coral-Fort Myers, FL",
+      "aliases": [
+        "cape coral",
+        "fort myers",
+        "naples fl"
+      ],
+      "state": "FL",
+      "fips_state": "12",
+      "fips_county": "071",
+      "fred": {
+        "hpi": "ATNHPIUS16020Q",
+        "unemployment": null
+      },
+      "bls_area": "C1602"
+    },
+    "17140": {
+      "name": "Cincinnati, OH-KY-IN",
+      "aliases": [
+        "cincinnati"
+      ],
+      "state": "OH",
+      "fips_state": "39",
+      "fips_county": "061",
+      "fred": {
+        "hpi": "ATNHPIUS17140Q",
+        "unemployment": "CINC139URN"
+      },
+      "bls_area": "C1714"
+    },
+    "17900": {
+      "name": "Columbia, SC",
+      "aliases": [
+        "columbia sc"
+      ],
+      "state": "SC",
+      "fips_state": "45",
+      "fips_county": "079",
+      "fred": {
+        "hpi": "ATNHPIUS17900Q",
+        "unemployment": null
+      },
+      "bls_area": "C1790"
+    },
+    "16700": {
+      "name": "Charleston-North Charleston, SC",
+      "aliases": [
+        "charleston sc",
+        "north charleston"
+      ],
+      "state": "SC",
+      "fips_state": "45",
+      "fips_county": "019",
+      "fred": {
+        "hpi": "ATNHPIUS16700Q",
+        "unemployment": "CHAR245URN"
+      },
+      "bls_area": "C1670"
+    },
+    "24660": {
+      "name": "Greensboro-High Point, NC",
+      "aliases": [
+        "greensboro",
+        "high point nc"
+      ],
+      "state": "NC",
+      "fips_state": "37",
+      "fips_county": "081",
+      "fred": {
+        "hpi": "ATNHPIUS24660Q",
+        "unemployment": "GREE237URN"
+      },
+      "bls_area": "C2466"
+    },
+    "24860": {
+      "name": "Greenville-Anderson, SC",
+      "aliases": [
+        "greenville sc",
+        "anderson sc",
+        "spartanburg"
+      ],
+      "state": "SC",
+      "fips_state": "45",
+      "fips_county": "045",
+      "fred": {
+        "hpi": "ATNHPIUS24860Q",
+        "unemployment": "GREE145URN"
+      },
+      "bls_area": "C2486"
+    },
+    "26380": {
+      "name": "Honolulu, HI",
+      "aliases": [
+        "honolulu",
+        "oahu",
+        "hawaii"
+      ],
+      "state": "HI",
+      "fips_state": "15",
+      "fips_county": "003",
+      "fred": {
+        "hpi": "ATNHPIUS26180Q",
+        "unemployment": "HONO015URN"
+      },
+      "bls_area": "C2618"
+    },
+    "28940": {
+      "name": "Knoxville, TN",
+      "aliases": [
+        "knoxville"
+      ],
+      "state": "TN",
+      "fips_state": "47",
+      "fips_county": "093",
+      "fred": {
+        "hpi": "ATNHPIUS28940Q",
+        "unemployment": "KNOX247URN"
+      },
+      "bls_area": "C2894"
+    },
+    "29460": {
+      "name": "Lakeland-Winter Haven, FL",
+      "aliases": [
+        "lakeland",
+        "winter haven"
+      ],
+      "state": "FL",
+      "fips_state": "12",
+      "fips_county": "105",
+      "fred": {
+        "hpi": "ATNHPIUS29460Q",
+        "unemployment": null
+      },
+      "bls_area": "C2946"
+    },
+    "30460": {
+      "name": "Lexington-Fayette, KY",
+      "aliases": [
+        "lexington ky",
+        "fayette ky"
+      ],
+      "state": "KY",
+      "fips_state": "21",
+      "fips_county": "067",
+      "fred": {
+        "hpi": "ATNHPIUS30460Q",
+        "unemployment": null
+      },
+      "bls_area": "C3046"
+    },
+    "31140": {
+      "name": "Louisville/Jefferson County, KY-IN",
+      "aliases": [
+        "louisville"
+      ],
+      "state": "KY",
+      "fips_state": "21",
+      "fips_county": "111",
+      "fred": {
+        "hpi": "ATNHPIUS31140Q",
+        "unemployment": "LOUI121URN"
+      },
+      "bls_area": "C3114"
+    },
+    "35380": {
+      "name": "New Orleans-Metairie, LA",
+      "aliases": [
+        "new orleans",
+        "metairie",
+        "nola"
+      ],
+      "state": "LA",
+      "fips_state": "22",
+      "fips_county": "071",
+      "fred": {
+        "hpi": "ATNHPIUS35380Q",
+        "unemployment": "NEWO022URN"
+      },
+      "bls_area": "C3538"
+    },
+    "36260": {
+      "name": "Ogden-Clearfield, UT",
+      "aliases": [
+        "ogden",
+        "clearfield ut"
+      ],
+      "state": "UT",
+      "fips_state": "49",
+      "fips_county": "057",
+      "fred": {
+        "hpi": "ATNHPIUS36260Q",
+        "unemployment": null
+      },
+      "bls_area": "C3626"
+    },
+    "37340": {
+      "name": "Palm Bay-Melbourne-Titusville, FL",
+      "aliases": [
+        "palm bay",
+        "melbourne fl",
+        "titusville fl"
+      ],
+      "state": "FL",
+      "fips_state": "12",
+      "fips_county": "009",
+      "fred": {
+        "hpi": "ATNHPIUS37340Q",
+        "unemployment": null
+      },
+      "bls_area": "C3734"
+    },
+    "39300": {
+      "name": "Providence-Warwick, RI-MA",
+      "aliases": [
+        "providence",
+        "warwick ri"
+      ],
+      "state": "RI",
+      "fips_state": "44",
+      "fips_county": "007",
+      "fred": {
+        "hpi": "ATNHPIUS39300Q",
+        "unemployment": "PROV044URN"
+      },
+      "bls_area": "C3930"
+    },
+    "42340": {
+      "name": "Savannah, GA",
+      "aliases": [
+        "savannah"
+      ],
+      "state": "GA",
+      "fips_state": "13",
+      "fips_county": "051",
+      "fred": {
+        "hpi": "ATNHPIUS42340Q",
+        "unemployment": null
+      },
+      "bls_area": "C4234"
+    },
+    "10420": {
+      "name": "Akron, OH",
+      "aliases": [
+        "akron"
+      ],
+      "state": "OH",
+      "fips_state": "39",
+      "fips_county": "153",
+      "fred": {
+        "hpi": "ATNHPIUS10420Q",
+        "unemployment": "AKRO239URN"
+      },
+      "bls_area": "C1042"
+    },
+    "10740": {
+      "name": "Albuquerque, NM",
+      "aliases": [
+        "albuquerque"
+      ],
+      "state": "NM",
+      "fips_state": "35",
+      "fips_county": "001",
+      "fred": {
+        "hpi": "ATNHPIUS10740Q",
+        "unemployment": "ALBU035URN"
+      },
+      "bls_area": "C1074"
+    },
+    "14260": {
+      "name": "Boise City, ID",
+      "aliases": [
+        "boise"
+      ],
+      "state": "ID",
+      "fips_state": "16",
+      "fips_county": "001",
+      "fred": {
+        "hpi": "ATNHPIUS14260Q",
+        "unemployment": "BOIS016URN"
+      },
+      "bls_area": "C1426"
+    },
+    "15380": {
+      "name": "Buffalo-Cheektowaga, NY",
+      "aliases": [
+        "buffalo ny",
+        "cheektowaga"
+      ],
+      "state": "NY",
+      "fips_state": "36",
+      "fips_county": "029",
+      "fred": {
+        "hpi": "ATNHPIUS15380Q",
+        "unemployment": "BUFF036URN"
+      },
+      "bls_area": "C1538"
+    },
+    "17820": {
+      "name": "Colorado Springs, CO",
+      "aliases": [
+        "colorado springs"
+      ],
+      "state": "CO",
+      "fips_state": "08",
+      "fips_county": "041",
+      "fred": {
+        "hpi": "ATNHPIUS17820Q",
+        "unemployment": "COLO208URN"
+      },
+      "bls_area": "C1782"
+    },
+    "19380": {
+      "name": "Dayton-Kettering, OH",
+      "aliases": [
+        "dayton",
+        "kettering"
+      ],
+      "state": "OH",
+      "fips_state": "39",
+      "fips_county": "113",
+      "fred": {
+        "hpi": "ATNHPIUS19380Q",
+        "unemployment": "DAYT239URN"
+      },
+      "bls_area": "C1938"
+    },
+    "20500": {
+      "name": "Durham-Chapel Hill, NC",
+      "aliases": [
+        "durham nc",
+        "chapel hill"
+      ],
+      "state": "NC",
+      "fips_state": "37",
+      "fips_county": "063",
+      "fred": {
+        "hpi": "ATNHPIUS20500Q",
+        "unemployment": null
+      },
+      "bls_area": "C2050"
+    },
+    "21340": {
+      "name": "El Paso, TX",
+      "aliases": [
+        "el paso"
+      ],
+      "state": "TX",
+      "fips_state": "48",
+      "fips_county": "141",
+      "fred": {
+        "hpi": "ATNHPIUS21340Q",
+        "unemployment": "ELPA248URN"
+      },
+      "bls_area": "C2134"
+    },
+    "22180": {
+      "name": "Fayetteville-Springdale-Rogers, AR",
+      "aliases": [
+        "fayetteville ar",
+        "springdale ar",
+        "rogers ar"
+      ],
+      "state": "AR",
+      "fips_state": "05",
+      "fips_county": "143",
+      "fred": {
+        "hpi": "ATNHPIUS22180Q",
+        "unemployment": null
+      },
+      "bls_area": "C2218"
+    },
+    "23420": {
+      "name": "Fresno, CA",
+      "aliases": [
+        "fresno"
+      ],
+      "state": "CA",
+      "fips_state": "06",
+      "fips_county": "019",
+      "fred": {
+        "hpi": "ATNHPIUS23420Q",
+        "unemployment": "FRES006URN"
+      },
+      "bls_area": "C2342"
+    },
+    "24340": {
+      "name": "Grand Rapids-Kentwood, MI",
+      "aliases": [
+        "grand rapids",
+        "kentwood mi"
+      ],
+      "state": "MI",
+      "fips_state": "26",
+      "fips_county": "081",
+      "fred": {
+        "hpi": "ATNHPIUS24340Q",
+        "unemployment": "GRAN226URN"
+      },
+      "bls_area": "C2434"
+    },
+    "25540": {
+      "name": "Hartford-East Hartford-Middletown, CT",
+      "aliases": [
+        "hartford"
+      ],
+      "state": "CT",
+      "fips_state": "09",
+      "fips_county": "003",
+      "fred": {
+        "hpi": "ATNHPIUS25540Q",
+        "unemployment": "HART609URN"
+      },
+      "bls_area": "C2554"
+    },
+    "26620": {
+      "name": "Huntsville, AL",
+      "aliases": [
+        "huntsville al"
+      ],
+      "state": "AL",
+      "fips_state": "01",
+      "fips_county": "089",
+      "fred": {
+        "hpi": "ATNHPIUS26620Q",
+        "unemployment": null
+      },
+      "bls_area": "C2662"
+    },
+    "30780": {
+      "name": "Little Rock-North Little Rock-Conway, AR",
+      "aliases": [
+        "little rock",
+        "north little rock",
+        "conway ar"
+      ],
+      "state": "AR",
+      "fips_state": "05",
+      "fips_county": "119",
+      "fred": {
+        "hpi": "ATNHPIUS30780Q",
+        "unemployment": "LITT005URN"
+      },
+      "bls_area": "C3078"
+    },
+    "31540": {
+      "name": "Madison, WI",
+      "aliases": [
+        "madison wi"
+      ],
+      "state": "WI",
+      "fips_state": "55",
+      "fips_county": "025",
+      "fred": {
+        "hpi": "ATNHPIUS31540Q",
+        "unemployment": null
+      },
+      "bls_area": "C3154"
+    },
+    "32580": {
+      "name": "McAllen-Edinburg-Mission, TX",
+      "aliases": [
+        "mcallen",
+        "edinburg tx"
+      ],
+      "state": "TX",
+      "fips_state": "48",
+      "fips_county": "215",
+      "fred": {
+        "hpi": "ATNHPIUS32580Q",
+        "unemployment": null
+      },
+      "bls_area": "C3258"
+    },
+    "19780": {
+      "name": "Des Moines-West Des Moines, IA",
+      "aliases": [
+        "des moines"
+      ],
+      "state": "IA",
+      "fips_state": "19",
+      "fips_county": "153",
+      "fred": {
+        "hpi": "ATNHPIUS19780Q",
+        "unemployment": "DESM019URN"
+      },
+      "bls_area": "C1978"
+    },
+    "36540": {
+      "name": "Omaha-Council Bluffs, NE-IA",
+      "aliases": [
+        "omaha",
+        "council bluffs"
+      ],
+      "state": "NE",
+      "fips_state": "31",
+      "fips_county": "055",
+      "fred": {
+        "hpi": "ATNHPIUS36540Q",
+        "unemployment": "OMAH031URN"
+      },
+      "bls_area": "C3654"
+    },
+    "46140": {
+      "name": "Tulsa, OK",
+      "aliases": [
+        "tulsa"
+      ],
+      "state": "OK",
+      "fips_state": "40",
+      "fips_county": "143",
+      "fred": {
+        "hpi": "ATNHPIUS46140Q",
+        "unemployment": "TULS240URN"
+      },
+      "bls_area": "C4614"
+    },
+    "48620": {
+      "name": "Wichita, KS",
+      "aliases": [
+        "wichita"
+      ],
+      "state": "KS",
+      "fips_state": "20",
+      "fips_county": "173",
+      "fred": {
+        "hpi": "ATNHPIUS48620Q",
+        "unemployment": "WICH220URN"
+      },
+      "bls_area": "C4862"
+    },
+    "39900": {
+      "name": "Reno-Sparks, NV",
+      "aliases": [
+        "reno",
+        "sparks nv"
+      ],
+      "state": "NV",
+      "fips_state": "32",
+      "fips_county": "031",
+      "fred": {
+        "hpi": "ATNHPIUS39900Q",
+        "unemployment": null
+      },
+      "bls_area": "C3990"
+    },
+    "46060": {
+      "name": "Tucson, AZ",
+      "aliases": [
+        "tucson"
+      ],
+      "state": "AZ",
+      "fips_state": "04",
+      "fips_county": "019",
+      "fred": {
+        "hpi": "ATNHPIUS46060Q",
+        "unemployment": "TUCS204URN"
+      },
+      "bls_area": "C4606"
+    },
+    "41940": {
+      "name": "San Jose-Sunnyvale-Santa Clara, CA",
+      "aliases": [
+        "san jose",
+        "sunnyvale",
+        "santa clara",
+        "silicon valley"
+      ],
+      "state": "CA",
+      "fips_state": "06",
+      "fips_county": "085",
+      "fred": {
+        "hpi": "ATNHPIUS41940Q",
+        "unemployment": "SANJ106URN"
+      },
+      "bls_area": "C4194"
+    },
+    "38940": {
+      "name": "Port St. Lucie, FL",
+      "aliases": [
+        "port st lucie",
+        "st lucie"
+      ],
+      "state": "FL",
+      "fips_state": "12",
+      "fips_county": "111",
+      "fred": {
+        "hpi": "ATNHPIUS38940Q",
+        "unemployment": null
+      },
+      "bls_area": "C3894"
+    },
+    "35840": {
+      "name": "North Port-Sarasota-Bradenton, FL",
+      "aliases": [
+        "sarasota",
+        "bradenton",
+        "north port fl"
+      ],
+      "state": "FL",
+      "fips_state": "12",
+      "fips_county": "115",
+      "fred": {
+        "hpi": "ATNHPIUS35840Q",
+        "unemployment": null
+      },
+      "bls_area": "C3584"
+    },
+    "25420": {
+      "name": "Harrisburg-Carlisle, PA",
+      "aliases": [
+        "harrisburg",
+        "carlisle pa"
+      ],
+      "state": "PA",
+      "fips_state": "42",
+      "fips_county": "043",
+      "fred": {
+        "hpi": "ATNHPIUS25420Q",
+        "unemployment": null
+      },
+      "bls_area": "C2542"
+    },
+    "35300": {
+      "name": "New Haven-Milford, CT",
+      "aliases": [
+        "new haven ct",
+        "milford ct"
+      ],
+      "state": "CT",
+      "fips_state": "09",
+      "fips_county": "009",
+      "fred": {
+        "hpi": "ATNHPIUS35300Q",
+        "unemployment": null
+      },
+      "bls_area": "C3530"
+    },
+    "40380": {
+      "name": "Rochester, NY",
+      "aliases": [
+        "rochester ny"
+      ],
+      "state": "NY",
+      "fips_state": "36",
+      "fips_county": "055",
+      "fred": {
+        "hpi": "ATNHPIUS40380Q",
+        "unemployment": "ROCH036URN"
+      },
+      "bls_area": "C4038"
+    },
+    "44060": {
+      "name": "Syracuse, NY",
+      "aliases": [
+        "syracuse"
+      ],
+      "state": "NY",
+      "fips_state": "36",
+      "fips_county": "067",
+      "fred": {
+        "hpi": "ATNHPIUS44060Q",
+        "unemployment": null
+      },
+      "bls_area": "C4406"
+    },
+    "47260": {
+      "name": "Virginia Beach-Norfolk-Newport News, VA-NC",
+      "aliases": [
+        "virginia beach",
+        "norfolk va",
+        "newport news",
+        "hampton roads"
+      ],
+      "state": "VA",
+      "fips_state": "51",
+      "fips_county": "810",
+      "fred": {
+        "hpi": "ATNHPIUS47260Q",
+        "unemployment": "VIRG051URN"
+      },
+      "bls_area": "C4726"
+    },
+    "47380": {
+      "name": "Waco, TX",
+      "aliases": [
+        "waco"
+      ],
+      "state": "TX",
+      "fips_state": "48",
+      "fips_county": "309",
+      "fred": {
+        "hpi": "ATNHPIUS47380Q",
+        "unemployment": null
+      },
+      "bls_area": "C4738"
+    },
+    "12940": {
+      "name": "Baton Rouge, LA",
+      "aliases": [
+        "baton rouge"
+      ],
+      "state": "LA",
+      "fips_state": "22",
+      "fips_county": "033",
+      "fred": {
+        "hpi": "ATNHPIUS12940Q",
+        "unemployment": "BATO222URN"
+      },
+      "bls_area": "C1294"
+    },
+    "15980": {
+      "name": "Cape Girardeau, MO-IL",
+      "aliases": [
+        "cape girardeau"
+      ],
+      "state": "MO",
+      "fips_state": "29",
+      "fips_county": "031",
+      "fred": {
+        "hpi": "ATNHPIUS15980Q",
+        "unemployment": null
+      },
+      "bls_area": "C1598"
+    },
+    "18580": {
+      "name": "Corpus Christi, TX",
+      "aliases": [
+        "corpus christi"
+      ],
+      "state": "TX",
+      "fips_state": "48",
+      "fips_county": "355",
+      "fred": {
+        "hpi": "ATNHPIUS18580Q",
+        "unemployment": null
+      },
+      "bls_area": "C1858"
+    },
+    "22660": {
+      "name": "Fort Collins, CO",
+      "aliases": [
+        "fort collins"
+      ],
+      "state": "CO",
+      "fips_state": "08",
+      "fips_county": "069",
+      "fred": {
+        "hpi": "ATNHPIUS22660Q",
+        "unemployment": null
+      },
+      "bls_area": "C2266"
+    },
+    "23540": {
+      "name": "Gainesville, FL",
+      "aliases": [
+        "gainesville fl"
+      ],
+      "state": "FL",
+      "fips_state": "12",
+      "fips_county": "001",
+      "fred": {
+        "hpi": "ATNHPIUS23540Q",
+        "unemployment": null
+      },
+      "bls_area": "C2354"
+    },
+    "33860": {
+      "name": "Montgomery, AL",
+      "aliases": [
+        "montgomery al"
+      ],
+      "state": "AL",
+      "fips_state": "01",
+      "fips_county": "101",
+      "fred": {
+        "hpi": "ATNHPIUS33860Q",
+        "unemployment": null
+      },
+      "bls_area": "C3386"
+    },
+    "34820": {
+      "name": "Myrtle Beach-Conway-North Myrtle Beach, SC-NC",
+      "aliases": [
+        "myrtle beach",
+        "conway sc"
+      ],
+      "state": "SC",
+      "fips_state": "45",
+      "fips_county": "051",
+      "fred": {
+        "hpi": "ATNHPIUS34820Q",
+        "unemployment": null
+      },
+      "bls_area": "C3482"
+    },
+    "37100": {
+      "name": "Oxnard-Thousand Oaks-Ventura, CA",
+      "aliases": [
+        "oxnard",
+        "thousand oaks",
+        "ventura ca"
+      ],
+      "state": "CA",
+      "fips_state": "06",
+      "fips_county": "111",
+      "fred": {
+        "hpi": "ATNHPIUS37100Q",
+        "unemployment": "OXNA106URN"
+      },
+      "bls_area": "C3710"
+    },
+    "38860": {
+      "name": "Portland-South Portland, ME",
+      "aliases": [
+        "portland me",
+        "south portland"
+      ],
+      "state": "ME",
+      "fips_state": "23",
+      "fips_county": "005",
+      "fred": {
+        "hpi": "ATNHPIUS38860Q",
+        "unemployment": null
+      },
+      "bls_area": "C3886"
+    },
+    "39340": {
+      "name": "Provo-Orem, UT",
+      "aliases": [
+        "provo",
+        "orem ut"
+      ],
+      "state": "UT",
+      "fips_state": "49",
+      "fips_county": "049",
+      "fred": {
+        "hpi": "ATNHPIUS39340Q",
+        "unemployment": null
+      },
+      "bls_area": "C3934"
+    },
+    "41060": {
+      "name": "St. George, UT",
+      "aliases": [
+        "st george ut",
+        "saint george ut"
+      ],
+      "state": "UT",
+      "fips_state": "49",
+      "fips_county": "053",
+      "fred": {
+        "hpi": "ATNHPIUS41060Q",
+        "unemployment": null
+      },
+      "bls_area": "C4106"
+    },
+    "42200": {
+      "name": "Santa Maria-Santa Barbara, CA",
+      "aliases": [
+        "santa barbara",
+        "santa maria ca"
+      ],
+      "state": "CA",
+      "fips_state": "06",
+      "fips_county": "083",
+      "fred": {
+        "hpi": "ATNHPIUS42200Q",
+        "unemployment": null
+      },
+      "bls_area": "C4220"
+    },
+    "44700": {
+      "name": "Stockton, CA",
+      "aliases": [
+        "stockton ca"
+      ],
+      "state": "CA",
+      "fips_state": "06",
+      "fips_county": "077",
+      "fred": {
+        "hpi": "ATNHPIUS44700Q",
+        "unemployment": "STOC006URN"
+      },
+      "bls_area": "C4470"
+    }
+  },
+  "propertyTypeMap": {
+    "multifamily": {
+      "cremiType": "Multifamily",
+      "fredSeries": [],
+      "naicsCode": "531110"
+    },
+    "industrial": {
+      "cremiType": "Industrial",
+      "fredSeries": [],
+      "naicsCode": "531120"
+    },
+    "office": {
+      "cremiType": "Office",
+      "fredSeries": [],
+      "naicsCode": "531120"
+    },
+    "retail": {
+      "cremiType": "Retail",
+      "fredSeries": [],
+      "naicsCode": "531120"
+    },
+    "net lease": {
+      "cremiType": "Retail",
+      "fredSeries": [],
+      "naicsCode": "531120"
+    },
+    "hospitality": {
+      "cremiType": "Hospitality",
+      "fredSeries": [],
+      "naicsCode": "721110"
+    },
+    "self storage": {
+      "cremiType": "Industrial",
+      "fredSeries": [],
+      "naicsCode": "531130"
+    },
+    "medical office": {
+      "cremiType": "Office",
+      "fredSeries": [],
+      "naicsCode": "621111"
+    },
+    "senior living": {
+      "cremiType": "Multifamily",
+      "fredSeries": [],
+      "naicsCode": "623110"
+    },
+    "student housing": {
+      "cremiType": "Multifamily",
+      "fredSeries": [],
+      "naicsCode": "531110"
+    },
+    "data center": {
+      "cremiType": "Industrial",
+      "fredSeries": [],
+      "naicsCode": "518210"
+    },
+    "life science": {
+      "cremiType": "Office",
+      "fredSeries": [],
+      "naicsCode": "541711"
+    },
+    "mixed use": {
+      "cremiType": "Multifamily",
+      "fredSeries": [],
+      "naicsCode": "531110"
+    }
+  },
+  "nationalSeries": {
+    "fedFundsRate": "FEDFUNDS",
+    "treasury10Y": "GS10",
+    "treasury2Y": "GS2",
+    "treasury30Y": "GS30",
+    "mortgage30Y": "MORTGAGE30US",
+    "cpi": "CPIAUCSL",
+    "corePCE": "PCEPILFE",
+    "gdp": "GDP",
+    "realGDPGrowth": "A191RL1Q225SBEA",
+    "housingStarts": "HOUST",
+    "buildingPermits": "PERMIT",
+    "crePriceIndex": "BOGZ1FL075035503Q",
+    "crePriceYoY": "BOGZ1FL010000386Q",
+    "creLoanDelinquency": "DRCRELEXFACBS",
+    "creSmallBankDelinquency": "DRCRELEXFOBS",
+    "unemploymentRate": "UNRATE",
+    "yieldCurve10Y2Y": "T10Y2Y",
+    "yieldCurve10Y3M": "T10Y3M",
+    "baaCreditSpread": "BAA10Y",
+    "aaaCreditSpread": "AAA10Y",
+    "rentalVacancyRate": "RRVRUSQ156N",
+    "rentalCPI": "CUUR0000SEHA",
+    "ownersEquivRent": "CUSR0000SEHC",
+    "nonResConstruction": "TLNRESCONS",
+    "consumerSentiment": "UMCSENT",
+    "nonfarmPayroll": "PAYEMS",
+    "laborForceParticipation": "CIVPART",
+    "retailSales": "RSAFS",
+    "housingUnderConstruction": "COMPUTSA"
+  }
+}
