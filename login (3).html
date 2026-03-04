@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alts Fund LINK — Sign In</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #1a1a2e;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: #16213e;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 12px;
+            padding: 40px 36px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+        }
+
+        .logo-section {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .logo-section h1 {
+            color: #D4AF37;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+        .logo-section p {
+            color: #8892b0;
+            font-size: 14px;
+            margin-top: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            color: #ccd6f6;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px 14px;
+            background: #0f1629;
+            border: 1px solid rgba(136, 146, 176, 0.3);
+            border-radius: 8px;
+            color: #ccd6f6;
+            font-size: 15px;
+            transition: border-color 0.2s;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #D4AF37;
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+        }
+        .form-group input::placeholder { color: #4a5568; }
+
+        .btn-login {
+            width: 100%;
+            padding: 13px;
+            background: linear-gradient(135deg, #D4AF37, #b8962e);
+            color: #1a1a2e;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            letter-spacing: 0.5px;
+        }
+        .btn-login:hover {
+            background: linear-gradient(135deg, #e0be4a, #D4AF37);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+        }
+        .btn-login:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+        .error-msg {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #f87171;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 16px;
+            display: none;
+        }
+        .success-msg {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #4ade80;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 16px;
+            display: none;
+        }
+        .pending-msg {
+            background: rgba(212, 175, 55, 0.1);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            color: #D4AF37;
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 16px;
+            display: none;
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .toggle-mode {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .toggle-mode a {
+            color: #D4AF37;
+            text-decoration: none;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .toggle-mode a:hover { text-decoration: underline; }
+
+        .forgot-link {
+            text-align: right;
+            margin-top: -12px;
+            margin-bottom: 20px;
+        }
+        .forgot-link a {
+            color: #8892b0;
+            text-decoration: none;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .forgot-link a:hover { color: #D4AF37; }
+
+        .register-fields { display: none; }
+        .register-fields.active { display: block; }
+
+        .footer-note {
+            text-align: center;
+            color: #4a5568;
+            font-size: 11px;
+            margin-top: 24px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="logo-section">
+                <h1>ALTS FUND LINK</h1>
+                <p id="modeSubtitle">Sign in to your advisor account</p>
+            </div>
+
+            <div id="errorMsg" class="error-msg"></div>
+            <div id="successMsg" class="success-msg"></div>
+            <div id="pendingMsg" class="pending-msg">
+                Your registration is under review.<br>
+                You'll receive an email once your account is approved.<br>
+                <strong>Thank you for your patience.</strong>
+            </div>
+
+            <form id="authForm">
+                <div class="register-fields" id="registerFields">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="displayName" placeholder="John Smith" autocomplete="name">
+                    </div>
+                    <div class="form-group">
+                        <label>Firm Name</label>
+                        <input type="text" id="firmName" placeholder="BD Wealth Group" autocomplete="organization">
+                    </div>
+                    <div class="form-group">
+                        <label>Broker Dealer / Entity Affiliation</label>
+                        <input type="text" id="bdAffiliation" placeholder="LPL Financial, Cetera, etc.">
+                    </div>
+                    <div class="form-group">
+                        <label>Phone</label>
+                        <input type="tel" id="phone" placeholder="913-555-0123" autocomplete="tel">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="email" placeholder="you@yourfirm.com" required autocomplete="email">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="password" placeholder="••••••••" required autocomplete="current-password">
+                </div>
+
+                <div class="forgot-link" id="forgotLink">
+                    <a onclick="handleForgotPassword()">Forgot password?</a>
+                </div>
+
+                <button type="submit" class="btn-login" id="submitBtn">Sign In</button>
+            </form>
+
+            <div class="toggle-mode">
+                <a id="toggleLink" onclick="toggleMode()">Don't have an account? Register</a>
+            </div>
+
+            <div class="footer-note">
+                For Broker Dealer and Investment Advisor due diligence use only. All data is property of Alts Fund Link. User ID and password cannot be shared with any other individual or group. Registration constitutes user agreeing to full confidentiality regarding all platform structure, functionality, or data contained in or related to the platform.
+            </div>
+        </div>
+    </div>
+
+    <!-- EmailJS SDK for sending admin notification emails -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, sendPasswordResetEmail, updateProfile, onAuthStateChanged
+        } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+        import { getFirestore, doc, setDoc, getDoc, serverTimestamp
+        } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC8RQmPNlOlZpDhIKqHL5UkpBtTSMEGQs8",
+            authDomain: "alts-fund-link.firebaseapp.com",
+            projectId: "alts-fund-link",
+            storageBucket: "alts-fund-link.firebasestorage.app",
+            messagingSenderId: "1025925507856",
+            appId: "1:1025925507856:web:0f596a9c94704146379395"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        let isRegisterMode = false;
+
+        // ── AUTH STATE: redirect if already logged in & approved ──
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                const userDoc = await getDoc(doc(db, 'users', user.uid));
+                if (userDoc.exists()) {
+                    const data = userDoc.data();
+
+                    if (data.status === 'pending') {
+                        // Signed in but not yet approved
+                        await signOut(auth);
+                        showPending();
+                        return;
+                    }
+
+                    if (data.status === 'suspended' || data.status === 'rejected') {
+                        await signOut(auth);
+                        showError('Your account has been suspended. Please contact support.');
+                        return;
+                    }
+
+                    // Approved — redirect based on role
+                    if (data.role === 'admin') {
+                        window.location.href = 'admin.html';
+                    } else {
+                        window.location.href = 'index.html';
+                    }
+                }
+            }
+        });
+
+        // ── FORM SUBMIT ─────────────────────────────
+        document.getElementById('authForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+
+            hideMessages();
+            btn.disabled = true;
+            btn.textContent = isRegisterMode ? 'Creating Account...' : 'Signing In...';
+
+            if (isRegisterMode) {
+                await handleRegister(email, password);
+            } else {
+                await handleLogin(email, password);
+            }
+
+            btn.disabled = false;
+            btn.textContent = isRegisterMode ? 'Create Account' : 'Sign In';
+        });
+
+        // ── LOGIN ───────────────────────────────────
+        async function handleLogin(email, password) {
+            try {
+                const result = await signInWithEmailAndPassword(auth, email, password);
+
+                // Check user status
+                const userDoc = await getDoc(doc(db, 'users', result.user.uid));
+                if (userDoc.exists()) {
+                    const data = userDoc.data();
+
+                    if (data.status === 'pending') {
+                        await signOut(auth);
+                        showPending();
+                        return;
+                    }
+
+                    if (data.status === 'suspended' || data.status === 'rejected') {
+                        await signOut(auth);
+                        showError('Your account has been suspended. Please contact support.');
+                        return;
+                    }
+
+                    // Success — auth state listener handles redirect
+                } else {
+                    // User exists in Auth but no Firestore doc (edge case)
+                    showError('Account setup incomplete. Please contact support.');
+                    await signOut(auth);
+                }
+            } catch (error) {
+                showError(getErrorMessage(error.code));
+            }
+        }
+
+        // ── REGISTER ────────────────────────────────
+        async function handleRegister(email, password) {
+            const displayName = document.getElementById('displayName').value.trim();
+            const firmName = document.getElementById('firmName').value.trim();
+            const bdAffiliation = document.getElementById('bdAffiliation').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+
+            if (!displayName) { showError('Please enter your name.'); return; }
+            if (!bdAffiliation) { showError('Please enter your Broker Dealer / Entity Affiliation.'); return; }
+
+            try {
+                const result = await createUserWithEmailAndPassword(auth, email, password);
+                await updateProfile(result.user, { displayName });
+
+                // Create user doc with PENDING status
+                await setDoc(doc(db, 'users', result.user.uid), {
+                    role: 'advisor',
+                    status: 'pending',
+                    email: email,
+                    displayName: displayName,
+                    firmName: firmName,
+                    bdAffiliation: bdAffiliation,
+                    phone: phone,
+                    firmLogo: '',
+                    licenseNumber: '',
+                    preferences: {
+                        defaultView: 'advisor',
+                        assetClassPreferences: [],
+                        structurePreferences: []
+                    },
+                    subscription: {
+                        plan: 'trial',
+                        startDate: serverTimestamp(),
+                        expiresAt: null
+                    },
+                    meta: {
+                        createdAt: serverTimestamp(),
+                        lastLogin: null,
+                        loginCount: 0
+                    }
+                });
+
+                // Send admin notification email via EmailJS
+                sendAdminNotification(displayName, firmName, email, phone);
+
+                // Sign them out (they can't access until approved)
+                await signOut(auth);
+
+                showPending();
+
+            } catch (error) {
+                showError(getErrorMessage(error.code));
+            }
+        }
+
+        // ── ADMIN EMAIL NOTIFICATION ────────────────
+        // Uses EmailJS (free, 200 emails/month)
+        // SETUP: 
+        // 1. Go to emailjs.com, create free account
+        // 2. Add an email service (Gmail)
+        // 3. Create a template with variables: {{from_name}}, {{firm}}, {{email}}, {{phone}}, {{message}}
+        // 4. Replace the IDs below with your actual EmailJS IDs
+        function sendAdminNotification(name, firm, email, phone) {
+            try {
+                // ▼▼▼ REPLACE THESE WITH YOUR EMAILJS IDS ▼▼▼
+                const EMAILJS_PUBLIC_KEY = 'YOUR_EMAILJS_PUBLIC_KEY';
+                const EMAILJS_SERVICE_ID = 'YOUR_EMAILJS_SERVICE_ID';
+                const EMAILJS_TEMPLATE_ID = 'YOUR_EMAILJS_TEMPLATE_ID';
+                // ▲▲▲ REPLACE THESE WITH YOUR EMAILJS IDS ▲▲▲
+
+                if (EMAILJS_PUBLIC_KEY.includes('YOUR_')) {
+                    console.warn('EmailJS not configured — skipping admin notification email.');
+                    return;
+                }
+
+                emailjs.init(EMAILJS_PUBLIC_KEY);
+                emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+                    from_name: name,
+                    firm: firm,
+                    email: email,
+                    phone: phone || 'Not provided',
+                    message: `New registration on AFL Platform:\n\nName: ${name}\nFirm: ${firm}\nEmail: ${email}\nPhone: ${phone || 'Not provided'}\n\nLog in to the Admin Panel to approve or reject.`
+                }).then(() => {
+                    console.log('Admin notification email sent.');
+                }).catch(err => {
+                    console.warn('Failed to send admin notification:', err);
+                });
+            } catch (err) {
+                console.warn('EmailJS not loaded or failed:', err);
+            }
+        }
+
+        // ── FORGOT PASSWORD ─────────────────────────
+        window.handleForgotPassword = async function() {
+            const email = document.getElementById('email').value.trim();
+            if (!email) { showError('Enter your email address first, then click Forgot Password.'); return; }
+            try {
+                await sendPasswordResetEmail(auth, email);
+                showSuccess('Password reset email sent. Check your inbox.');
+            } catch (error) {
+                showError(getErrorMessage(error.code));
+            }
+        };
+
+        // ── TOGGLE MODE ─────────────────────────────
+        window.toggleMode = function() {
+            isRegisterMode = !isRegisterMode;
+            const fields = document.getElementById('registerFields');
+            const btn = document.getElementById('submitBtn');
+            const link = document.getElementById('toggleLink');
+            const subtitle = document.getElementById('modeSubtitle');
+            const forgot = document.getElementById('forgotLink');
+
+            hideMessages();
+
+            if (isRegisterMode) {
+                fields.classList.add('active');
+                btn.textContent = 'Create Account';
+                link.textContent = 'Already have an account? Sign In';
+                subtitle.textContent = 'Request access to the platform';
+                forgot.style.display = 'none';
+            } else {
+                fields.classList.remove('active');
+                btn.textContent = 'Sign In';
+                link.textContent = "Don't have an account? Register";
+                subtitle.textContent = 'Sign in to your advisor account';
+                forgot.style.display = 'block';
+            }
+        };
+
+        // ── UI HELPERS ──────────────────────────────
+        function showError(msg) {
+            hideMessages();
+            const el = document.getElementById('errorMsg');
+            el.textContent = msg;
+            el.style.display = 'block';
+        }
+        function showSuccess(msg) {
+            hideMessages();
+            const el = document.getElementById('successMsg');
+            el.textContent = msg;
+            el.style.display = 'block';
+        }
+        function showPending() {
+            hideMessages();
+            document.getElementById('pendingMsg').style.display = 'block';
+            document.getElementById('authForm').style.display = 'none';
+            document.getElementById('toggleLink').parentElement.style.display = 'none';
+            document.getElementById('modeSubtitle').textContent = 'Registration submitted';
+        }
+        function hideMessages() {
+            document.getElementById('errorMsg').style.display = 'none';
+            document.getElementById('successMsg').style.display = 'none';
+            document.getElementById('pendingMsg').style.display = 'none';
+        }
+
+        function getErrorMessage(code) {
+            const messages = {
+                'auth/user-not-found':          'No account found with this email.',
+                'auth/wrong-password':          'Incorrect password.',
+                'auth/invalid-email':           'Please enter a valid email address.',
+                'auth/email-already-in-use':    'An account with this email already exists.',
+                'auth/weak-password':           'Password must be at least 6 characters.',
+                'auth/too-many-requests':       'Too many attempts. Please try again later.',
+                'auth/invalid-credential':      'Invalid email or password.',
+                'auth/network-request-failed':  'Network error. Please check your connection.'
+            };
+            return messages[code] || 'An unexpected error occurred. Please try again.';
+        }
+    </script>
+</body>
+</html>
