@@ -1178,7 +1178,7 @@
                 </div>`;
 
             try {
-                await fetch('https://us-central1-alts-fund-link.cloudfunctions.net/sendUserStatusEmail', {
+                await fetch('https://sendstatusemail-pqsbpjb7qa-uc.a.run.app', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ to: userEmail, subject, html })
