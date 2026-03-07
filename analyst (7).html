@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script type="module" src="auth-gate.js"></script>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>The Analyst — AFL Platform</title>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --afl-bg:        #0a0c0f;
+      --afl-bg2:       #0f1215;
+      --afl-bg3:       #141820;
+      --afl-border:    #1e2530;
+      --afl-border2:   #252d3a;
+      --afl-gold:      #c9a84c;
+      --afl-gold2:     #e8c97a;
+      --afl-gold-dim:  rgba(201,168,76,0.12);
+      --afl-gold-glow: rgba(201,168,76,0.06);
+      --afl-text:      #e8eaf0;
+      --afl-text2:     #8a94a6;
+      --afl-text3:     #4a5568;
+      --afl-bear:      #e05c5c;
+      --afl-bear-dim:  rgba(224,92,92,0.12);
+      --afl-comply:    #5c9ee0;
+      --afl-comply-dim:rgba(92,158,224,0.12);
+      --afl-radius:    6px;
+    }
+    #analyst-root *, #analyst-root *::before, #analyst-root *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    #analyst-root {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--afl-bg);
+      color: var(--afl-text);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* TOP BAR */
+    #analyst-root .top-bar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 0 20px;
+      height: 52px;
+      border-bottom: 1px solid var(--afl-border);
+      background: var(--afl-bg2);
+      flex-shrink: 0;
+    }
+    #analyst-root .analyst-wordmark {
+      font-family: 'DM Serif Display', serif;
+      font-size: 18px;
+      color: var(--afl-gold);
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+    #analyst-root .analyst-wordmark span {
+      color: var(--afl-text2);
+      font-size: 11px;
+      font-family: 'DM Mono', monospace;
+      font-weight: 300;
+      margin-left: 10px;
+      letter-spacing: 0.08em;
+    }
+    #analyst-root .mode-pills { display: flex; gap: 4px; margin-left: 8px; }
+    #analyst-root .mode-pill {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      cursor: pointer;
+      border: 1px solid var(--afl-border2);
+      background: transparent;
+      color: var(--afl-text2);
+      transition: all 0.15s;
+      font-family: 'DM Sans', sans-serif;
+      text-transform: uppercase;
+    }
+    #analyst-root .mode-pill:hover { border-color: var(--afl-gold); color: var(--afl-gold); }
+    #analyst-root .mode-pill.active-advisor { background: var(--afl-gold-dim); border-color: var(--afl-gold); color: var(--afl-gold); }
+    #analyst-root .mode-pill.active-bear { background: var(--afl-bear-dim); border-color: var(--afl-bear); color: var(--afl-bear); }
+    #analyst-root .mode-pill.active-comply { background: var(--afl-comply-dim); border-color: var(--afl-comply); color: var(--afl-comply); }
+    #analyst-root .top-bar-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+    #analyst-root .query-counter { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--afl-text3); }
+    #analyst-root .query-counter span { color: var(--afl-gold); }
+
+    /* MAIN LAYOUT */
+    #analyst-root .main { display: flex; flex: 1; overflow: hidden; }
+
+    /* LEFT SIDEBAR */
+    #analyst-root .sidebar-left {
+      width: 240px;
+      flex-shrink: 0;
+      border-right: 1px solid var(--afl-border);
+      background: var(--afl-bg2);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    #analyst-root .sidebar-section {
+      padding: 14px 14px 10px;
+      border-bottom: 1px solid var(--afl-border);
+      flex-shrink: 0;
+    }
+    #analyst-root .sidebar-label {
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      color: var(--afl-text3);
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    #analyst-root .client-input {
+      width: 100%;
+      background: var(--afl-bg3);
+      border: 1px solid var(--afl-border2);
+      border-radius: var(--afl-radius);
+      padding: 7px 10px;
+      font-size: 12px;
+      color: var(--afl-text);
+      font-family: 'DM Sans', sans-serif;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    #analyst-root .client-input:focus { border-color: var(--afl-gold); }
+    #analyst-root .client-input::placeholder { color: var(--afl-text3); }
+    #analyst-root .basket-list { display: flex; flex-direction: column; gap: 4px; max-height: 110px; overflow-y: auto; }
+    #analyst-root .basket-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 5px 8px;
+      background: var(--afl-bg3);
+      border: 1px solid var(--afl-border);
+      border-radius: var(--afl-radius);
+      font-size: 11px;
+      color: var(--afl-text2);
+    }
+    #analyst-root .remove-btn { cursor: pointer; color: var(--afl-text3); font-size: 15px; line-height:1; transition: color 0.1s; }
+    #analyst-root .remove-btn:hover { color: var(--afl-bear); }
+    #analyst-root .basket-empty { font-size: 11px; color: var(--afl-text3); font-style: italic; }
+    #analyst-root .presets-list { display: flex; flex-direction: column; gap: 2px; overflow-y: auto; flex: 1; padding: 8px 12px; }
+    #analyst-root .preset-group-label {
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      color: var(--afl-text3);
+      text-transform: uppercase;
+      margin: 10px 0 4px;
+    }
+    #analyst-root .preset-group-label:first-child { margin-top: 2px; }
+    #analyst-root .preset-btn {
+      width: 100%;
+      text-align: left;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: var(--afl-radius);
+      padding: 6px 8px;
+      font-size: 11px;
+      color: var(--afl-text2);
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      line-height: 1.4;
+      transition: all 0.12s;
+    }
+    #analyst-root .preset-btn:hover { background: var(--afl-gold-glow); border-color: var(--afl-border2); color: var(--afl-text); }
+
+    /* CHAT AREA */
+    #analyst-root .chat-area { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    #analyst-root .messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    #analyst-root .messages::-webkit-scrollbar { width: 4px; }
+    #analyst-root .messages::-webkit-scrollbar-thumb { background: var(--afl-border2); border-radius: 2px; }
+
+    /* Welcome */
+    #analyst-root .welcome {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px;
+      text-align: center;
+      min-height: 300px;
+    }
+    #analyst-root .welcome-mark { font-family: 'DM Serif Display', serif; font-size: 52px; color: var(--afl-gold); opacity: 0.7; margin-bottom: 16px; }
+    #analyst-root .welcome-title { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--afl-text); margin-bottom: 10px; }
+    #analyst-root .welcome-sub { font-size: 13px; color: var(--afl-text2); max-width: 420px; line-height: 1.7; margin-bottom: 28px; }
+    #analyst-root .welcome-chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; max-width: 520px; }
+    #analyst-root .welcome-chip {
+      padding: 6px 14px;
+      background: var(--afl-bg3);
+      border: 1px solid var(--afl-border2);
+      border-radius: 20px;
+      font-size: 11px;
+      color: var(--afl-text2);
+      cursor: pointer;
+      transition: all 0.12s;
+    }
+    #analyst-root .welcome-chip:hover { border-color: var(--afl-gold); color: var(--afl-gold); background: var(--afl-gold-dim); }
+
+    /* Messages */
+    #analyst-root .msg { display: flex; flex-direction: column; gap: 6px; animation: msgIn 0.2s ease; }
+    @keyframes msgIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    #analyst-root .msg-header { display: flex; align-items: center; gap: 8px; }
+    #analyst-root .msg-role { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; }
+    #analyst-root .role-user { color: var(--afl-text3); }
+    #analyst-root .role-advisor { color: var(--afl-gold); }
+    #analyst-root .role-bear { color: var(--afl-bear); }
+    #analyst-root .role-comply { color: var(--afl-comply); }
+    #analyst-root .msg-badge { font-size: 9px; padding: 1px 6px; border-radius: 10px; font-weight: 500; letter-spacing: 0.06em; }
+    #analyst-root .badge-advisor { background: var(--afl-gold-dim); color: var(--afl-gold); border: 1px solid rgba(201,168,76,0.2); }
+    #analyst-root .badge-bear { background: var(--afl-bear-dim); color: var(--afl-bear); border: 1px solid rgba(224,92,92,0.2); }
+    #analyst-root .badge-comply { background: var(--afl-comply-dim); color: var(--afl-comply); border: 1px solid rgba(92,158,224,0.2); }
+    #analyst-root .msg-body {
+      font-size: 13.5px;
+      line-height: 1.75;
+      color: var(--afl-text);
+      padding: 14px 16px;
+      background: var(--afl-bg2);
+      border: 1px solid var(--afl-border);
+      border-radius: var(--afl-radius);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    #analyst-root .msg-body.user-body { background: var(--afl-bg3); color: var(--afl-text2); font-size: 13px; }
+    #analyst-root .msg-body.streaming::after { content: '▋'; animation: blink 0.7s infinite; color: var(--afl-gold); }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+    #analyst-root .msg-body strong { color: var(--afl-gold2); font-weight: 600; }
+    #analyst-root .msg-body em { color: var(--afl-text2); font-style: italic; }
+
+    /* INPUT BAR */
+    #analyst-root .input-bar {
+      padding: 14px 20px;
+      border-top: 1px solid var(--afl-border);
+      background: var(--afl-bg2);
+      display: flex;
+      gap: 10px;
+      align-items: flex-end;
+      flex-shrink: 0;
+    }
+    #analyst-root .input-wrap { flex: 1; }
+    #analyst-root .chat-input {
+      width: 100%;
+      background: var(--afl-bg3);
+      border: 1px solid var(--afl-border2);
+      border-radius: var(--afl-radius);
+      padding: 10px 14px;
+      font-size: 13px;
+      color: var(--afl-text);
+      font-family: 'DM Sans', sans-serif;
+      resize: none;
+      outline: none;
+      min-height: 42px;
+      max-height: 140px;
+      line-height: 1.5;
+      transition: border-color 0.15s;
+    }
+    #analyst-root .chat-input:focus { border-color: var(--afl-gold); }
+    #analyst-root .chat-input::placeholder { color: var(--afl-text3); }
+    #analyst-root .send-btn {
+      width: 42px; height: 42px;
+      border-radius: var(--afl-radius);
+      background: var(--afl-gold);
+      border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.15s;
+      color: #0a0c0f;
+    }
+    #analyst-root .send-btn:hover { background: var(--afl-gold2); transform: translateY(-1px); }
+    #analyst-root .send-btn:disabled { background: var(--afl-border2); color: var(--afl-text3); cursor: not-allowed; transform: none; }
+    #analyst-root .send-btn.bear-mode { background: var(--afl-bear); color: #fff; }
+    #analyst-root .send-btn.comply-mode { background: var(--afl-comply); color: #fff; }
+    #analyst-root .clear-btn {
+      height: 42px; padding: 0 12px;
+      border-radius: var(--afl-radius);
+      background: transparent;
+      border: 1px solid var(--afl-border2);
+      color: var(--afl-text3); font-size: 11px;
+      cursor: pointer; font-family: 'DM Sans', sans-serif;
+      transition: all 0.15s; white-space: nowrap;
+    }
+    #analyst-root .clear-btn:hover { border-color: var(--afl-border); color: var(--afl-text2); }
+
+    /* RIGHT SIDEBAR */
+    #analyst-root .sidebar-right {
+      width: 220px;
+      flex-shrink: 0;
+      border-left: 1px solid var(--afl-border);
+      background: var(--afl-bg2);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    #analyst-root .right-section { padding: 14px; border-bottom: 1px solid var(--afl-border); flex-shrink: 0; }
+    #analyst-root .stat-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+    #analyst-root .stat-label { font-size: 11px; color: var(--afl-text3); }
+    #analyst-root .stat-val { font-family: 'DM Mono', monospace; font-size: 12px; color: var(--afl-gold); }
+    #analyst-root .offering-chips { display: flex; flex-direction: column; gap: 4px; overflow-y: auto; flex: 1; padding: 10px 14px; }
+    #analyst-root .offering-chips::-webkit-scrollbar { width: 3px; }
+    #analyst-root .offering-chips::-webkit-scrollbar-thumb { background: var(--afl-border); border-radius: 2px; }
+    #analyst-root .offering-chip {
+      padding: 7px 10px;
+      background: var(--afl-bg3);
+      border: 1px solid var(--afl-border);
+      border-radius: var(--afl-radius);
+      cursor: pointer;
+      transition: all 0.12s;
+    }
+    #analyst-root .offering-chip:hover { border-color: var(--afl-gold); background: var(--afl-gold-glow); }
+    #analyst-root .offering-chip.focused { border-color: var(--afl-gold); background: var(--afl-gold-dim); }
+    #analyst-root .chip-name { font-size: 11px; color: var(--afl-text); font-weight: 500; line-height: 1.3; }
+    #analyst-root .chip-meta { font-size: 10px; color: var(--afl-text3); margin-top: 2px; font-family: 'DM Mono', monospace; }
+
+    /* Thinking */
+    #analyst-root .thinking {
+      display: flex; align-items: center; gap: 8px;
+      padding: 12px 16px;
+      background: var(--afl-bg2);
+      border: 1px solid var(--afl-border);
+      border-radius: var(--afl-radius);
+    }
+    #analyst-root .thinking-dots { display: flex; gap: 4px; }
+    #analyst-root .thinking-dots span {
+      width: 5px; height: 5px;
+      background: var(--afl-gold); border-radius: 50%;
+      animation: dp 1.2s infinite; opacity: 0.4;
+    }
+    #analyst-root .thinking-dots span:nth-child(2) { animation-delay: 0.2s; }
+    #analyst-root .thinking-dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes dp { 0%,100%{opacity:0.4;transform:scale(1)} 50%{opacity:1;transform:scale(1.3)} }
+    #analyst-root .thinking-text { font-size: 11px; color: var(--afl-text3); font-style: italic; }
+    #analyst-root .error-msg {
+      padding: 10px 14px;
+      background: rgba(224,92,92,0.08);
+      border: 1px solid rgba(224,92,92,0.2);
+      border-radius: var(--afl-radius);
+      font-size: 12px; color: var(--afl-bear);
+    }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--afl-border2); border-radius: 2px; }
+  </style>
+</head>
+<div id="analyst-root">
+
+<div class="top-bar">
+  <div class="analyst-wordmark">The Analyst <span>AFL INTELLIGENCE</span></div>
+  <div class="mode-pills">
+    <button class="mode-pill active-advisor" data-mode="advisor" onclick="setMode('advisor')">Advisor</button>
+    <button class="mode-pill" data-mode="bear" onclick="setMode('bear')">Bear Case</button>
+    <button class="mode-pill" data-mode="comply" onclick="setMode('comply')">Compliance</button>
+  </div>
+  <div class="top-bar-right">
+    <div class="query-counter">Today: <span id="queryCount">0</span> / 20</div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- LEFT -->
+  <div class="sidebar-left">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Client Context</div>
+      <input class="client-input" id="clientName" placeholder="Client name (optional)"/>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Focus Basket</div>
+      <div class="basket-list" id="basketList">
+        <div class="basket-empty" id="basketEmpty">No offerings focused</div>
+      </div>
+    </div>
+    <div class="sidebar-section" style="padding-bottom:6px;">
+      <div class="sidebar-label">Quick Questions</div>
+    </div>
+    <div class="presets-list" id="presetsList"></div>
+  </div>
+
+  <!-- CHAT -->
+  <div class="chat-area">
+    <div class="messages" id="messages">
+      <div class="welcome" id="welcomePanel">
+        <div class="welcome-mark">⬡</div>
+        <div class="welcome-title">Your Due Diligence Analyst</div>
+        <div class="welcome-sub" id="welcomeSub">Ask anything across all AFL offerings. Compare sponsors, stress-test structures, analyze markets, build client narratives.</div>
+        <div class="welcome-chips" id="welcomeChips"></div>
+      </div>
+    </div>
+    <div class="input-bar">
+      <div class="input-wrap">
+        <textarea class="chat-input" id="chatInput" placeholder="Ask about any offering, sponsor, structure, market, or client scenario…" rows="1"></textarea>
+      </div>
+      <button class="clear-btn" onclick="clearChat()">Clear</button>
+      <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="sidebar-right">
+    <div class="right-section">
+      <div class="sidebar-label">Platform Stats</div>
+      <div class="stat-row"><span class="stat-label">Offerings</span><span class="stat-val" id="statOfferings">—</span></div>
+      <div class="stat-row"><span class="stat-label">Sponsors</span><span class="stat-val" id="statSponsors">—</span></div>
+      <div class="stat-row"><span class="stat-label">Avg Y1 CoC</span><span class="stat-val" id="statAvgCoc">—</span></div>
+      <div class="stat-row"><span class="stat-label">Avg LTV</span><span class="stat-val" id="statAvgLtv">—</span></div>
+    </div>
+    <div class="right-section" style="padding-bottom:6px;">
+      <div class="sidebar-label">Offerings — Click to Focus</div>
+    </div>
+    <div class="offering-chips" id="offeringChips"></div>
+  </div>
+
+</div>
+
+<script src="shared.js"></script>
+<script>
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyC8RQmPNlOlZpDhIKqHL5UkpBtTSMEGQs8",
+  authDomain: "alts-fund-link.firebaseapp.com",
+  projectId: "alts-fund-link",
+  storageBucket: "alts-fund-link.firebasestorage.app",
+  messagingSenderId: "1025925507856",
+  appId: "1:1025925507856:web:0f596a9c94704146379395"
+};
+if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+
+const FUNCTION_URL = 'https://us-central1-alts-fund-link.cloudfunctions.net/analyzeOffering';
+const EXCLUDE_FIELDS = ['brochureUrl','ppmUrl','trackRecordUrl','salesTeamUrl','videoUrl',
+  'sponsorNewsUrl','aiChatUrl','quarterlyUpdateUrl','sponsorLogoUrl'];
+
+const PRESETS = {
+  'Compare & Rank': [
+    'Rank all offerings by risk-adjusted yield',
+    'Which sponsors have the strongest track records?',
+    'Compare leverage levels across all DSTs',
+  ],
+  'Due Diligence': [
+    'What are the weakest debt structures on the platform?',
+    'Which offerings have concentration or tenant risk?',
+    'Flag any offerings with below-market cap rates',
+  ],
+  'Client Scenarios': [
+    'Best options for a conservative 1031 client',
+    'Which offerings qualify for a $500K minimum investment?',
+    'Build a diversified 3-fund DST portfolio',
+  ],
+  'Market Context': [
+    'How does current rate environment affect these deals?',
+    'Which asset classes are best positioned right now?',
+    'Which offerings face refinancing risk near-term?',
+  ],
+};
+
+let currentMode = 'advisor';
+let conversationHistory = [];
+let allFunds = [];
+let focusedFunds = new Set();
+let isStreaming = false;
+let queryCount = parseInt(sessionStorage.getItem('analystQC') || '0');
+document.getElementById('queryCount').textContent = queryCount;
+
+// ── Mode ──
+function setMode(mode) {
+  currentMode = mode;
+  document.querySelectorAll('.mode-pill').forEach(p => {
+    p.className = 'mode-pill';
+    if (p.dataset.mode === mode) p.classList.add('active-' + mode);
+  });
+  const btn = document.getElementById('sendBtn');
+  btn.className = 'send-btn' + (mode === 'bear' ? ' bear-mode' : mode === 'comply' ? ' comply-mode' : '');
+  const placeholders = {
+    advisor: 'Ask about any offering, sponsor, structure, market, or client scenario…',
+    bear: 'What risks should I stress-test? What could go wrong with this deal?',
+    comply: 'Ask for compliant language, suitability framing, or disclosure guidance…',
+  };
+  document.getElementById('chatInput').placeholder = placeholders[mode];
+}
+
+// ── System prompt ──
+function buildSystemPrompt() {
+  const clientName = document.getElementById('clientName').value.trim();
+  const focused = allFunds.filter(f => focusedFunds.has(f.id));
+  const contextFunds = focused.length > 0 ? focused : allFunds;
+  const cleanFunds = contextFunds.map(f => {
+    const c = {};
+    for (const [k, v] of Object.entries(f)) {
+      if (!EXCLUDE_FIELDS.includes(k) && v !== null && v !== undefined && v !== '') c[k] = v;
+    }
+    return c;
+  });
+
+  const modeInstructions = {
+    advisor: `You are The Analyst — a senior institutional DST and alternative investment analyst on the AFL platform. You reason across all offerings simultaneously, synthesize deal structures, and help financial advisors make informed recommendations. Be direct, data-driven, and specific. Reference actual numbers. Your tone is that of a trusted senior colleague — sharp, not stiff.`,
+    bear: `You are The Analyst in BEAR CASE mode. Adversarial stress-testing only. Identify weaknesses, risks, failure scenarios, hidden dangers. Challenge assumptions aggressively. Look for concentration risk, debt maturity walls, cap rate compression, sponsor quality issues, lease rollover exposure, and macro vulnerabilities. Be direct — this advisor needs the downside before their client does.`,
+    comply: `You are The Analyst in COMPLIANCE mode. Help with Reg D / Reg A compliant language, Reg BI suitability framing, and disclosure-aware client communication. Avoid performance guarantees, unqualified forward-looking statements, and unqualified superlatives. Frame all information as educational. Remind advisors to reference offering documents. Use measured, broker-dealer-reviewable language.`,
+  };
+
+  const clientCtx = clientName ? `\n\nCURRENT CLIENT: ${clientName}. Tailor suitability commentary to this client.` : '';
+  const focusCtx = focused.length ? `\n\nFOCUSED OFFERINGS: ${focused.map(f=>f.name).join(', ')}. Prioritize these.` : '';
+
+  return `${modeInstructions[currentMode]}${clientCtx}${focusCtx}
+
+DATA NOTES:
+- Percentages are whole numbers (5.25 = 5.25%)
+- income[] array: null = not disclosed. 0 = sponsor projected zero (intentional, e.g. development fund)
+- debtTerms and leaseTerms contain rich narrative detail — read carefully
+- Today: ${new Date().toLocaleDateString()}
+
+AFL OFFERING DATABASE (${cleanFunds.length} offerings):
+${JSON.stringify(cleanFunds)}
+
+Always cite offering names and specific data points. If a field is missing, say so rather than guessing.`;
+}
+
+// ── Presets ──
+function renderPresets() {
+  const list = document.getElementById('presetsList');
+  const chips = document.getElementById('welcomeChips');
+  list.innerHTML = '';
+  chips.innerHTML = '';
+  let chipCount = 0;
+  for (const [group, qs] of Object.entries(PRESETS)) {
+    const lbl = document.createElement('div');
+    lbl.className = 'preset-group-label';
+    lbl.textContent = group;
+    list.appendChild(lbl);
+    qs.forEach(q => {
+      const btn = document.createElement('button');
+      btn.className = 'preset-btn';
+      btn.textContent = q;
+      btn.onclick = () => { document.getElementById('chatInput').value = q; sendMessage(); };
+      list.appendChild(btn);
+      if (chipCount < 6) {
+        const chip = document.createElement('div');
+        chip.className = 'welcome-chip';
+        chip.textContent = q;
+        chip.onclick = () => { document.getElementById('chatInput').value = q; sendMessage(); };
+        chips.appendChild(chip);
+        chipCount++;
+      }
+    });
+  }
+}
+
+// ── Offering chips ──
+function renderOfferingChips() {
+  const container = document.getElementById('offeringChips');
+  container.innerHTML = '';
+  allFunds.forEach(fund => {
+    const el = document.createElement('div');
+    el.className = 'offering-chip' + (focusedFunds.has(fund.id) ? ' focused' : '');
+    el.id = 'chip-' + fund.id;
+    el.innerHTML = `<div class="chip-name">${fund.name || 'Unnamed'}</div><div class="chip-meta">${fund.sponsor || ''} · ${fund.assetClass || ''}</div>`;
+    el.onclick = () => toggleFocus(fund);
+    container.appendChild(el);
+  });
+}
+
+function toggleFocus(fund) {
+  if (focusedFunds.has(fund.id)) {
+    focusedFunds.delete(fund.id);
+    removeBasketItem(fund.id);
+  } else {
+    focusedFunds.add(fund.id);
+    addBasketItem(fund);
+  }
+  const chip = document.getElementById('chip-' + fund.id);
+  if (chip) chip.classList.toggle('focused', focusedFunds.has(fund.id));
+}
+
+function addBasketItem(fund) {
+  document.getElementById('basketEmpty').style.display = 'none';
+  const el = document.createElement('div');
+  el.className = 'basket-item';
+  el.id = 'bitem-' + fund.id;
+  el.innerHTML = `<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${fund.name}</span><span class="remove-btn" onclick="removeFocus('${fund.id}')">×</span>`;
+  document.getElementById('basketList').appendChild(el);
+}
+
+function removeBasketItem(id) {
+  const el = document.getElementById('bitem-' + id);
+  if (el) el.remove();
+  if (!document.querySelectorAll('.basket-item').length) document.getElementById('basketEmpty').style.display = '';
+}
+
+function removeFocus(id) {
+  focusedFunds.delete(id);
+  removeBasketItem(id);
+  const chip = document.getElementById('chip-' + id);
+  if (chip) chip.classList.remove('focused');
+}
+
+// ── Stats ──
+function updateStats() {
+  const sponsors = new Set(allFunds.map(f=>f.sponsor).filter(Boolean));
+  const cocs = allFunds.map(f=>parseFloat(f.y1coc)).filter(v=>!isNaN(v)&&v>0);
+  const ltvs = allFunds.map(f=>parseFloat(f.ltv)).filter(v=>!isNaN(v)&&v>0);
+  document.getElementById('statOfferings').textContent = allFunds.length;
+  document.getElementById('statSponsors').textContent = sponsors.size;
+  document.getElementById('statAvgCoc').textContent = cocs.length ? (cocs.reduce((a,b)=>a+b,0)/cocs.length).toFixed(2)+'%' : '—';
+  document.getElementById('statAvgLtv').textContent = ltvs.length ? (ltvs.reduce((a,b)=>a+b,0)/ltvs.length).toFixed(1)+'%' : '—';
+}
+
+// ── Messages ──
+function hideWelcome() {
+  const w = document.getElementById('welcomePanel');
+  if (w) w.style.display = 'none';
+}
+
+function escHtml(t) {
+  return t
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g,'<em>$1</em>');
+}
+
+function appendMsg(role, text, mode) {
+  hideWelcome();
+  const msgs = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'msg';
+  const badgeHtml = mode ? `<span class="msg-badge badge-${mode}">${mode.toUpperCase()}</span>` : '';
+  const roleClass = role === 'user' ? 'role-user' : 'role-' + (mode||'advisor');
+  const roleLabel = role === 'user' ? 'You' : 'The Analyst';
+  div.innerHTML = `
+    <div class="msg-header">
+      <span class="msg-role ${roleClass}">${roleLabel}</span>
+      ${badgeHtml}
+    </div>
+    <div class="msg-body ${role==='user'?'user-body':''}">${escHtml(text)}</div>
+  `;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  return div.querySelector('.msg-body');
+}
+
+function appendThinking() {
+  hideWelcome();
+  const msgs = document.getElementById('messages');
+  const div = document.createElement('div');
+  div.className = 'msg';
+  div.id = 'thinking';
+  div.innerHTML = `
+    <div class="msg-header"><span class="msg-role role-${currentMode}">The Analyst</span></div>
+    <div class="thinking">
+      <div class="thinking-dots"><span></span><span></span><span></span></div>
+      <span class="thinking-text">Analyzing ${allFunds.length} offerings…</span>
+    </div>
+  `;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+  return div;
+}
+
+// ── Send ──
+async function sendMessage() {
+  if (isStreaming) return;
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text) return;
+  if (!allFunds.length) { appendMsg('assistant', 'Offering data still loading. Please wait a moment.', currentMode); return; }
+
+  input.value = '';
+  input.style.height = 'auto';
+  conversationHistory.push({ role: 'user', content: text });
+  appendMsg('user', text, null);
+
+  queryCount++;
+  sessionStorage.setItem('analystQC', queryCount);
+  document.getElementById('queryCount').textContent = queryCount;
+
+  const thinkingEl = appendThinking();
+  isStreaming = true;
+  document.getElementById('sendBtn').disabled = true;
+
+  try {
+    const user = firebase.auth().currentUser;
+    if (!user) throw new Error('Not authenticated — please log in');
+    const token = await user.getIdToken();
+
+    const res = await fetch(FUNCTION_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify({ systemPrompt: buildSystemPrompt(), messages: conversationHistory }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: 'HTTP ' + res.status }));
+      throw new Error(err.error || 'Request failed');
+    }
+
+    thinkingEl.remove();
+    const msgBody = appendMsg('assistant', '', currentMode);
+    msgBody.classList.add('streaming');
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let fullText = '';
+    let buf = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buf += decoder.decode(value, { stream: true });
+      const lines = buf.split('\n');
+      buf = lines.pop();
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        const raw = line.slice(6).trim();
+        if (raw === '[DONE]') continue;
+        try {
+          const parsed = JSON.parse(raw);
+          const delta = parsed.delta?.text || '';
+          if (delta) {
+            fullText += delta;
+            msgBody.innerHTML = escHtml(fullText);
+            document.getElementById('messages').scrollTop = 99999;
+          }
+        } catch(e) {}
+      }
+    }
+
+    msgBody.classList.remove('streaming');
+    conversationHistory.push({ role: 'assistant', content: fullText });
+
+  } catch(err) {
+    thinkingEl.remove();
+    const errDiv = document.createElement('div');
+    errDiv.className = 'msg';
+    errDiv.innerHTML = `<div class="error-msg">⚠ ${err.message || 'Something went wrong. Please try again.'}</div>`;
+    document.getElementById('messages').appendChild(errDiv);
+    conversationHistory.pop();
+  } finally {
+    isStreaming = false;
+    document.getElementById('sendBtn').disabled = false;
+  }
+}
+
+function clearChat() {
+  conversationHistory = [];
+  const msgs = document.getElementById('messages');
+  msgs.innerHTML = '';
+  const w = document.createElement('div');
+  w.className = 'welcome';
+  w.id = 'welcomePanel';
+  w.innerHTML = `
+    <div class="welcome-mark">⬡</div>
+    <div class="welcome-title">Your Due Diligence Analyst</div>
+    <div class="welcome-sub">Ask anything across all ${allFunds.length} AFL offerings. Compare sponsors, stress-test structures, analyze markets, build client narratives.</div>
+    <div class="welcome-chips" id="welcomeChips"></div>
+  `;
+  msgs.appendChild(w);
+  renderPresets();
+}
+
+// ── Input auto-resize + enter to send ──
+document.addEventListener('DOMContentLoaded', () => {
+  const input = document.getElementById('chatInput');
+  input.addEventListener('input', () => {
+    input.style.height = 'auto';
+    input.style.height = Math.min(input.scrollHeight, 140) + 'px';
+  });
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  });
+  renderPresets();
+});
+
+// ── Module init ──
+async function waitForFunds(maxWait = 8000) {
+  const interval = 200;
+  let elapsed = 0;
+  while (elapsed < maxWait) {
+    const funds = AFL && AFL.state && AFL.state.funds;
+    if (funds && funds.length > 0) return funds;
+    await new Promise(r => setTimeout(r, interval));
+    elapsed += interval;
+  }
+  return [];
+}
+
+window.currentModule = {
+  init: async function(params) {
+    try {
+      console.log('[Analyst] init params:', params ? Object.keys(params) : 'none');
+      console.log('[Analyst] params.funds:', params && params.funds ? params.funds.length : 'none');
+      console.log('[Analyst] AFL.state.funds:', window.AFL && AFL.state && AFL.state.funds ? AFL.state.funds.length : 'none');
+      console.log('[Analyst] full params:', JSON.stringify(params).slice(0, 500));
+      console.log('[Analyst] STATE check:', typeof STATE !== 'undefined' ? STATE.funds.length : 'no STATE');
+      // Shell passes funds directly as params.funds — use that first
+      if (params && params.funds && params.funds.length) {
+        allFunds = params.funds;
+      } else if (AFL && AFL.state && AFL.state.funds && AFL.state.funds.length) {
+        allFunds = AFL.state.funds;
+      } else {
+        allFunds = await waitForFunds();
+      }
+      console.log('[Analyst] Loaded', allFunds.length, 'offerings');
+      analystSetup();
+      updateStats();
+      renderOfferingChips();
+      const sub = document.getElementById('welcomeSub');
+      if (sub) sub.textContent = `Ask anything across all ${allFunds.length} AFL offerings. Compare sponsors, stress-test structures, analyze markets, build client narratives.`;
+    } catch(e) {
+      console.error('[Analyst] Data load error:', e);
+    }
+  }
+};
+
+// Presets render on load
+// Run setup after module HTML is injected into DOM
+function analystSetup() {
+  renderPresets();
+  const input = document.getElementById('chatInput');
+  if (!input) return;
+  input.addEventListener('input', () => {
+    input.style.height = 'auto';
+    input.style.height = Math.min(input.scrollHeight, 140) + 'px';
+  });
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  });
+}
+// Shell injects HTML then calls init() — setup runs at end of init
+// But also try immediate execution in case DOM is already ready
+if (document.getElementById('chatInput')) {
+  analystSetup();
+} else {
+  document.addEventListener('DOMContentLoaded', analystSetup);
+}
+</script>
+</div>
+</html>
